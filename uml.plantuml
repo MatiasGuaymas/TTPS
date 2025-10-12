@@ -1,0 +1,87 @@
+@startuml
+class Usuario {
+    -nombre: String
+    -apellido: String
+    -email: String
+    -contraseña: String
+    -telefono: String
+    -ciudad: String
+    -puntos: int
+    -habilitado: boolean
+}
+
+class Mascota {
+    -nombre: String
+    -tamaño: String
+    -color: String
+    -fechaPerdida: LocalDate
+    -fotos: Image[]
+    -descripcion: String
+}
+
+class Avistamiento {
+    -foto: Image
+    -fecha: LocalDate
+    -comentario: String
+}
+
+class Barrio {
+    -nombre: String
+}
+
+class Medalla {
+    -nombre: String
+    -descripcion: String
+    -icono: Image
+}
+
+class Coordenada {
+    -latitud: Real
+    -longitud: Real
+}
+
+enum Rol << enumeration >> {
+    +USUARIO
+    +ADMINISTRADOR
+}
+
+enum Estado << enumeration >> {
+    ' Estados posibles de una mascota
+    +PERDIDO_PROPIO
+    +PERDIDO_AJENO
+    +RECUPERADO
+    +ADOPTADO
+}
+
+' --- Relaciones ---
+
+' Un avistamiento tiene una coordenada y una coordenada puede tener muchos avistamientos
+Avistamiento "*" --> "1" Coordenada: -coordenada
+
+' Una mascota tiene una ultima coordenada pero una coordenada puede tener muchas mascotas
+Mascota "*" --> "1" Coordenada: -ultimaCoordenada
+
+'Un barrio tiene una coordenada y esa coordenada solo pertenece a ese barrio
+Barrio "1" --> "1" Coordenada: -coordenada
+
+' Un Usuario tiene un solo Rol. Un rol tiene muchos usuarios
+Usuario "*" --> "1" Rol : -rol
+
+' Un Usuario vive en un Barrio. Un barrio tiene muchos usuarios
+Usuario "*" --> "1" Barrio : -barrio
+
+' Un Usuario puede tener muchas Medallas, y una Medalla puede ser obtenida por muchos Usuarios
+Usuario "*" --> "*" Medalla : -medallasObtenidas
+
+' Un Usuario (creador) puede reportar muchas mascotas. Una mascota Tiene un solo reportador.
+Usuario "1" <-- "*" Mascota : -creador
+
+' Una Mascota tiene un solo estado. Un estado tiene muchas mascotas
+Mascota "*" --> "1" Estado : -estado
+
+' Una Mascota puede tener muchos avistamientos. Cada avistamiento pertenece a una sola mascota.
+Mascota "1" --> "*" Avistamiento : -avistamientos
+
+' Un Usuario (reportador) realiza muchos avistamientos. Un avistamiento es hecho por un solo usuario
+Avistamiento "*" --> "1" Usuario : -reportador
+@enduml

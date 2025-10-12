@@ -1,5 +1,6 @@
 package io.github.vicen621.volveacasa.models;
 
-public class Neighborhood {
-    private String name;
+public class Barrio {
+    private String nombre;
+    private Coordenada lugar;
 }
