@@ -6,6 +6,7 @@ class Usuario {
     -contraseña: String
     -telefono: String
     -ciudad: String
+    -barrio: String
     -puntos: int
     -habilitado: boolean
 }
@@ -13,20 +14,19 @@ class Usuario {
 class Mascota {
     -nombre: String
     -tamaño: String
+    -peso: Real
     -color: String
     -fechaPerdida: LocalDate
     -fotos: Image[]
     -descripcion: String
+    -raza: String
+    -fecha_adopcion: LocalDate
 }
 
 class Avistamiento {
     -foto: Image
     -fecha: LocalDate
     -comentario: String
-}
-
-class Barrio {
-    -nombre: String
 }
 
 class Medalla {
@@ -53,7 +53,35 @@ enum Estado << enumeration >> {
     +ADOPTADO
 }
 
+enum Tipo << enumeration >> {
+    +PERRO
+    +GATO
+    +COBAYA
+    +LORO
+    +CONEJO
+    +CABALLO
+    +TORTUGA
+}
+
+class Mensaje {
+    -contenido: String
+    -fecha: LocalDate
+}
+
 ' --- Relaciones ---
+Mensaje "*" --> "1" Usuario: -destinatario
+
+Mensaje "*" --> "1" Usuario: -emisor
+
+' Una mascota tiene un adoptante. Un usuario puede tener multiples mascotas
+' Campo opcional
+Mascota "*" --> "1" Usuario: -adoptante
+
+' La mascota tiene un tipo, un tipo puede tener muchas mascotas
+Mascota "*" --> "1" Tipo: -tipo
+
+' Esta relacion en realidad no tiene mucho sentido
+Usuario "1" --> "1" Coordenada: -coordenada
 
 ' Un avistamiento tiene una coordenada y una coordenada puede tener muchos avistamientos
 Avistamiento "*" --> "1" Coordenada: -coordenada
@@ -61,14 +89,8 @@ Avistamiento "*" --> "1" Coordenada: -coordenada
 ' Una mascota tiene una ultima coordenada pero una coordenada puede tener muchas mascotas
 Mascota "*" --> "1" Coordenada: -ultimaCoordenada
 
-'Un barrio tiene una coordenada y esa coordenada solo pertenece a ese barrio
-Barrio "1" --> "1" Coordenada: -coordenada
-
 ' Un Usuario tiene un solo Rol. Un rol tiene muchos usuarios
 Usuario "*" --> "1" Rol : -rol
-
-' Un Usuario vive en un Barrio. Un barrio tiene muchos usuarios
-Usuario "*" --> "1" Barrio : -barrio
 
 ' Un Usuario puede tener muchas Medallas, y una Medalla puede ser obtenida por muchos Usuarios
 Usuario "*" --> "*" Medalla : -medallasObtenidas

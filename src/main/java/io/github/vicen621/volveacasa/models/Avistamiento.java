@@ -7,8 +7,9 @@ import java.time.LocalDate;
 // la unica manera de obtener esta clase es a traves de la mascota
 public class Avistamiento {
     private Usuario reportador;
-    private Coordenada coordenada;
-    private Image foto;
+    private float latitud;
+    private float longitud;
+    private String fotoBase64;
     private LocalDate fecha;
     private String comentario;
 }

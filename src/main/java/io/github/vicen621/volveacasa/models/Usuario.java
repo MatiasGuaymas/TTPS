@@ -9,11 +9,13 @@ public class Usuario {
     private String contrasena;
     private String telefono;
     private String ciudad;
+    private String barrio;
     private int puntos;
     private boolean habilitado;
+    private float latitud;
+    private float longitud;
     private Rol rol;
     private List<Medalla> medallas;
-    private Barrio barrio;
 
     public enum Rol {
         USUARIO,
