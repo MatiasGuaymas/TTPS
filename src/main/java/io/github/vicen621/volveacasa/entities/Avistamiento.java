@@ -1,6 +1,5 @@
-package io.github.vicen621.volveacasa.models;
+package io.github.vicen621.volveacasa.entities;
 
-import java.awt.*;
 import java.time.LocalDate;
 
 // No necesita la mascota porque

@@ -1,4 +1,4 @@
-package io.github.vicen621.volveacasa.models;
+package io.github.vicen621.volveacasa.entities;
 
 import java.util.List;
 
