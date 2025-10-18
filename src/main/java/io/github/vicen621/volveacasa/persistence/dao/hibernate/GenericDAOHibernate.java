@@ -5,13 +5,14 @@ import io.github.vicen621.volveacasa.persistence.dao.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class GenericDAOHibernate<T> implements GenericDAO<T> {
     private Class<T> entityClass;
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GenericDAOHibernate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericDAOHibernate.class);
 
     public GenericDAOHibernate(Class<T> entityClass) {
         this.entityClass = entityClass;
