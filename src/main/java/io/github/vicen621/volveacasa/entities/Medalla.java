@@ -3,6 +3,7 @@ package io.github.vicen621.volveacasa.entities;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="medallas")
 public class Medalla {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,4 +18,38 @@ public class Medalla {
 
     //FIXME: Ver si necesita lista de usuarios
     protected Medalla() {}
+
+    public Medalla(String nombre, String descripcion, String iconoBase64) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.iconoBase64 = iconoBase64;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getIconoBase64() {
+        return iconoBase64;
+    }
+
+    public void setIconoBase64(String iconoBase64) {
+        this.iconoBase64 = iconoBase64;
+    }
 }
