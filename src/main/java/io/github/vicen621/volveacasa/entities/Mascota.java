@@ -40,21 +40,21 @@ public class Mascota {
     @Enumerated(EnumType.STRING)
     private Tipo tipo;
 
+    @ManyToOne
+    @JoinColumn(name = "creador_id")
+    private Usuario creador;
+
     @ElementCollection
     @CollectionTable(name="mascota_fotos", joinColumns=@JoinColumn(name="mascota_id")) // Crea una tabla "mascota_fotos"
     @Column(name="foto_base64", columnDefinition = "TEXT")
-    private List<String> fotosBase64;
+    private List<String> fotosBase64 = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "mascota",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Avistamiento> avistamientos;
-
-    @ManyToOne
-    @JoinColumn(name = "creador_id")
-    private Usuario creador;
+    private List<Avistamiento> avistamientos = new ArrayList<>();
 
     protected Mascota() {}
 
@@ -201,6 +201,10 @@ public class Mascota {
         this.creador = creador;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private String nombre;
         private String tamano;
@@ -215,6 +219,8 @@ public class Mascota {
         private Tipo tipo;
         private Usuario creador;
         private List<String> fotosBase64 = new ArrayList<>();
+
+        private Builder() {}
 
         public Builder nombre(String nombre) {
             this.nombre = nombre;

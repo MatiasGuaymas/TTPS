@@ -235,6 +235,10 @@ public class Usuario {
         }
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private String nombre;
         private String apellidos;
@@ -249,7 +253,7 @@ public class Usuario {
         private boolean habilitado = true;
         private Rol rol = Rol.USUARIO;
 
-        public Builder() {}
+        private Builder() {}
 
         public Builder nombre(String nombre) {
             this.nombre = nombre;

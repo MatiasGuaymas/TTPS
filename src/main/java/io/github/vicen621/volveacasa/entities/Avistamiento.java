@@ -94,6 +94,10 @@ public class Avistamiento {
         this.mascota = mascota;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private Mascota mascota;
         private Usuario reportador;
@@ -103,6 +107,8 @@ public class Avistamiento {
         private LocalDate fecha;
 
         private String comentario = "";
+
+        private Builder() {}
 
         public Builder mascota(Mascota mascota) {
             this.mascota = mascota;
