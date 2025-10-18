@@ -16,4 +16,5 @@ public class Medalla {
     private String iconoBase64;
 
     //FIXME: Ver si necesita lista de usuarios
+    protected Medalla() {}
 }

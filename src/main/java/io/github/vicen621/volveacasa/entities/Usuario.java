@@ -52,9 +52,12 @@ public class Usuario {
     private List<Medalla> medallas;
 
     @OneToMany(mappedBy = "creador")
-    List<Mascota> mascotas;
+    private List<Mascota> mascotas;
+
     @OneToMany(mappedBy = "reportador")
-    List<Avistamiento> avistamientos;
+    private List<Avistamiento> avistamientos;
+
+    protected Usuario() {}
 
     public enum Rol {
         USUARIO,

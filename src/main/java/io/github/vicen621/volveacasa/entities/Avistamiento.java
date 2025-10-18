@@ -28,4 +28,6 @@ public class Avistamiento {
     @ManyToOne
     @JoinColumn(name = "mascota_id")
     private Mascota mascota;
+
+    protected Avistamiento() {}
 }

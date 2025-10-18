@@ -45,6 +45,8 @@ public class Mascota {
     @JoinColumn(name = "creador_id")
     private Usuario creador;
 
+    protected Mascota() {}
+
     public enum Estado {
         PERDIDO_PROPIO,
         PERDIDO_AJENO,

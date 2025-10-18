@@ -19,4 +19,6 @@ public class Mensaje {
     @ManyToOne
     @JoinColumn(name="emisor_id")
     private Usuario emisor;
+
+    protected Mensaje() {}
 }
