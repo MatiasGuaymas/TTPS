@@ -4,6 +4,7 @@ import io.github.vicen621.volveacasa.entities.Usuario;
 import io.github.vicen621.volveacasa.persistence.EntityManagerSingleton;
 import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 public class UsuarioDAOHibernate extends GenericDAOHibernate<Usuario> implements UsuarioDAO {
 
@@ -14,7 +15,10 @@ public class UsuarioDAOHibernate extends GenericDAOHibernate<Usuario> implements
     @Override
     public Usuario getByEmail(String mail) {
         try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            return em.find(Usuario.class, mail);
+            String jpql = "SELECT e FROM " + getEntityClass().getSimpleName() + " e WHERE e.email = :email";
+            TypedQuery<Usuario> query = em.createQuery(jpql, getEntityClass());
+            query.setParameter("email", mail);
+            return query.getSingleResult();
         }
     }
 
