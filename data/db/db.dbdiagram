@@ -1,0 +1,92 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table usuarios {
+  id integer [pk]
+  nombre varchar [not null]
+  apellido varchar [not null]
+  email varchar [unique, not null]
+  contraseña varchar [not null]
+  telefono varchar [not null]
+  ciudad varchar [not null]
+  barrio varchar [not null]
+  puntos int [not null]
+  habilitado boolean [not null]
+  latitud real [not null]
+  longitud real [not null]
+  rol Rol [not null]
+}
+
+enum Rol {
+  usuario
+  admin
+}
+
+Table usuarios_medallas {
+  id_usuario integer [not null, ref: > usuarios.id]
+  id_medalla integer [not null, ref: > medallas.id]
+}
+
+Table medallas {
+  id integer [pk]
+  nombre varchar [unique, not null]
+  descripcion varchar [not null]
+}
+
+Table mascotas {
+  id integer [pk]
+  nombre varchar [not null]
+  tamaño varchar [not null]
+  peso real [not null]
+  color varchar [not null]
+  fechaPerdida date [not null]
+  descripcion varchar [not null]
+  raza varchar [not null]
+  estado Estado [not null]
+  tipo Tipo [not null]
+  creador_id int [not null, ref: > usuarios.id]
+  fechaAdopcion date [null]
+  adoptante_id int [not null, ref: > usuarios.id]
+}
+
+enum Tipo {
+  perro
+  gato
+  cobaya
+  loro
+  conejo
+  caballo
+  tortuga
+}
+
+enum Estado {
+  perdido_ajeno
+  perdido_propio
+  recuperado
+  adoptado
+}
+
+Table fotos {
+  id integer [pk]
+  base64 varchar [not null]
+  mascota_id integer [not null, ref: > mascotas.id]
+}
+
+Table mensajes {
+  id integer [pk]
+  destinatario_id integer [not null, ref: > usuarios.id]
+  emisor_id integer [not null, ref: > usuarios.id]
+  contenido varchar [not null]
+  fecha timestamp [not null]
+}
+
+Table avistamientos {
+  id integer [pk]
+  mascota_id integer [not null, ref: > mascotas.id]
+  reportador_id integer [not null, ref: > usuarios.id]
+  fotoBase64 varchar [not null]
+  fecha date [not null]
+  comentario varchar [not null]
+  latitud real [not null]
+  longitud real [not null]
+}

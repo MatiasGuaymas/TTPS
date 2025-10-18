@@ -20,7 +20,6 @@ class Mascota {
     -fotos: Image[]
     -descripcion: String
     -raza: String
-    -fecha_adopcion: LocalDate
 }
 
 class Avistamiento {
@@ -72,10 +71,6 @@ class Mensaje {
 Mensaje "*" --> "1" Usuario: -destinatario
 
 Mensaje "*" --> "1" Usuario: -emisor
-
-' Una mascota tiene un adoptante. Un usuario puede tener multiples mascotas
-' Campo opcional
-Mascota "*" --> "1" Usuario: -adoptante
 
 ' La mascota tiene un tipo, un tipo puede tener muchas mascotas
 Mascota "*" --> "1" Tipo: -tipo
