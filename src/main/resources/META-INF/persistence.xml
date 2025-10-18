@@ -13,10 +13,9 @@
 
         <properties>
             <!-- Database connection settings -->
-            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://db:3306/grupo01?useSSL=false&amp;serverTimezone=GMT-3&amp;allowPublicKeyRetrieval=true" />
-            <property name="jakarta.persistence.jdbc.user" value="user"/>
-            <property name="jakarta.persistence.jdbc.password" value="password"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5433/grupo01?useSSL=false&amp;serverTimezone=GMT-3&amp;allowPublicKeyRetrieval=true" />
+            <property name="jakarta.persistence.jdbc.user" value="admin"/>
+            <property name="jakarta.persistence.jdbc.password" value="admin"/>
 
             <!-- Automatically export the schema -->
             <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
@@ -26,7 +25,7 @@
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.highlight_sql" value="true"/>
 
-            <property name="hibernate.hbm2ddl.auto" value="update"/> <!-- (create, create-drop, update) -->
+            <property name="hibernate.hbm2ddl.auto" value="create"/> <!-- (create, create-drop, update) -->
         </properties>
 
     </persistence-unit>
