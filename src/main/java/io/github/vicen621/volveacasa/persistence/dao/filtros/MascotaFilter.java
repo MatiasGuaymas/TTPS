@@ -2,7 +2,12 @@ package io.github.vicen621.volveacasa.persistence.dao.filtros;
 
 import io.github.vicen621.volveacasa.entities.Mascota;
 
-public class MascotaFilter {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class MascotaFilter implements Filter {
     private Mascota.Tipo tipo;
     private Mascota.Estado estado;
     private String raza;
@@ -29,6 +34,34 @@ public class MascotaFilter {
 
     public String getColor() {
         return color;
+    }
+
+    @Override
+    public QueryComponents buildQueryComponents() {
+        List<String> predicates = new ArrayList<>();
+        Map<String, Object> parameters = new HashMap<>();
+
+        if (this.tipo != null) {
+            predicates.add("e.tipo = :tipo");
+            parameters.put("tipo", this.tipo);
+        }
+
+        if (this.estado != null) {
+            predicates.add("e.estado = :estado");
+            parameters.put("estado", this.estado);
+        }
+
+        if (this.raza != null) {
+            predicates.add("e.raza = :raza");
+            parameters.put("raza", this.raza);
+        }
+
+        if (this.color != null) {
+            predicates.add("e.color = :color");
+            parameters.put("color", this.color);
+        }
+
+        return new QueryComponents(predicates, parameters);
     }
 
     public static Builder builder() {

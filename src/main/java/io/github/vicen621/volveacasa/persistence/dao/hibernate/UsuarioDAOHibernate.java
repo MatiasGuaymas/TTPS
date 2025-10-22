@@ -3,6 +3,7 @@ package io.github.vicen621.volveacasa.persistence.dao.hibernate;
 import io.github.vicen621.volveacasa.entities.Usuario;
 import io.github.vicen621.volveacasa.persistence.EntityManagerSingleton;
 import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
+import io.github.vicen621.volveacasa.persistence.dao.filtros.QueryComponents;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.UsuarioFilter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -62,33 +63,17 @@ public class UsuarioDAOHibernate extends GenericDAOHibernate<Usuario> implements
     @Override
     public List<Usuario> getAllWithFilter(UsuarioFilter filter) {
         try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            StringBuilder jpql = new StringBuilder("SELECT u FROM " + getEntityClass().getSimpleName() + " u");
-            List<String> predicates = new ArrayList<>();
-            Map<String, Object> parameters = new HashMap<>();
+            StringBuilder jpql = new StringBuilder("SELECT e FROM " + getEntityClass().getSimpleName() + " e");
+            QueryComponents components = filter.buildQueryComponents();
 
-            if (filter.getBarrio() != null) {
-                predicates.add("u.barrio = :barrio");
-                parameters.put("barrio", filter.getBarrio());
-            }
-
-            if (filter.getCiudad() != null) {
-                predicates.add("u.ciudad = :ciudad");
-                parameters.put("ciudad", filter.getCiudad());
-            }
-
-            if (filter.getRol() != null) {
-                predicates.add("u.rol = :rol");
-                parameters.put("rol", filter.getRol());
-            }
-
-            if (!predicates.isEmpty()) {
-                jpql.append(" WHERE ").append(String.join(" AND ", predicates));
+            if (!components.predicates().isEmpty()) {
+                jpql.append(" WHERE ").append(String.join(" AND ", components.predicates()));
             }
 
             TypedQuery<Usuario> query = em.createQuery(jpql.toString(), Usuario.class);
 
             // Seteo todos los parametros
-            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            for (Map.Entry<String, Object> entry : components.parameters().entrySet()) {
                 query.setParameter(entry.getKey(), entry.getValue());
             }
 
