@@ -24,33 +24,27 @@ public class GenericDAOHibernate<T> implements GenericDAO<T> {
         try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
             transaction = em.getTransaction();
             transaction.begin();
+
+            // Asegurarse de que la entidad está gestionada antes de eliminarla
+            if (!em.contains(entity)) {
+                entity = em.merge(entity);
+            }
+
             em.remove(entity);
             transaction.commit();
         } catch (RuntimeException e) {
+            LOGGER.error("Error al ejecutar el borrado de {}", getEntityClass().getName(), e);
+
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
-
-            LOGGER.error("Error al ejecutar el borrado de {}", getEntityClass().getName(), e);
         }
     }
 
     @Override
     public void delete(Long id) {
-        EntityTransaction transaction = null;
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            transaction = em.getTransaction();
-            transaction.begin();
-            T entity = em.find(entityClass, id);
-            em.remove(entity);
-            transaction.commit();
-        } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-
-            LOGGER.error("Error al ejecutar el borrado de {} con id: {}", getEntityClass().getName(), id, e);
-        }
+        T entity = this.get(id);
+        this.delete(entity);
     }
 
     @Override
@@ -63,12 +57,11 @@ public class GenericDAOHibernate<T> implements GenericDAO<T> {
     @Override
     public List<T> getAll(String orderBy) {
         try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            TypedQuery<T> query = em.createNamedQuery(
-                    "SELECT e FROM " + getEntityClass().getSimpleName() +
-                            " e order by e." + orderBy,
-                    entityClass
-            );
-            return query.getResultList();
+            String hql = "SELECT e FROM " + getEntityClass().getSimpleName() + " e";
+            if (orderBy != null && !orderBy.trim().isEmpty()) {
+                hql += " ORDER BY e." + orderBy;
+            }
+            return em.createQuery(hql, entityClass).getResultList();
         }
     }
 
