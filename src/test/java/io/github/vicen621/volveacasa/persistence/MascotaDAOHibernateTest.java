@@ -1,7 +1,7 @@
 package io.github.vicen621.volveacasa.persistence;
 
-import io.github.vicen621.volveacasa.entities.Mascota;
-import io.github.vicen621.volveacasa.entities.Usuario;
+import io.github.vicen621.volveacasa.persistence.entities.Mascota;
+import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 import io.github.vicen621.volveacasa.persistence.dao.hibernate.MascotaDAOHibernate;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.MascotaFilter;
 import io.github.vicen621.volveacasa.persistence.dao.hibernate.UsuarioDAOHibernate;
@@ -59,7 +59,7 @@ public class MascotaDAOHibernateTest extends BaseDAOTest {
 
         mascotaDAO.get(perro.getId());
 
-		List<Mascota> resultados = mascotaDAO.getAllWithFilter(MascotaFilter.builder().conTipo(Mascota.Tipo.PERRO).build());
+		List<Mascota> resultados = mascotaDAO.getFiltered(MascotaFilter.builder().conTipo(Mascota.Tipo.PERRO).build());
         System.out.println(resultados);
 		Assertions.assertNotNull(resultados);
 		Assertions.assertEquals(1, resultados.size());
@@ -73,7 +73,7 @@ public class MascotaDAOHibernateTest extends BaseDAOTest {
 		mascotaDAO.persist(m1);
 		mascotaDAO.persist(m2);
 
-		List<Mascota> resultados = mascotaDAO.getAllWithFilter(MascotaFilter.builder().conEstado(Mascota.Estado.ADOPTADO).build());
+		List<Mascota> resultados = mascotaDAO.getFiltered(MascotaFilter.builder().conEstado(Mascota.Estado.ADOPTADO).build());
 		Assertions.assertNotNull(resultados);
 		Assertions.assertEquals(1, resultados.size());
 		Assertions.assertEquals(Mascota.Estado.ADOPTADO, resultados.get(0).getEstado());
@@ -86,7 +86,7 @@ public class MascotaDAOHibernateTest extends BaseDAOTest {
 		mascotaDAO.persist(m1);
 		mascotaDAO.persist(m2);
 
-		List<Mascota> resultados = mascotaDAO.getAllWithFilter(MascotaFilter.builder().conRaza("Caniche").build());
+		List<Mascota> resultados = mascotaDAO.getFiltered(MascotaFilter.builder().conRaza("Caniche").build());
 		Assertions.assertNotNull(resultados);
 		Assertions.assertEquals(1, resultados.size());
 		Assertions.assertEquals("Caniche", resultados.get(0).getRaza());
@@ -99,7 +99,7 @@ public class MascotaDAOHibernateTest extends BaseDAOTest {
 		mascotaDAO.persist(m1);
 		mascotaDAO.persist(m2);
 
-		List<Mascota> resultados = mascotaDAO.getAllWithFilter(MascotaFilter.builder().conColor("Blanco").build());
+		List<Mascota> resultados = mascotaDAO.getFiltered(MascotaFilter.builder().conColor("Blanco").build());
 		Assertions.assertNotNull(resultados);
 		Assertions.assertEquals(1, resultados.size());
 		Assertions.assertEquals("Blanco", resultados.get(0).getColor());
@@ -110,7 +110,7 @@ public class MascotaDAOHibernateTest extends BaseDAOTest {
 		Mascota perro = buildTestMascota("Perro1", Mascota.Tipo.PERRO, Mascota.Estado.PERDIDO_PROPIO, "Mestizo", "Negro");
 		mascotaDAO.persist(perro);
 
-		List<Mascota> resultados = mascotaDAO.getAllWithFilter(MascotaFilter.builder().conTipo(Mascota.Tipo.GATO).build());
+		List<Mascota> resultados = mascotaDAO.getFiltered(MascotaFilter.builder().conTipo(Mascota.Tipo.GATO).build());
 		Assertions.assertNotNull(resultados);
 		Assertions.assertEquals(0, resultados.size());
 	}

@@ -1,6 +1,6 @@
-package io.github.vicen621.volveacasa.entities;
+package io.github.vicen621.volveacasa.persistence.entities;
 
-import io.github.vicen621.volveacasa.entities.embeddable.Coordenadas;
+import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 
@@ -203,36 +203,40 @@ public class Usuario {
         return Collections.unmodifiableList(this.mascotasCreadas);
     }
 
-    public void addMascotaCreada(Mascota mascota) {
-        if (mascota != null && !this.mascotasCreadas.contains(mascota)) {
+    protected void addMascotaCreada(Mascota mascota) {
+        if (mascota != null && !this.mascotasCreadas.contains(mascota))
             this.mascotasCreadas.add(mascota);
-            mascota.setCreador(this);
-        }
     }
 
     public void removeMascotaCreada(Mascota mascota) {
-        if (mascota != null) {
+        if (mascota != null)
             this.mascotasCreadas.remove(mascota);
-            mascota.setCreador(null);
-        }
     }
 
     public List<Avistamiento> getAvistamientos() {
         return Collections.unmodifiableList(this.avistamientos);
     }
 
-    public void addAvistamiento(Avistamiento avistamiento) {
-        if (avistamiento != null && !this.avistamientos.contains(avistamiento)) {
+    protected void addAvistamiento(Avistamiento avistamiento) {
+        if (avistamiento != null && !this.avistamientos.contains(avistamiento))
             this.avistamientos.add(avistamiento);
-            avistamiento.setReportador(this);
-        }
     }
 
     public void removeAvistamiento(Avistamiento avistamiento) {
         if (avistamiento != null) {
             this.avistamientos.remove(avistamiento);
-            avistamiento.setReportador(null);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Usuario usuario)) return false;
+        return Objects.equals(getId(), usuario.getId()) && Objects.equals(getEmail(), usuario.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getEmail());
     }
 
     public static Builder builder() {

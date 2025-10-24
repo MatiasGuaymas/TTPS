@@ -1,6 +1,6 @@
 package io.github.vicen621.volveacasa.persistence;
 
-import io.github.vicen621.volveacasa.entities.Usuario;
+import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.UsuarioFilter;
 import io.github.vicen621.volveacasa.persistence.factory.DAOFactory;
@@ -106,7 +106,7 @@ class UsuarioDAOHibernateTest extends BaseDAOTest {
         usuarioDAO.persist(u2_Tolosa);
         usuarioDAO.persist(u3_Centro);
 
-        List<Usuario> resultados = usuarioDAO.getAllWithFilter(UsuarioFilter.builder().conBarrio("Centro").build());
+        List<Usuario> resultados = usuarioDAO.getFiltered(UsuarioFilter.builder().conBarrio("Centro").build());
 
         assertNotNull(resultados, "La lista no debe ser nula");
         assertEquals(2, resultados.size(), "Debería encontrar 2 usuarios en 'Centro'");
@@ -131,7 +131,7 @@ class UsuarioDAOHibernateTest extends BaseDAOTest {
         usuarioDAO.persist(u2_Berisso);
         usuarioDAO.persist(u3_LaPlata);
 
-        List<Usuario> resultados = usuarioDAO.getAllWithFilter(UsuarioFilter.builder().conCiudad("La Plata").build());
+        List<Usuario> resultados = usuarioDAO.getFiltered(UsuarioFilter.builder().conCiudad("La Plata").build());
 
         assertNotNull(resultados);
         assertEquals(2, resultados.size(), "Debería encontrar 2 usuarios en 'La Plata'");
@@ -156,8 +156,8 @@ class UsuarioDAOHibernateTest extends BaseDAOTest {
         usuarioDAO.persist(u2_Admin);
         usuarioDAO.persist(u3_User);
 
-        List<Usuario> usuarios = usuarioDAO.getAllWithFilter(UsuarioFilter.builder().conRol(Usuario.Rol.USUARIO).build());
-        List<Usuario> admins = usuarioDAO.getAllWithFilter(UsuarioFilter.builder().conRol(Usuario.Rol.ADMIN).build());
+        List<Usuario> usuarios = usuarioDAO.getFiltered(UsuarioFilter.builder().conRol(Usuario.Rol.USUARIO).build());
+        List<Usuario> admins = usuarioDAO.getFiltered(UsuarioFilter.builder().conRol(Usuario.Rol.ADMIN).build());
 
         assertNotNull(usuarios);
         assertEquals(2, usuarios.size(), "Debería encontrar 2 USUARIOs");
@@ -173,7 +173,7 @@ class UsuarioDAOHibernateTest extends BaseDAOTest {
         Usuario u1_Centro = buildTestUser("u1@test.com", "La Plata", "Centro", Usuario.Rol.USUARIO);
         usuarioDAO.persist(u1_Centro);
 
-        List<Usuario> resultados = usuarioDAO.getAllWithFilter(UsuarioFilter.builder().conBarrio("BarrioInexistente").build());
+        List<Usuario> resultados = usuarioDAO.getFiltered(UsuarioFilter.builder().conBarrio("BarrioInexistente").build());
 
         assertNotNull(resultados, "La lista no debe ser nula, debe estar vacía");
         assertEquals(0, resultados.size(), "No debería encontrar usuarios en un barrio inexistente");

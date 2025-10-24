@@ -1,6 +1,6 @@
-package io.github.vicen621.volveacasa.entities;
+package io.github.vicen621.volveacasa.persistence.entities;
 
-import io.github.vicen621.volveacasa.entities.embeddable.Coordenadas;
+import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -179,17 +179,14 @@ public class Mascota {
         return Collections.unmodifiableList(this.avistamientos);
     }
 
-    public void addAvistamiento(Avistamiento avistamiento) {
-        if (avistamiento != null && !this.avistamientos.contains(avistamiento)) {
+    protected void addAvistamiento(Avistamiento avistamiento) {
+        if (avistamiento != null && !this.avistamientos.contains(avistamiento))
             this.avistamientos.add(avistamiento);
-            avistamiento.setMascota(this);
-        }
     }
 
     public void removeAvistamiento(Avistamiento avistamiento) {
         if (avistamiento != null) {
             this.avistamientos.remove(avistamiento);
-            avistamiento.setMascota(null);
         }
     }
 
@@ -197,8 +194,15 @@ public class Mascota {
         return creador;
     }
 
-    public void setCreador(Usuario creador) {
-        this.creador = creador;
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Mascota mascota)) return false;
+        return Objects.equals(getId(), mascota.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 
     public static Builder builder() {

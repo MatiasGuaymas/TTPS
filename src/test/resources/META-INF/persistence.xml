@@ -5,11 +5,11 @@
              version="3.0">
 
     <persistence-unit name="io.github.vicen621.volveacasa.jpa">
-        <class>io.github.vicen621.volveacasa.entities.Avistamiento</class>
-        <class>io.github.vicen621.volveacasa.entities.Mascota</class>
-        <class>io.github.vicen621.volveacasa.entities.Medalla</class>
-        <class>io.github.vicen621.volveacasa.entities.Mensaje</class>
-        <class>io.github.vicen621.volveacasa.entities.Usuario</class>
+        <class>io.github.vicen621.volveacasa.persistence.entities.Avistamiento</class>
+        <class>io.github.vicen621.volveacasa.persistence.entities.Mascota</class>
+        <class>io.github.vicen621.volveacasa.persistence.entities.Medalla</class>
+        <class>io.github.vicen621.volveacasa.persistence.entities.Mensaje</class>
+        <class>io.github.vicen621.volveacasa.persistence.entities.Usuario</class>
 
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"/>

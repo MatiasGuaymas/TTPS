@@ -1,5 +1,7 @@
 package io.github.vicen621.volveacasa.persistence.dao;
 
+import io.github.vicen621.volveacasa.persistence.dao.filtros.Filter;
+
 import java.util.List;
 
 public interface GenericDAO<T> {
@@ -10,6 +12,8 @@ public interface GenericDAO<T> {
     T get(Long id);
 
     List<T> getAll(String orderBy);
+
+    List<T> getFiltered(Filter filter);
 
     T persist(T entity);
 

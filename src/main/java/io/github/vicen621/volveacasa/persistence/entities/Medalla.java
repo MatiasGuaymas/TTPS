@@ -1,6 +1,8 @@
-package io.github.vicen621.volveacasa.entities;
+package io.github.vicen621.volveacasa.persistence.entities;
 
 import jakarta.persistence.*;
+
+import java.util.Objects;
 
 @Entity
 @Table(name="medallas")
@@ -51,5 +53,16 @@ public class Medalla {
 
     public void setIconoBase64(String iconoBase64) {
         this.iconoBase64 = iconoBase64;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Medalla medalla)) return false;
+        return Objects.equals(getId(), medalla.getId()) && Objects.equals(getNombre(), medalla.getNombre());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getNombre());
     }
 }

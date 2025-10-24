@@ -1,6 +1,6 @@
 package io.github.vicen621.volveacasa.persistence.dao.hibernate;
 
-import io.github.vicen621.volveacasa.entities.Medalla;
+import io.github.vicen621.volveacasa.persistence.entities.Medalla;
 import io.github.vicen621.volveacasa.persistence.EntityManagerSingleton;
 import io.github.vicen621.volveacasa.persistence.dao.MedallaDAO;
 import jakarta.persistence.EntityManager;

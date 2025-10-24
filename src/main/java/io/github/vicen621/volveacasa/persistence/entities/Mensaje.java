@@ -1,8 +1,9 @@
-package io.github.vicen621.volveacasa.entities;
+package io.github.vicen621.volveacasa.persistence.entities;
 
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name="mensajes")
@@ -64,5 +65,16 @@ public class Mensaje {
 
     public void setEmisor(Usuario emisor) {
         this.emisor = emisor;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Mensaje mensaje)) return false;
+        return Objects.equals(getId(), mensaje.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 }

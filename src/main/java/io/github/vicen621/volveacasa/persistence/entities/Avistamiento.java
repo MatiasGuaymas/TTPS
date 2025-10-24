@@ -1,6 +1,6 @@
-package io.github.vicen621.volveacasa.entities;
+package io.github.vicen621.volveacasa.persistence.entities;
 
-import io.github.vicen621.volveacasa.entities.embeddable.Coordenadas;
+import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -14,10 +14,6 @@ public class Avistamiento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "reportador_id")
-    private Usuario reportador;
-
     @Embedded
     private Coordenadas coordenadas;
 
@@ -28,6 +24,10 @@ public class Avistamiento {
     private String comentario;
 
     @ManyToOne
+    @JoinColumn(name = "reportador_id")
+    private Usuario reportador;
+
+    @ManyToOne
     @JoinColumn(name = "mascota_id")
     private Mascota mascota;
 
@@ -35,11 +35,11 @@ public class Avistamiento {
 
     private Avistamiento(Builder builder) {
         this.mascota = builder.mascota;
-        this.reportador = builder.reportador;
         this.coordenadas = new Coordenadas(builder.latitud, builder.longitud);
         this.fotoBase64 = builder.fotoBase64;
         this.comentario = builder.comentario;
         this.fecha = builder.fecha;
+        this.reportador = builder.reportador;
     }
 
     public Long getId() {
@@ -48,10 +48,6 @@ public class Avistamiento {
 
     public Usuario getReportador() {
         return reportador;
-    }
-
-    public void setReportador(Usuario reportador) {
-        this.reportador = reportador;
     }
 
     public Coordenadas getCoordenadas() {
@@ -90,8 +86,15 @@ public class Avistamiento {
         return mascota;
     }
 
-    public void setMascota(Mascota mascota) {
-        this.mascota = mascota;
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Avistamiento that)) return false;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 
     public static Builder builder() {
@@ -153,7 +156,10 @@ public class Avistamiento {
             Objects.requireNonNull(fotoBase64, "La foto es obligatoria");
             Objects.requireNonNull(fecha,      "La fecha es obligatoria");
 
-            return new Avistamiento(this);
+            Avistamiento avistamiento = new Avistamiento(this);
+            reportador.addAvistamiento(avistamiento);
+            mascota.addAvistamiento(avistamiento);
+            return avistamiento;
         }
     }
 }

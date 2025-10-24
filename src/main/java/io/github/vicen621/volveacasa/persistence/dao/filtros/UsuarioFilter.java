@@ -1,6 +1,6 @@
 package io.github.vicen621.volveacasa.persistence.dao.filtros;
 
-import io.github.vicen621.volveacasa.entities.Usuario;
+import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 
 import java.util.ArrayList;
 import java.util.HashMap;

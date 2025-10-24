@@ -1,6 +1,6 @@
 package io.github.vicen621.volveacasa.persistence.dao;
 
-import io.github.vicen621.volveacasa.entities.Avistamiento;
+import io.github.vicen621.volveacasa.persistence.entities.Avistamiento;
 
 public interface AvistamientoDAO extends GenericDAO<Avistamiento> {
     // Agregar avistamiento

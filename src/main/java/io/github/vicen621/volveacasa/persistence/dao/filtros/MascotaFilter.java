@@ -1,6 +1,6 @@
 package io.github.vicen621.volveacasa.persistence.dao.filtros;
 
-import io.github.vicen621.volveacasa.entities.Mascota;
+import io.github.vicen621.volveacasa.persistence.entities.Mascota;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package io.github.vicen621.volveacasa.entities.embeddable;
+package io.github.vicen621.volveacasa.persistence.entities.embeddable;
 
 import jakarta.persistence.Embeddable;
 

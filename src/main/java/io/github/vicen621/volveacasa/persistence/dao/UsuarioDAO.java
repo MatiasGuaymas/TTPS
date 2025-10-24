@@ -1,9 +1,6 @@
 package io.github.vicen621.volveacasa.persistence.dao;
 
-import io.github.vicen621.volveacasa.entities.Usuario;
-import io.github.vicen621.volveacasa.persistence.dao.filtros.UsuarioFilter;
-
-import java.util.List;
+import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 
 public interface UsuarioDAO extends GenericDAO<Usuario> {
     Usuario getByEmail(String mail);
@@ -11,5 +8,4 @@ public interface UsuarioDAO extends GenericDAO<Usuario> {
     void disableUser(Long id);
     void enableUser(Usuario usuario);
     void enableUser(Long id);
-    List<Usuario> getAllWithFilter(UsuarioFilter filtro);
 }
