@@ -1,11 +1,13 @@
 package io.github.vicen621.volveacasa.persistence.entities;
 
 import jakarta.persistence.*;
+import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Entity
 @Table(name="medallas")
+@Component
 public class Medalla {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +20,6 @@ public class Medalla {
 
     private String iconoBase64;
 
-    //FIXME: Ver si necesita lista de usuarios
     protected Medalla() {}
 
     public Medalla(String nombre, String descripcion, String iconoBase64) {

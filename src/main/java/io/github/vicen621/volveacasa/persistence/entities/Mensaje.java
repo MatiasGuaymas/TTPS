@@ -1,12 +1,14 @@
 package io.github.vicen621.volveacasa.persistence.entities;
 
 import jakarta.persistence.*;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
 @Table(name="mensajes")
+@Component
 public class Mensaje {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

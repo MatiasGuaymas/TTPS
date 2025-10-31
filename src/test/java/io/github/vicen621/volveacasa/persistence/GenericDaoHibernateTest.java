@@ -1,16 +1,19 @@
 package io.github.vicen621.volveacasa.persistence;
 
-import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 import io.github.vicen621.volveacasa.persistence.dao.GenericDAO;
-import io.github.vicen621.volveacasa.persistence.factory.DAOFactory;
+import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
+import io.github.vicen621.volveacasa.persistence.entities.Usuario;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GenericDaoHibernateTest extends BaseDAOTest {
 
-    GenericDAO<Usuario> usuarioDAO;
+    static GenericDAO<Usuario> usuarioDAO;
 
     private Usuario buildTestUser(String email, boolean habilitado) {
         Usuario.Builder builder = Usuario.builder()
@@ -27,10 +30,15 @@ class GenericDaoHibernateTest extends BaseDAOTest {
         return builder.build();
     }
 
+    @BeforeAll
+    static void init() {
+        createContext();
+        usuarioDAO = ctx.getBean(UsuarioDAO.class);
+    }
+
     @BeforeEach
     void setUp() {
         cleanDatabase();
-        usuarioDAO = DAOFactory.getUsuarioDAO();
     }
 
     @Test
@@ -80,19 +88,6 @@ class GenericDaoHibernateTest extends BaseDAOTest {
         assertNotNull(actualizado);
         assertEquals("NombreCambiado", actualizado.getNombre());
         assertEquals("987654", actualizado.getTelefono());
-    }
-
-    @Test
-    void testDeleteByEntity() {
-        Usuario usuario = buildTestUser("delete@test.com", true);
-        usuarioDAO.persist(usuario);
-        Long id = usuario.getId();
-
-        assertNotNull(usuarioDAO.get(id), "El usuario no se guardó correctamente");
-
-        usuarioDAO.delete(usuario);
-
-        assertNull(usuarioDAO.get(id), "El usuario no fue borrado de la BD");
     }
 
     @Test

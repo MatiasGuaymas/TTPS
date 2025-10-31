@@ -1,21 +1,24 @@
 package io.github.vicen621.volveacasa.persistence.dao.hibernate;
 
 import io.github.vicen621.volveacasa.persistence.entities.Usuario;
-import io.github.vicen621.volveacasa.persistence.EntityManagerSingleton;
 import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UsuarioDAOHibernate extends GenericDAOHibernate<Usuario> implements UsuarioDAO {
 
-    public UsuarioDAOHibernate() {
-        super(Usuario.class);
+    @Autowired
+    public UsuarioDAOHibernate(EntityManager entityManager) {
+        super(Usuario.class, entityManager);
     }
 
     @Override
     public Usuario getByEmail(String mail) {
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
+        try (EntityManager em = this.getEntityManager();) {
             String jpql = "SELECT e FROM " + getEntityClass().getSimpleName() + " e WHERE e.email = :email";
             TypedQuery<Usuario> query = em.createQuery(jpql, getEntityClass());
             query.setParameter("email", mail);

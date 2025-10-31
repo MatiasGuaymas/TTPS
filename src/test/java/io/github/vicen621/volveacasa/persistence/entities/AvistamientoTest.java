@@ -1,6 +1,5 @@
 package io.github.vicen621.volveacasa.persistence.entities;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

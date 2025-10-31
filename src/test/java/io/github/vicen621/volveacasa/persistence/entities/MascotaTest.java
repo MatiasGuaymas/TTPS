@@ -1,19 +1,10 @@
 package io.github.vicen621.volveacasa.persistence.entities;
 
-import io.github.vicen621.volveacasa.persistence.EntityManagerSingleton;
-import io.github.vicen621.volveacasa.persistence.dao.AvistamientoDAO;
-import io.github.vicen621.volveacasa.persistence.dao.MascotaDAO;
-import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
-import io.github.vicen621.volveacasa.persistence.factory.DAOFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

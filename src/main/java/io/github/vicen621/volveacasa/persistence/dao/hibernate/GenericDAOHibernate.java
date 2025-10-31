@@ -1,65 +1,53 @@
 package io.github.vicen621.volveacasa.persistence.dao.hibernate;
 
-import io.github.vicen621.volveacasa.persistence.EntityManagerSingleton;
 import io.github.vicen621.volveacasa.persistence.dao.GenericDAO;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.Filter;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.QueryComponents;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 public class GenericDAOHibernate<T> implements GenericDAO<T> {
     private Class<T> entityClass;
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericDAOHibernate.class);
 
-    public GenericDAOHibernate(Class<T> entityClass) {
+    // @PersistenceContext
+    private EntityManager entityManager;
+
+    public GenericDAOHibernate(Class<T> entityClass, EntityManager entityManager) {
         this.entityClass = entityClass;
+        this.entityManager = entityManager;
     }
 
-    @Override
-    public void delete(T entity) {
-        EntityTransaction transaction = null;
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            transaction = em.getTransaction();
-            transaction.begin();
+    // public void setEntityManager(EntityManager em){
+    //     this.entityManager = em;
+    // }
 
-            // Asegurarse de que la entidad está gestionada antes de eliminarla
-            if (!em.contains(entity)) {
-                entity = em.merge(entity);
-            }
-
-            em.remove(entity);
-            transaction.commit();
-        } catch (RuntimeException e) {
-            LOGGER.error("Error al ejecutar el borrado de {}", getEntityClass().getName(), e);
-
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-        }
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 
     @Override
     public void delete(Long id) {
         T entity = this.get(id);
-        this.delete(entity);
+        this.entityManager.remove(entity);
     }
 
     @Override
     public T get(Long id) {
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            return em.find(entityClass, id);
-        }
+        return this.getEntityManager().find(entityClass, id);
     }
 
     @Override
     public List<T> getAll(String orderBy) {
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
+        try (EntityManager em = this.getEntityManager()) {
             String hql = "SELECT e FROM " + getEntityClass().getSimpleName() + " e";
             if (orderBy != null && !orderBy.trim().isEmpty()) {
                 hql += " ORDER BY e." + orderBy;
@@ -70,44 +58,18 @@ public class GenericDAOHibernate<T> implements GenericDAO<T> {
 
     @Override
     public T persist(T entity) {
-        EntityTransaction transaction = null;
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            transaction = em.getTransaction();
-            transaction.begin();
-            em.persist(entity);
-            transaction.commit();
-        } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-
-            LOGGER.error("Error al ejecutar el alta de {}", getEntityClass().getName(), e);
-        }
+        this.getEntityManager().persist(entity);
         return entity;
     }
 
     @Override
     public T update(T entity) {
-        EntityTransaction transaction = null;
-        T ret = null;
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
-            transaction = em.getTransaction();
-            transaction.begin();
-            ret = em.merge(entity);
-            transaction.commit();
-        } catch (RuntimeException e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-
-            LOGGER.error("Error al ejecutar el update de {}", getEntityClass().getName(), e);
-        }
-        return ret;
+        return this.getEntityManager().merge(entity);
     }
 
     @Override
     public List<T> getFiltered(Filter filter) {
-        try (EntityManager em = EntityManagerSingleton.getInstance().createEntityManager()) {
+        try (EntityManager em = this.getEntityManager()) {
             StringBuilder jpql = new StringBuilder("SELECT e FROM " + getEntityClass().getSimpleName() + " e");
             QueryComponents components = filter.buildQueryComponents();
 

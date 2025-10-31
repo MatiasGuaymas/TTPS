@@ -2,6 +2,7 @@ package io.github.vicen621.volveacasa.persistence.entities;
 
 import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name="mascotas")
+@Component
 public class Mascota {
 
     @Id

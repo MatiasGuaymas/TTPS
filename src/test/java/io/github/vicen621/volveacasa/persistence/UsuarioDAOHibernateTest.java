@@ -1,9 +1,9 @@
 package io.github.vicen621.volveacasa.persistence;
 
-import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.UsuarioFilter;
-import io.github.vicen621.volveacasa.persistence.factory.DAOFactory;
+import io.github.vicen621.volveacasa.persistence.entities.Usuario;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,12 +13,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UsuarioDAOHibernateTest extends BaseDAOTest {
 
-    private UsuarioDAO usuarioDAO;
+    static UsuarioDAO usuarioDAO;
+
+    @BeforeAll
+    static void init() {
+        createContext();
+        usuarioDAO = ctx.getBean(UsuarioDAO.class);
+    }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         cleanDatabase();
-        usuarioDAO = DAOFactory.getUsuarioDAO();
     }
 
     private Usuario buildTestUser(String email, boolean habilitado) {

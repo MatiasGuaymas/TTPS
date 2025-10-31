@@ -2,7 +2,9 @@ package io.github.vicen621.volveacasa.persistence.entities;
 
 import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +13,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "usuarios")
+@Component
 public class Usuario {
 
     @Id
@@ -44,11 +47,8 @@ public class Usuario {
 
     // Como no necesito que cree la medalla (ya está creada) no se agrega CascadeType.PERSIST
     // Tampoco necesito que borre la medalla (no pertenece a un unico usuario) no se agrega CascadeType.REMOVE
-    @ManyToMany
-    @Cascade({
-            org.hibernate.annotations.CascadeType.MERGE,
-            org.hibernate.annotations.CascadeType.REFRESH
-    })
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(
             name = "usuario_medallas",
             joinColumns = @JoinColumn(

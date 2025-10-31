@@ -1,36 +1,46 @@
 package io.github.vicen621.volveacasa.persistence;
 
+import io.github.vicen621.volveacasa.persistence.dao.MascotaDAO;
+import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
+import io.github.vicen621.volveacasa.persistence.dao.filtros.MascotaFilter;
 import io.github.vicen621.volveacasa.persistence.entities.Mascota;
 import io.github.vicen621.volveacasa.persistence.entities.Usuario;
-import io.github.vicen621.volveacasa.persistence.dao.hibernate.MascotaDAOHibernate;
-import io.github.vicen621.volveacasa.persistence.dao.filtros.MascotaFilter;
-import io.github.vicen621.volveacasa.persistence.dao.hibernate.UsuarioDAOHibernate;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.List;
 
 public class MascotaDAOHibernateTest extends BaseDAOTest {
-	private MascotaDAOHibernate mascotaDAO;
+	static MascotaDAO mascotaDAO;
+    static UsuarioDAO usuarioDAO;
 	private Usuario usuarioTest;
 
-	@BeforeEach
-	void setUp() {
-		cleanDatabase();
-		mascotaDAO = new MascotaDAOHibernate();
-		usuarioTest = Usuario.builder()
-				.nombre("Juan")
-				.apellidos("Perez")
-				.email("juan.perez@test.com")
-				.contrasena("1234")
-				.telefono("123456789")
-				.ciudad("CiudadTest")
-				.barrio("BarrioTest")
-				.latitud(-34.6037f)
-				.longitud(-58.3816f)
-				.build();
-		UsuarioDAOHibernate usuarioDAO = new UsuarioDAOHibernate();
-		usuarioDAO.persist(usuarioTest);
+	@BeforeAll
+	static void init() {
+        createContext();
+		mascotaDAO = ctx.getBean(MascotaDAO.class);
+        usuarioDAO = ctx.getBean(UsuarioDAO.class);
 	}
+
+    @BeforeEach
+    void setUp() {
+        cleanDatabase();
+        usuarioTest = Usuario.builder()
+                .nombre("Juan")
+                .apellidos("Perez")
+                .email("juan.perez@test.com")
+                .contrasena("1234")
+                .telefono("123456789")
+                .ciudad("CiudadTest")
+                .barrio("BarrioTest")
+                .latitud(-34.6037f)
+                .longitud(-58.3816f)
+                .build();
+        usuarioDAO.persist(usuarioTest);
+    }
 
 	private Mascota buildTestMascota(String nombre, Mascota.Tipo tipo, Mascota.Estado estado, String raza, String color) {
 		return Mascota.builder()
