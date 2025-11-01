@@ -1,7 +1,5 @@
-package io.github.vicen621.volveacasa.persistence;
+package io.github.vicen621.volveacasa.persistence.dao;
 
-import io.github.vicen621.volveacasa.persistence.dao.MascotaDAO;
-import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.MascotaFilter;
 import io.github.vicen621.volveacasa.persistence.entities.Mascota;
 import io.github.vicen621.volveacasa.persistence.entities.Usuario;

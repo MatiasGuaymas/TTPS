@@ -1,5 +1,6 @@
-package io.github.vicen621.volveacasa.persistence;
+package io.github.vicen621.volveacasa.persistence.dao;
 
+import io.github.vicen621.volveacasa.persistence.TestPersistenceConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -11,7 +12,7 @@ public abstract class BaseDAOTest {
     public static void createContext() {
         ctx = new AnnotationConfigApplicationContext();
         // Registra la clase de configuration (PersistenceConfig)
-        ctx.register(PersistenceConfig.class);
+        ctx.register(TestPersistenceConfig.class);
         // Refresca para actualizar la creacion de beans
         ctx.refresh();
         BaseDAOTest.em = ctx.getBean(EntityManagerFactory.class).createEntityManager();
