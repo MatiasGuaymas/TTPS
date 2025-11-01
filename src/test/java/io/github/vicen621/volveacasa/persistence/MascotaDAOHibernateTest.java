@@ -70,7 +70,6 @@ public class MascotaDAOHibernateTest extends BaseDAOTest {
         mascotaDAO.get(perro.getId());
 
 		List<Mascota> resultados = mascotaDAO.getFiltered(MascotaFilter.builder().conTipo(Mascota.Tipo.PERRO).build());
-        System.out.println(resultados);
 		Assertions.assertNotNull(resultados);
 		Assertions.assertEquals(1, resultados.size());
 		Assertions.assertEquals("Perro1", resultados.get(0).getNombre());
