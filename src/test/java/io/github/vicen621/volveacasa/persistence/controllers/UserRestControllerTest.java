@@ -48,29 +48,10 @@ public class UserRestControllerTest extends BaseControllerTest {
 
     @Test
     void listAllUsersOrderByName_whenUsersExist_returnsOkAndList() throws Exception {
-        Usuario usuario1 = Usuario.builder()
-                .nombre("Juan")
-                .apellidos("Perez")
-                .email("juan.perez@test.com")
-                .contrasena("1234")
-                .telefono("123456789")
-                .ciudad("CiudadTest")
-                .barrio("BarrioTest")
-                .latitud(-34.6037f)
-                .longitud(-58.3816f)
-                .build();
-        Usuario usuario2 = Usuario.builder()
-                .nombre("Ana")
-                .apellidos("Gomez")
-                .email("ana.gomez@test.com")
-                .contrasena("abcd")
-                .telefono("987654321")
-                .ciudad("OtraCiudad")
-                .barrio("OtroBarrio")
-                .latitud(-34.6037f)
-                .longitud(-58.3816f)
-                .build();
-        List<Usuario> users = Arrays.asList(usuario1, usuario2);
+        List<Usuario> users = Arrays.asList(
+            buildUser("Juan", "Perez", "juan.perez@test.com"),
+            buildUser("Ana", "Gomez", "ana.gomez@test.com")
+        );
 
         when(usuarioDAO.getAll("nombre")).thenReturn(users);
 
@@ -80,5 +61,19 @@ public class UserRestControllerTest extends BaseControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].nombre").value("Juan"))
                 .andExpect(jsonPath("$[1].nombre").value("Ana"));
+    }
+
+    private Usuario buildUser(String nombre, String apellidos, String email) {
+        return Usuario.builder()
+                .nombre(nombre)
+                .apellidos(apellidos)
+                .email(email)
+                .contrasena("1234")
+                .telefono("123456789")
+                .ciudad("CiudadTest")
+                .barrio("BarrioTest")
+                .latitud(-34.6037f)
+                .longitud(-58.3816f)
+                .build();
     }
 }
