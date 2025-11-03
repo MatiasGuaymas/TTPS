@@ -1,7 +1,6 @@
 package io.github.vicen621.volveacasa.persistence.controllers;
 
-import io.github.vicen621.volveacasa.persistence.BaseDAOTest;
-import io.github.vicen621.volveacasa.persistence.PersistenceConfig;
+import io.github.vicen621.volveacasa.persistence.TestPersistenceConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -13,7 +12,7 @@ public abstract class BaseControllerTest {
     public static void createContext() {
         ctx = new AnnotationConfigApplicationContext();
         // Registra la clase de configuration (PersistenceConfig)
-        ctx.register(PersistenceConfig.class);
+        ctx.register(TestPersistenceConfig.class);
         // Refresca para actualizar la creacion de beans
         ctx.refresh();
         em = ctx.getBean(EntityManagerFactory.class).createEntityManager();
