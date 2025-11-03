@@ -2,14 +2,18 @@ package io.github.vicen621.volveacasa.persistence.entities;
 
 import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Getter
 @Entity
-@Table(name="avistamientos")
 @Component
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
+@Table(name="avistamientos")
 public class Avistamiento {
 
     @Id
@@ -21,8 +25,10 @@ public class Avistamiento {
 
     private String fotoBase64;
 
+    @Setter
     private LocalDate fecha;
 
+    @Setter
     private String comentario;
 
     @ManyToOne
@@ -33,8 +39,6 @@ public class Avistamiento {
     @JoinColumn(name = "mascota_id")
     private Mascota mascota;
 
-    protected Avistamiento() {}
-
     private Avistamiento(Builder builder) {
         this.mascota = builder.mascota;
         this.coordenadas = new Coordenadas(builder.latitud, builder.longitud);
@@ -44,65 +48,15 @@ public class Avistamiento {
         this.reportador = builder.reportador;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Usuario getReportador() {
-        return reportador;
-    }
-
-    public Coordenadas getCoordenadas() {
-        return coordenadas;
-    }
-
     public void actualizarUbicacion(float latitud, float longitud) {
         this.coordenadas = new Coordenadas(latitud, longitud);
-    }
-
-    public String getFotoBase64() {
-        return fotoBase64;
-    }
-
-    public void setFotoBase64(String fotoBase64) {
-        this.fotoBase64 = fotoBase64;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
-
-    public String getComentario() {
-        return comentario;
-    }
-
-    public void setComentario(String comentario) {
-        this.comentario = comentario;
-    }
-
-    public Mascota getMascota() {
-        return mascota;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Avistamiento that)) return false;
-        return Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
+    // TODO: Borrar
     public static class Builder {
         private Mascota mascota;
         private Usuario reportador;

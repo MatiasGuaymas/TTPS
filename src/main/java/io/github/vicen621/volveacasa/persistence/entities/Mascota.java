@@ -2,6 +2,7 @@ package io.github.vicen621.volveacasa.persistence.entities;
 
 import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -13,9 +14,12 @@ import java.util.Objects;
 @Entity
 @Table(name="mascotas")
 @Component
+@Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mascota {
 
     @Id
+    @Setter(AccessLevel.NONE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -32,6 +36,7 @@ public class Mascota {
     private float peso;
 
     @Embedded
+    @Setter(AccessLevel.NONE)
     private Coordenadas coordenadas;
 
     private LocalDate fechaPerdida;
@@ -43,10 +48,12 @@ public class Mascota {
     private Tipo tipo;
 
     @ManyToOne
+    @Setter(AccessLevel.NONE)
     @JoinColumn(name = "creador_id")
     private Usuario creador;
 
     @ElementCollection
+    @Setter(AccessLevel.NONE)
     @CollectionTable(name="mascota_fotos", joinColumns=@JoinColumn(name="mascota_id")) // Crea una tabla "mascota_fotos"
     @Column(name="foto_base64", columnDefinition = "TEXT")
     private List<String> fotosBase64 = new ArrayList<>();
@@ -57,8 +64,6 @@ public class Mascota {
             orphanRemoval = true
     )
     private List<Avistamiento> avistamientos = new ArrayList<>();
-
-    protected Mascota() {}
 
     private Mascota(Builder builder) {
         this.nombre = builder.nombre;
@@ -75,88 +80,8 @@ public class Mascota {
         this.creador = builder.creador;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getTamano() {
-        return tamano;
-    }
-
-    public void setTamano(String tamano) {
-        this.tamano = tamano;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getRaza() {
-        return raza;
-    }
-
-    public void setRaza(String raza) {
-        this.raza = raza;
-    }
-
-    public float getPeso() {
-        return peso;
-    }
-
-    public void setPeso(float peso) {
-        this.peso = peso;
-    }
-
-    public Coordenadas getCoordenadas() {
-        return coordenadas;
-    }
-
     public void actualizarUbicacion(float latitud, float longitud) {
         this.coordenadas = new Coordenadas(latitud, longitud);
-    }
-
-    public LocalDate getFechaPerdida() {
-        return fechaPerdida;
-    }
-
-    public void setFechaPerdida(LocalDate fechaPerdida) {
-        this.fechaPerdida = fechaPerdida;
-    }
-
-    public Estado getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Estado estado) {
-        this.estado = estado;
-    }
-
-    public Tipo getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
     }
 
     public List<String> getFotosBase64() {
@@ -192,25 +117,11 @@ public class Mascota {
         }
     }
 
-    public Usuario getCreador() {
-        return creador;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Mascota mascota)) return false;
-        return Objects.equals(getId(), mascota.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
-    }
-
     public static Builder builder() {
         return new Builder();
     }
 
+    // TODO: Borrar
     public static class Builder {
         private String nombre;
         private String tamano;

@@ -1,6 +1,5 @@
-package io.github.vicen621.volveacasa.persistence;
+package io.github.vicen621.volveacasa.persistence.dao;
 
-import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.UsuarioFilter;
 import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 import org.junit.jupiter.api.BeforeAll;

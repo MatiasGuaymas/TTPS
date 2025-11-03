@@ -2,6 +2,7 @@ package io.github.vicen621.volveacasa.persistence.entities;
 
 import io.github.vicen621.volveacasa.persistence.entities.embeddable.Coordenadas;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.stereotype.Component;
@@ -11,12 +12,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Data
 @Entity
 @Table(name = "usuarios")
 @Component
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Usuario {
 
     @Id
+    @Setter(AccessLevel.NONE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -40,6 +44,7 @@ public class Usuario {
     private boolean habilitado;
 
     @Embedded
+    @Setter(AccessLevel.NONE)
     private Coordenadas coordenadas;
 
     @Enumerated(EnumType.STRING)
@@ -47,6 +52,7 @@ public class Usuario {
 
     // Como no necesito que cree la medalla (ya está creada) no se agrega CascadeType.PERSIST
     // Tampoco necesito que borre la medalla (no pertenece a un unico usuario) no se agrega CascadeType.REMOVE
+    @Setter(AccessLevel.NONE)
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(
@@ -67,6 +73,7 @@ public class Usuario {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @Setter(AccessLevel.NONE)
     private List<Mascota> mascotasCreadas = new ArrayList<>();
 
     @OneToMany(
@@ -74,9 +81,8 @@ public class Usuario {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @Setter(AccessLevel.NONE)
     private List<Avistamiento> avistamientos = new ArrayList<>();
-
-    protected Usuario() {}
 
     // Constructor privado para el builder
     private Usuario(Builder builder) {
@@ -93,96 +99,8 @@ public class Usuario {
         this.rol = builder.rol;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellidos() {
-        return apellidos;
-    }
-
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getCiudad() {
-        return ciudad;
-    }
-
-    public void setCiudad(String ciudad) {
-        this.ciudad = ciudad;
-    }
-
-    public String getBarrio() {
-        return barrio;
-    }
-
-    public void setBarrio(String barrio) {
-        this.barrio = barrio;
-    }
-
-    public int getPuntos() {
-        return puntos;
-    }
-
-    public void setPuntos(int puntos) {
-        this.puntos = puntos;
-    }
-
-    public boolean isHabilitado() {
-        return habilitado;
-    }
-
-    public void setHabilitado(boolean habilitado) {
-        this.habilitado = habilitado;
-    }
-
-    public Coordenadas getCoordenadas() {
-        return coordenadas;
-    }
-
     public void actualizarUbicacion(float latitud, float longitud) {
         this.coordenadas = new Coordenadas(latitud, longitud);
-    }
-
-    public Rol getRol() {
-        return rol;
-    }
-
-    public void setRol(Rol rol) {
-        this.rol = rol;
     }
 
     public List<Medalla> getMedallas() {
@@ -243,6 +161,7 @@ public class Usuario {
         return new Builder();
     }
 
+    // TODO: Borrar
     public static class Builder {
         private String nombre;
         private String apellidos;

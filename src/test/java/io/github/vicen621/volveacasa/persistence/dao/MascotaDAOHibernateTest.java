@@ -1,7 +1,5 @@
-package io.github.vicen621.volveacasa.persistence;
+package io.github.vicen621.volveacasa.persistence.dao;
 
-import io.github.vicen621.volveacasa.persistence.dao.MascotaDAO;
-import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import io.github.vicen621.volveacasa.persistence.dao.filtros.MascotaFilter;
 import io.github.vicen621.volveacasa.persistence.entities.Mascota;
 import io.github.vicen621.volveacasa.persistence.entities.Usuario;
@@ -70,7 +68,6 @@ public class MascotaDAOHibernateTest extends BaseDAOTest {
         mascotaDAO.get(perro.getId());
 
 		List<Mascota> resultados = mascotaDAO.getFiltered(MascotaFilter.builder().conTipo(Mascota.Tipo.PERRO).build());
-        System.out.println(resultados);
 		Assertions.assertNotNull(resultados);
 		Assertions.assertEquals(1, resultados.size());
 		Assertions.assertEquals("Perro1", resultados.get(0).getNombre());
