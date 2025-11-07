@@ -18,19 +18,19 @@ public abstract class BaseControllerTest {
         em = ctx.getBean(EntityManagerFactory.class).createEntityManager();
     }
 
-    public void cleanDatabase() {
+    /*public void cleanDatabase() {
         // Hay que borrar en el orden correcto para no violar Foreign Keys
         // Tablas "hijas" primero
         em.getTransaction().begin();
-        em.createQuery("DELETE FROM Avistamiento").executeUpdate();
+        em.createQuery("DELETE FROM Sighting").executeUpdate();
         em.createNativeQuery("DELETE FROM mascota_fotos").executeUpdate(); // La tabla de @ElementCollection
-        em.createQuery("DELETE FROM Mascota").executeUpdate();
+        em.createQuery("DELETE FROM Pet").executeUpdate();
 
         // Tablas "raíz" al final
         em.createNativeQuery("DELETE FROM usuario_medallas").executeUpdate(); // La tabla de @ManyToMany
-        em.createQuery("DELETE FROM Medalla").executeUpdate();
-        em.createQuery("DELETE FROM Mensaje").executeUpdate();
-        em.createQuery("DELETE FROM Usuario").executeUpdate();
+        em.createQuery("DELETE FROM Medal").executeUpdate();
+        em.createQuery("DELETE FROM Message").executeUpdate();
+        em.createQuery("DELETE FROM User").executeUpdate();
         em.getTransaction().commit();
-    }
+    }*/
 }

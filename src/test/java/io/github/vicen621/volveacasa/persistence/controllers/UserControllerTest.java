@@ -1,14 +1,15 @@
 package io.github.vicen621.volveacasa.persistence.controllers;
 
-import io.github.vicen621.volveacasa.controllers.UserController;
-import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
-import io.github.vicen621.volveacasa.persistence.entities.Usuario;
+import io.github.grupo01.volve_a_casa.controllers.UserController;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest extends BaseControllerTest {
     @Mock
-    private UsuarioDAO usuarioDAO;
+    private UserRepository userRepository;
     private MockMvc mockMvc;
 
     @BeforeAll
@@ -34,13 +35,13 @@ public class UserControllerTest extends BaseControllerTest {
 
     @BeforeEach
     void setup() {
-        cleanDatabase();
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(usuarioDAO)).build();
+        // cleanDatabase();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userRepository)).build();
     }
 
     @Test
     void listAllUsersOrderByName_whenEmpty_returnsNoContent() throws Exception {
-        when(usuarioDAO.getAll("nombre")).thenReturn(Collections.emptyList());
+        when(userRepository.findAll(Sort.by("name"))).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/users").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -48,23 +49,23 @@ public class UserControllerTest extends BaseControllerTest {
 
     @Test
     void listAllUsersOrderByName_whenUsersExist_returnsOkAndList() throws Exception {
-        List<Usuario> users = Arrays.asList(
+        List<User> users = Arrays.asList(
             buildUser("Juan", "Perez", "juan.perez@test.com"),
             buildUser("Ana", "Gomez", "ana.gomez@test.com")
         );
 
-        when(usuarioDAO.getAll("nombre")).thenReturn(users);
+        when(userRepository.findAll(Sort.by("name"))).thenReturn(users);
 
         mockMvc.perform(get("/users")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].nombre").value("Juan"))
-                .andExpect(jsonPath("$[1].nombre").value("Ana"));
+                .andExpect(jsonPath("$[0].name").value("Juan"))
+                .andExpect(jsonPath("$[1].name").value("Ana"));
     }
 
-    private Usuario buildUser(String nombre, String apellidos, String email) {
-        return Usuario.builder()
+    private User buildUser(String nombre, String apellidos, String email) {
+        return User.builder()
                 .nombre(nombre)
                 .apellidos(apellidos)
                 .email(email)

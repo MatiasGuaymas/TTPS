@@ -1,0 +1,92 @@
+package io.github.grupo01.volve_a_casa.controllers;
+
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(value="/users", produces= MediaType.APPLICATION_JSON_VALUE, name="UserRestController")
+public class UserController {
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> listAllUsersOrderByName() {
+        List<User> users = userRepository.findAll(Sort.by("name"));
+        if (users.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        if (userRepository.findById(user.getId()).isPresent()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        userRepository.save(user);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/:{id}")
+    public ResponseEntity<Map<String, String>> getUserById(@RequestHeader("token") String token, @PathVariable Long id) {
+        Map<String, String> response = new HashMap<>();
+
+        if (!checkToken(token)) {
+            response.put("error", "Token inválido");
+            response.put("message", "El token proporcionado no es válido");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            response.put("error", "User no encontrado");
+            response.put("message", "No existe un usuario con el ID proporcionado");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        response.put("message", "User encontrado");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/:{id}")
+    public ResponseEntity<Map<String, String>> updateUser(@RequestHeader("token") String token, @PathVariable Long id, @RequestBody User newUser) {
+        Map<String, String> response = new HashMap<>();
+
+        if (!checkToken(token)) {
+            response.put("error", "Token inválido");
+            response.put("message", "El token proporcionado no es válido");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        Optional<User> existingUser = userRepository.findById(id);
+        if (existingUser.isEmpty()) {
+            response.put("error", "User no encontrado");
+            response.put("message", "No existe un usuario con el ID proporcionado");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userRepository.save(newUser);
+        response.put("message", "User actualizado correctamente");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private boolean checkToken(String token){
+        return token != null && token.endsWith("123456") && userRepository.existsById(Long.valueOf(token.replace("123456","")));
+    }
+
+}
