@@ -146,6 +146,10 @@ public class Usuario {
         }
     }
 
+    public boolean checkPassword(String contrasena) {
+        return this.contrasena.equals(contrasena);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Usuario usuario)) return false;

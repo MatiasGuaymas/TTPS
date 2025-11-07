@@ -1,6 +1,6 @@
 package io.github.vicen621.volveacasa.persistence.controllers;
 
-import io.github.vicen621.volveacasa.controllers.UserRestController;
+import io.github.vicen621.volveacasa.controllers.UserController;
 import io.github.vicen621.volveacasa.persistence.dao.UsuarioDAO;
 import io.github.vicen621.volveacasa.persistence.entities.Usuario;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserRestControllerTest extends BaseControllerTest {
+public class UserControllerTest extends BaseControllerTest {
     @Mock
     private UsuarioDAO usuarioDAO;
     private MockMvc mockMvc;
@@ -35,7 +35,7 @@ public class UserRestControllerTest extends BaseControllerTest {
     @BeforeEach
     void setup() {
         cleanDatabase();
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserRestController(usuarioDAO)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(usuarioDAO)).build();
     }
 
     @Test
