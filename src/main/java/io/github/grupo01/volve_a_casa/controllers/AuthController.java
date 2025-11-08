@@ -47,7 +47,7 @@ public class AuthController {
 
         response.put("message", "Autenticación exitosa");
         HttpHeaders headers = new HttpHeaders();
-        headers.add("token", optionalUser.get().getId() + "1233456");
+        headers.add("token", optionalUser.get().getId() + "123456");
         return new ResponseEntity<>(response, headers, HttpStatus.OK);
     }
 }

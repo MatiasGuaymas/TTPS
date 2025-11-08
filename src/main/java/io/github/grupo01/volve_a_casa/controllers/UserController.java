@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        if (userRepository.findById(user.getId()).isPresent()) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
@@ -43,29 +44,27 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
-    @GetMapping("/:{id}")
-    public ResponseEntity<Map<String, String>> getUserById(@RequestHeader("token") String token, @PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@RequestHeader("token") String token, @PathVariable("id") Long id) {
         Map<String, String> response = new HashMap<>();
-
         if (!checkToken(token)) {
             response.put("error", "Token inválido");
             response.put("message", "El token proporcionado no es válido");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             response.put("error", "User no encontrado");
             response.put("message", "No existe un usuario con el ID proporcionado");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        response.put("message", "User encontrado");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(user.get());
     }
 
-    @PutMapping("/:{id}")
-    public ResponseEntity<Map<String, String>> updateUser(@RequestHeader("token") String token, @PathVariable Long id, @RequestBody User newUser) {
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestHeader("token") String token, @RequestBody UserUpdateDTO updatedData) {
         Map<String, String> response = new HashMap<>();
 
         if (!checkToken(token)) {
@@ -74,15 +73,19 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
 
-        Optional<User> existingUser = userRepository.findById(id);
-        if (existingUser.isEmpty()) {
-            response.put("error", "User no encontrado");
-            response.put("message", "No existe un usuario con el ID proporcionado");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Optional<User> optionalUser = userRepository.findById(Long.valueOf(token.replace("123456","")));
+
+        if (optionalUser.isEmpty()) {
+            response.put("error", "Usuario no encontrado");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
-        userRepository.save(newUser);
-        response.put("message", "User actualizado correctamente");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+
+        User user = optionalUser.get();
+
+        user.updateFromDTO(updatedData);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(user);
     }
 
     private boolean checkToken(String token){

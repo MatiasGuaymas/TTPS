@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.embeddable.Coordinates;
 import jakarta.persistence.*;
 import lombok.*;
@@ -148,6 +149,15 @@ public class User {
 
     public boolean checkPassword(String password) {
         return this.password.equals(password);
+    }
+
+    public void updateFromDTO(UserUpdateDTO dto) {
+        if (dto.name() != null) this.name = dto.name();
+        if (dto.lastName() != null) this.lastName = dto.lastName();
+        if (dto.phoneNumber() != null) this.phone = dto.phoneNumber();
+        if (dto.city() != null) this.city = dto.city();
+        if (dto.neighborhood() != null) this.neighborhood = dto.neighborhood();
+        if (dto.latitude() != 0 && dto.longitude() != 0) this.actualizarUbicacion(dto.latitude(), dto.longitude());
     }
 
     @Override

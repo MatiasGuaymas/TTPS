@@ -33,7 +33,7 @@ public class PersistenceConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan("io.github.vicen621.volveacasa.persistence.entities");
+        em.setPackagesToScan("io.github.grupo01.volve_a_casa.persistence.entities");
         em.setEntityManagerFactoryInterface(EntityManagerFactory.class);
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

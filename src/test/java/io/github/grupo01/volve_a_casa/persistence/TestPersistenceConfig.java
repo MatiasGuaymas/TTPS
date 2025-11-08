@@ -1,4 +1,4 @@
-package io.github.vicen621.volveacasa.persistence;
+package io.github.grupo01.volve_a_casa.persistence;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,7 +15,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan(basePackages = "io.github.vicen621.volveacasa.persistence")
+@ComponentScan(basePackages = "io.github.grupo01.volve_a_casa.persistence")
 public class TestPersistenceConfig {
 
     @Bean
@@ -32,7 +32,7 @@ public class TestPersistenceConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource ds) {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(ds);
-        emf.setPackagesToScan("io.github.vicen621.volveacasa.persistence.entities");
+        emf.setPackagesToScan("io.github.grupo01.volve_a_casa.persistence.entities");
         emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Properties props = new Properties();

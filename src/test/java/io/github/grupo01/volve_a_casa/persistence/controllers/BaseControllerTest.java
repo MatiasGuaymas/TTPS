@@ -1,6 +1,6 @@
-package io.github.vicen621.volveacasa.persistence.controllers;
+package io.github.grupo01.volve_a_casa.persistence.controllers;
 
-import io.github.vicen621.volveacasa.persistence.TestPersistenceConfig;
+import io.github.grupo01.volve_a_casa.persistence.TestPersistenceConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

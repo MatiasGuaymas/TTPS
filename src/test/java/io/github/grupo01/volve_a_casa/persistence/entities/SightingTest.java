@@ -1,4 +1,4 @@
-package io.github.vicen621.volveacasa.persistence.entities;
+package io.github.grupo01.volve_a_casa.persistence.entities;
 
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
