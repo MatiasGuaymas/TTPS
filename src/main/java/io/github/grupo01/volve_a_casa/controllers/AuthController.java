@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value="/authentication", produces=MediaType.APPLICATION_JSON_VALUE, name="AuthController")
+@RequestMapping(value="/auth", produces=MediaType.APPLICATION_JSON_VALUE, name="AuthController")
 public class AuthController {
     private UserRepository userRepository;
 
@@ -26,14 +26,15 @@ public class AuthController {
         this.userRepository = userRepository;
     }
 
+    //TODO: Testear este metodo
     @PostMapping
-    public ResponseEntity<Map<String,String>> authenticateUser(@RequestHeader("usuario")String mail, @RequestHeader("clave")String password) {
+    public ResponseEntity<Map<String,String>> authenticateUser(@RequestHeader("email")String mail, @RequestHeader("password")String password) {
         Optional<User> optionalUser = userRepository.findByEmail(mail);
         Map<String, String> response = new HashMap<>();
         if (optionalUser.isEmpty()) {
             response.put("error", "Usuario no encontrado");
             response.put("message", "El correo ingresado no corresponde a ningún usuario registrado");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         User user = optionalUser.get();
