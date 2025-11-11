@@ -1,11 +1,13 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.embeddable.Coordinates;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.Objects;
 @Table(name = "usuarios")
 @Component
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+//TODO: Cambiar todos los new BCryptPasswordEncoder() por un bean singleton
 public class User {
 
     @Id
@@ -90,7 +93,7 @@ public class User {
         this.name = builder.nombre;
         this.lastName = builder.apellidos;
         this.email = builder.email;
-        this.password = builder.contrasena;
+        this.password = new BCryptPasswordEncoder().encode(builder.contrasena);
         this.phone = builder.telefono;
         this.city = builder.ciudad;
         this.neighborhood = builder.barrio;
@@ -148,7 +151,7 @@ public class User {
     }
 
     public boolean checkPassword(String password) {
-        return this.password.equals(password);
+        return this.password.equals(new BCryptPasswordEncoder().encode(password));
     }
 
     public void updateFromDTO(UserUpdateDTO dto) {
