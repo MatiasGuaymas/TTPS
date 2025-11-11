@@ -2,6 +2,7 @@ package io.github.grupo01.volve_a_casa.persistence.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.grupo01.volve_a_casa.controllers.UserController;
+import io.github.grupo01.volve_a_casa.controllers.dto.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
@@ -73,9 +74,19 @@ public class UserControllerTest extends BaseControllerTest {
 
     @Test
     void createUser_whenUserDoesNotExist_returnsCreated() throws Exception {
-        User newUser = buildUser("Luis", "Martinez", "luismartinez@test.com");
+        UserCreateDTO newUser = new UserCreateDTO(
+                "luismartinez@test.com",
+                "password",
+                "nombre",
+                "apellido",
+                "11 1234-5678",
+                "La Plata",
+                "Manuel B. Gonnet",
+                -51.03f,
+                -43.23f
+        );
 
-        when(userRepository.findByEmail(newUser.getEmail())).thenReturn(java.util.Optional.empty());
+        when(userRepository.findByEmail(newUser.email())).thenReturn(java.util.Optional.empty());
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,12 +98,22 @@ public class UserControllerTest extends BaseControllerTest {
 
     @Test
     void createUser_whenUserExists_returnsConflict() throws Exception {
-        User existingUser = buildUser("Carlos", "Lopez", "carloslopez@test.com");
+        UserCreateDTO newUser = new UserCreateDTO(
+                "luismartinez@test.com",
+                "password",
+                "nombre",
+                "apellido",
+                "11 1234-5678",
+                "La Plata",
+                "Manuel B. Gonnet",
+                -51.03f,
+                -43.23f
+        );
 
-        when(userRepository.findByEmail(existingUser.getEmail())).thenReturn(java.util.Optional.of(existingUser));
+        when(userRepository.findByEmail(newUser.email())).thenReturn(java.util.Optional.of(new User(newUser)));
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(existingUser)))
+                        .content(objectMapper.writeValueAsString(newUser)))
                 .andExpect(status().isConflict());
     }
 
