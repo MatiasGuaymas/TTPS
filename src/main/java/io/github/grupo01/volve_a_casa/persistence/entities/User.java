@@ -103,6 +103,13 @@ public class User {
         this.role = builder.role;
     }
 
+    public User(UserCreateDTO dto) {
+        this.name = dto.name();
+        this.lastName = dto.lastName();
+        this.email = dto.email();
+        this.password = new BCryptPasswordEncoder().encode(dto.password());
+    }
+
     public void actualizarUbicacion(float latitud, float longitud) {
         this.coordinates = new Coordinates(latitud, longitud);
     }

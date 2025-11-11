@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
@@ -34,14 +35,24 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+    // TODO: testear este metodo entero
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+    public ResponseEntity<?> createUser(@RequestBody UserCreateDTO userCreateDTO) {
+        Map<String, String> response = new HashMap<>();
+        if (!userCreateDTO.isValid()) {
+            response.put("error", "Datos inválidos");
+            response.put("message", "Faltan campos obligatorios para crear el usuario");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        userRepository.save(user);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        if (userRepository.findByEmail(userCreateDTO.email()).isPresent()) {
+            response.put("error", "Email repetido");
+            response.put("message", "El email ya está siendo utilizado por otro usuario");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+        userRepository.save(new User(userCreateDTO));
+        return new ResponseEntity<>(userCreateDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
