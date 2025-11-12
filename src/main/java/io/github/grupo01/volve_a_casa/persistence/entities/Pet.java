@@ -1,15 +1,34 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
-import io.github.grupo01.volve_a_casa.persistence.entities.embeddable.Coordinates;
-import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import org.springframework.stereotype.Component;
+
+import io.github.grupo01.volve_a_casa.controllers.dto.PetUpdateDTO;
+import io.github.grupo01.volve_a_casa.persistence.entities.embeddable.Coordinates;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="pets")
@@ -96,6 +115,19 @@ public class Pet {
     public void removeFotoBase64(String fotoBase64) {
         if (fotoBase64 != null)
             this.photosBase64.remove(fotoBase64);
+    }
+
+    public void updateFromDTO(PetUpdateDTO dto) {
+        if (dto.name() != null) this.name = dto.name();
+        if (dto.description() != null) this.description = dto.description();
+        if (dto.color() != null) this.color = dto.color();
+        if (dto.size() != null) this.size = dto.size();
+        if (dto.race() != null) this.race = dto.race();
+        if (dto.weight() != null && dto.weight() > 0) this.weight = dto.weight();
+        if (dto.type() != null) this.type = dto.type();
+        if (dto.state() != null) this.state = dto.state();
+        if (dto.latitude() != null && dto.longitude() != null)
+            this.actualizarUbicacion(dto.latitude(), dto.longitude());
     }
 
     /**
