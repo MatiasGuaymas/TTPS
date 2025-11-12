@@ -1,7 +1,5 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
-import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
-import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,38 +9,57 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SightingTest {
-/*
+
     @Nested
     class BuilderTest {
-        private User getUser() {
+        private User getUser(String nombre, String apellidos, String email) {
             return User.builder()
-                    .nombre("test")
-                    .apellidos("test")
-                    .email("test@gmail.com")
+                    .nombre(nombre)
+                    .apellidos(apellidos)
+                    .email(email)
                     .contrasena("1234")
                     .telefono("123456789")
-                    .ciudad("CiudadTest")
-                    .barrio("BarrioTest")
+                    .ciudad("La Plata")
+                    .barrio("Centro")
                     .latitud(-34.6037f)
                     .longitud(-58.3816f)
+                    .build();
+        }
+
+        private Pet getPet(User creador) {
+            return Pet.builder()
+                    .nombre("Firulais")
+                    .tamano("Mediano")
+                    .descripcion("Perro mestizo")
+                    .color("Marrón")
+                    .raza("Mestizo")
+                    .peso(12.5f)
+                    .latitud(-34.6037f)
+                    .longitud(-58.3816f)
+                    .fechaPerdida(LocalDate.now())
+                    .estado(Pet.State.PERDIDO_PROPIO)
+                    .tipo(Pet.Type.PERRO)
+                    .agregarFoto("fotoBase64")
+                    .creador(creador)
                     .build();
         }
 
         @Test
         @DisplayName("Construcción exitosa de Avistamiento")
         public void testConstruccionExitosa() {
-            Pet mascota = new Pet(); // constructor protegido pero accesible en el mismo paquete
-            User reportador = new User();
+            User owner = getUser("Rodolfo Alfredo", "Bertone", "bertone@info.unlp.edu.ar");
+            User reporter = getUser("Laura Cristina", "De Giusti", "ldgiusti@info.unlp.edu.ar");
+            Pet mascota = getPet(owner);
 
-            float latitud = 12.34f;
-            float longitud = -56.78f;
+            float latitud = -34.9214f;
+            float longitud = -57.9544f;
             String foto = "base64string";
             LocalDate fecha = LocalDate.of(2024, 5, 20);
             String comentario = "Lo vi cerca del parque";
 
-            Avistamiento av = Avistamiento.builder()
+            Sighting av = Sighting.builder()
                     .mascota(mascota)
-                    .reportador(reportador)
+                    .reportador(reporter)
                     .latitud(latitud)
                     .longitud(longitud)
                     .fotoBase64(foto)
@@ -52,33 +69,33 @@ public class SightingTest {
 
             assertNotNull(av);
             assertEquals(mascota, av.getPet());
-            // Testo que la relación sea bidireccional
-            assertTrue(mascota.getAvistamientos().contains(av));
-            assertEquals(reportador, av.getReportador());
             // Testeo que la relación sea bidireccional
-            assertTrue(reportador.getAvistamientos().contains(av));
-            assertEquals(latitud, av.getCoordenadas().getLatitud());
-            assertEquals(longitud, av.getCoordenadas().getLongitud());
-            assertEquals(foto, av.getFotoBase64());
-            assertEquals(fecha, av.getFecha());
-            assertEquals(comentario, av.getComentario());
+            assertTrue(mascota.getSightings().contains(av));
+            assertEquals(reporter, av.getReporter());
+            // Testeo que la relación sea bidireccional
+            assertTrue(reporter.getSightings().contains(av));
+            assertEquals(latitud, av.getCoordinates().getLatitude());
+            assertEquals(longitud, av.getCoordinates().getLongitude());
+            assertEquals(foto, av.getPhotoBase64());
+            assertEquals(fecha, av.getDate());
+            assertEquals(comentario, av.getComment());
         }
-
 
         @Test
         @DisplayName("Test constructor sin comentario")
         public void testConstruccionExitosaSinComentario() {
-            Pet mascota = new Pet(); // constructor protegido pero accesible en el mismo paquete
-            User reportador = new User();
+            User owner = getUser("Laura Andrea", "Fava", "lfava@info.unlp.edu.ar");
+            User reporter = getUser("Alejandro", "Fernandez", "fernandez@info.unlp.edu.ar");
+            Pet mascota = getPet(owner);
 
-            float latitud = 12.34f;
-            float longitud = -56.78f;
+            float latitud = -34.9214f;
+            float longitud = -57.9544f;
             String foto = "base64string";
             LocalDate fecha = LocalDate.of(2024, 5, 20);
 
-            Avistamiento av = Avistamiento.builder()
+            Sighting av = Sighting.builder()
                     .mascota(mascota)
-                    .reportador(reportador)
+                    .reportador(reporter)
                     .latitud(latitud)
                     .longitud(longitud)
                     .fotoBase64(foto)
@@ -87,20 +104,21 @@ public class SightingTest {
 
             assertNotNull(av);
             assertEquals(mascota, av.getPet());
-            assertEquals(reportador, av.getReportador());
-            assertEquals(latitud, av.getCoordenadas().getLatitud());
-            assertEquals(longitud, av.getCoordenadas().getLongitud());
-            assertEquals(foto, av.getFotoBase64());
-            assertEquals(fecha, av.getFecha());
-            assertEquals("", av.getComentario());
+            assertEquals(reporter, av.getReporter());
+            assertEquals(latitud, av.getCoordinates().getLatitude());
+            assertEquals(longitud, av.getCoordinates().getLongitude());
+            assertEquals(foto, av.getPhotoBase64());
+            assertEquals(fecha, av.getDate());
+            assertEquals("", av.getComment());
         }
 
         @Test
         @DisplayName("Falta mascota")
         public void testSinPet() {
-            User reportador = new User();
-            Exception ex = assertThrows(NullPointerException.class, () -> Avistamiento.builder()
-                    .reportador(reportador)
+            User reporter = getUser("Alejandra", "Garrido", "garrido@info.unlp.edu.ar");
+
+            Exception ex = assertThrows(NullPointerException.class, () -> Sighting.builder()
+                    .reportador(reporter)
                     .latitud(1.0f)
                     .longitud(2.0f)
                     .fotoBase64("f")
@@ -112,8 +130,10 @@ public class SightingTest {
         @Test
         @DisplayName("Falta reportador")
         public void testSinReportador() {
-            Pet mascota = new Pet();
-            Exception ex = assertThrows(NullPointerException.class, () -> Avistamiento.builder()
+            User owner = getUser("Ivana", "Harari", "iharari@info.unlp.edu.ar");
+            Pet mascota = getPet(owner);
+
+            Exception ex = assertThrows(NullPointerException.class, () -> Sighting.builder()
                     .mascota(mascota)
                     .latitud(1.0f)
                     .longitud(2.0f)
@@ -126,11 +146,13 @@ public class SightingTest {
         @Test
         @DisplayName("Falta latitud")
         public void testSinLatitud() {
-            Pet mascota = new Pet();
-            User reportador = new User();
-            Exception ex = assertThrows(NullPointerException.class, () -> Avistamiento.builder()
+            User owner = getUser("Alejandra Beatriz", "Lliteras", "lliteras@info.unlp.edu.ar");
+            User reporter = getUser("Ricardo Marcelo", "Naiouf", "naiouf@info.unlp.edu.ar");
+            Pet mascota = getPet(owner);
+
+            Exception ex = assertThrows(NullPointerException.class, () -> Sighting.builder()
                     .mascota(mascota)
-                    .reportador(reportador)
+                    .reportador(reporter)
                     .longitud(2.0f)
                     .fotoBase64("f")
                     .fecha(LocalDate.now())
@@ -141,11 +163,13 @@ public class SightingTest {
         @Test
         @DisplayName("Falta longitud")
         public void testSinLongitud() {
-            Pet mascota = new Pet();
-            User reportador = new User();
-            Exception ex = assertThrows(NullPointerException.class, () -> Avistamiento.builder()
+            User owner = getUser("Cecilia Verónica", "Sanz", "csanz@info.unlp.edu.ar");
+            User reporter = getUser("Pablo Javier", "Thomas", "pthomas@info.unlp.edu.ar");
+            Pet mascota = getPet(owner);
+
+            Exception ex = assertThrows(NullPointerException.class, () -> Sighting.builder()
                     .mascota(mascota)
-                    .reportador(reportador)
+                    .reportador(reporter)
                     .latitud(1.0f)
                     .fotoBase64("f")
                     .fecha(LocalDate.now())
@@ -156,11 +180,13 @@ public class SightingTest {
         @Test
         @DisplayName("Falta foto")
         public void testSinFoto() {
-            Pet mascota = new Pet();
-            User reportador = new User();
-            Exception ex = assertThrows(NullPointerException.class, () -> Avistamiento.builder()
+            User owner = getUser("Diego", "Torres", "torres@info.unlp.edu.ar");
+            User reporter = getUser("Franco", "Chichizola", "chichizola@info.unlp.edu.ar");
+            Pet mascota = getPet(owner);
+
+            Exception ex = assertThrows(NullPointerException.class, () -> Sighting.builder()
                     .mascota(mascota)
-                    .reportador(reportador)
+                    .reportador(reporter)
                     .latitud(1.0f)
                     .longitud(2.0f)
                     .fecha(LocalDate.now())
@@ -171,16 +197,18 @@ public class SightingTest {
         @Test
         @DisplayName("Falta fecha")
         public void testSinFecha() {
-            Pet mascota = new Pet();
-            User reportador = new User();
-            Exception ex = assertThrows(NullPointerException.class, () -> Avistamiento.builder()
+            User owner = getUser("Rodolfo Alfredo", "Bertone", "bertone@info.unlp.edu.ar");
+            User reporter = getUser("Laura Cristina", "De Giusti", "ldgiusti@info.unlp.edu.ar");
+            Pet mascota = getPet(owner);
+
+            Exception ex = assertThrows(NullPointerException.class, () -> Sighting.builder()
                     .mascota(mascota)
-                    .reportador(reportador)
+                    .reportador(reporter)
                     .latitud(1.0f)
                     .longitud(2.0f)
                     .fotoBase64("f")
                     .build());
             assertEquals("La fecha es obligatoria", ex.getMessage());
         }
-    }*/
+    }
 }
