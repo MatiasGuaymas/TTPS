@@ -106,7 +106,7 @@ public class Pet {
         return Collections.unmodifiableList(this.sightings);
     }
 
-    protected void addAvistamiento(Sighting sighting) {
+    public void addAvistamiento(Sighting sighting) {
         if (sighting != null && !this.sightings.contains(sighting))
             this.sightings.add(sighting);
     }
