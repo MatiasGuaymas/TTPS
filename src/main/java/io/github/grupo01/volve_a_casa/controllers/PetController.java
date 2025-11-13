@@ -2,6 +2,7 @@ package io.github.grupo01.volve_a_casa.controllers;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -159,4 +160,41 @@ public class PetController{
         }
     }
 
+
+    @GetMapping("/lost")
+    public ResponseEntity<List<Pet>> listAllLostPets() {
+        List<Pet> lostPets = petRepository.findAllLostPets();
+
+        if (lostPets.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(lostPets, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPetById(@PathVariable("id") Long id) {
+        Map<String, String> response = new HashMap<>();
+
+        Optional<Pet> petOptional = petRepository.findById(id);
+        if (petOptional.isEmpty()) {
+            response.put("error", "Mascota no encontrada");
+            response.put("message", "No se encontró una mascota con el ID proporcionado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        return ResponseEntity.ok(petOptional.get());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Pet>> listAllPets() {
+        List<Pet> pets = petRepository.findAll();
+        if (pets.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(pets, HttpStatus.OK);
+    }
 }
+
+
+
