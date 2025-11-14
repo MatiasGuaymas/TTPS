@@ -1,4 +1,4 @@
-package io.github.grupo01.volve_a_casa.persistence.controllers;
+package io.github.grupo01.volve_a_casa.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -141,7 +141,8 @@ public class SightingControllerTest {
         );
 
         doNothing().when(tokenValidator).validate(token);
-        when(sightingService.createSighting(anyLong(), any(SightingCreateDTO.class)))
+        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
+        when(sightingService.createSighting(userId, dto))
                 .thenReturn(createSightingResponse(1L, petId, userId));
 
         mockMvc.perform(post("/sightings")

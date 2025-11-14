@@ -27,12 +27,14 @@ public class PetService {
         this.userService = userService;
     }
 
+    // TODO: Test de integracion
     public Pet findById(long id) {
         return petRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mascota no encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet with id " + id + " not found"));
     }
 
+    // TODO: Test de integracion
     public List<PetResponseDTO> findAllLostPets() {
         return petRepository.findAllByStateInOrderByLostDate(Pet.State.PERDIDO_PROPIO, Pet.State.PERDIDO_AJENO)
                 .stream()
@@ -40,6 +42,7 @@ public class PetService {
                 .toList();
     }
 
+    // TODO: Test de integracion
     public List<PetResponseDTO> findAll(Sort sort) {
         return petRepository.findAll(sort).stream()
                 .map(PetResponseDTO::fromPet)
@@ -88,6 +91,7 @@ public class PetService {
         petRepository.delete(pet);
     }
 
+    // TODO: Test de integracion
     public List<SightingResponseDTO> getPetSightings(long petId) {
         Pet pet = this.findById(petId);
         return pet.getSightings().stream()

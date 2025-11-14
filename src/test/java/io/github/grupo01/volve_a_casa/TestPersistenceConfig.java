@@ -1,9 +1,10 @@
-package io.github.grupo01.volve_a_casa.persistence;
+package io.github.grupo01.volve_a_casa;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -15,6 +16,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
+@Profile("test")
 @ComponentScan(basePackages = "io.github.grupo01.volve_a_casa.persistence")
 public class TestPersistenceConfig {
 

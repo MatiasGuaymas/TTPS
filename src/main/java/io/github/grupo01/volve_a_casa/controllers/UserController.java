@@ -56,6 +56,11 @@ public class UserController {
     public ResponseEntity<?> getMyPets(@RequestHeader("token") String token) {
         tokenValidator.validate(token);
         List<PetResponseDTO> pets = userService.getPetsCreatedByUser(tokenValidator.extractUserId(token));
+
+        if (pets.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
         return ResponseEntity.ok(pets);
     }
 

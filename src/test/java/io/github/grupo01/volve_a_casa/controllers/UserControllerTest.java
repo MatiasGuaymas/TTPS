@@ -1,11 +1,13 @@
-package io.github.grupo01.volve_a_casa.persistence.controllers;
+package io.github.grupo01.volve_a_casa.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.grupo01.volve_a_casa.controllers.UserController;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
+import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.security.TokenValidator;
 import io.github.grupo01.volve_a_casa.services.UserService;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -189,7 +192,8 @@ class UserControllerTest {
         UserResponseDTO updated = createResponse(requesterId, "Juan Carlos", "Gomez", "juan@test.com");
 
         doNothing().when(tokenValidator).validate(anyString());
-        when(userService.updateUser(anyLong(), any(UserUpdateDTO.class))).thenReturn(updated);
+        when(tokenValidator.extractUserId(requesterId + "123456")).thenReturn(requesterId);
+        when(userService.updateUser(requesterId, updateDTO)).thenReturn(updated);
 
         mockMvc.perform(put("/users/update")
                         .header("token", token)
@@ -215,6 +219,55 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").value("Token invalido"));
+    }
+
+    @Test
+    void getMyPets_whenTokenInvalid_returnsUnauthorized() throws Exception {
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido"))
+                .when(tokenValidator).validate(anyString());
+
+        mockMvc.perform(get("/users/my_pets")
+                        .header("token", "Invalido")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Token invalido"));
+    }
+
+    @Test
+    void getMyPets_whenTokenValidAndEmpty_returnsNoContent() throws Exception {
+        long requesterId = 1L;
+        String token = requesterId + "123456";
+
+        doNothing().when(tokenValidator).validate(anyString());
+        when(tokenValidator.extractUserId(requesterId + "123456")).thenReturn(requesterId);
+        when(userService.getPetsCreatedByUser(requesterId)).thenReturn(List.of());
+
+        mockMvc.perform(get("/users/my_pets")
+                        .header("token", token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getMyPets_whenTokenValidAndPetExists_returnsOkAndList() throws Exception {
+        long requesterId = 1L;
+        String token = requesterId + "123456";
+
+        PetResponseDTO pet1 = createPetResponse(1L, requesterId, "Bigotes");
+        PetResponseDTO pet2 = createPetResponse(3L, requesterId, "Firulais");
+        PetResponseDTO pet3 = createPetResponse(8L, requesterId, "Misha");
+
+        doNothing().when(tokenValidator).validate(anyString());
+        when(tokenValidator.extractUserId(requesterId + "123456")).thenReturn(requesterId);
+        when(userService.getPetsCreatedByUser(requesterId)).thenReturn(List.of(pet1, pet2, pet3));
+
+        mockMvc.perform(get("/users/my_pets")
+                        .header("token", token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Bigotes"))
+                .andExpect(jsonPath("$[1].name").value("Firulais"))
+                .andExpect(jsonPath("$[2].name").value("Misha"));
     }
 
     private UserResponseDTO createResponse(Long id, String name, String lastname, String email) {
@@ -243,6 +296,24 @@ class UserControllerTest {
                 "La Plata",
                 -54.23f,
                 -12.32f
+        );
+    }
+
+    private PetResponseDTO createPetResponse(long id, long creatorId, String name) {
+        return new PetResponseDTO(
+                id,
+                name,
+                "mediano",
+                "perro mediano",
+                "color",
+                "race",
+                10.0f,
+                -54.21f,
+                -23.128f,
+                LocalDate.now(),
+                Pet.State.PERDIDO_PROPIO,
+                Pet.Type.PERRO,
+                creatorId
         );
     }
 }

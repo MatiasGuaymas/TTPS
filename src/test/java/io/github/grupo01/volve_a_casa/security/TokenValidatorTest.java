@@ -1,7 +1,6 @@
-package io.github.grupo01.volve_a_casa.persistence.security;
+package io.github.grupo01.volve_a_casa.security;
 
 import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
-import io.github.grupo01.volve_a_casa.security.TokenValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

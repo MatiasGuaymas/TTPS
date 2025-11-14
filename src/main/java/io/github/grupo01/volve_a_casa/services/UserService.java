@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-// TODO: Testear
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -27,12 +26,14 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // TODO: Test de integracion
     public User findById(long id) {
         return userRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
     }
 
+    // TODO: Test de integracion
     public List<UserResponseDTO> findAll(Sort sorted) {
         return userRepository.findAll(sorted)
                 .stream()
@@ -40,8 +41,17 @@ public class UserService {
                 .toList();
     }
 
+    // TODO: Test de integracion
+    public List<PetResponseDTO> getPetsCreatedByUser(long id) {
+        User user = this.findById(id);
+        return user.getCreatedPets()
+                .stream()
+                .map(PetResponseDTO::fromPet)
+                .toList();
+    }
+
     public UserResponseDTO createUser(UserCreateDTO dto) {
-        if (userRepository.findByEmail(dto.email()).isPresent()) {
+        if (userRepository.existsByEmail(dto.email())) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "El email ya está siendo utilizado por otro usuario"
@@ -71,21 +81,13 @@ public class UserService {
         return UserResponseDTO.fromUser(savedUser);
     }
 
-    public List<PetResponseDTO> getPetsCreatedByUser(long id) {
-        User user = this.findById(id);
-        return user.getCreatedPets()
-                .stream()
-                .map(PetResponseDTO::fromPet)
-                .toList();
-    }
-
     public String authenticateUser(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Mail o contraseña incorrectos"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials"));
 
 
-        if (!user.getPassword().equals(passwordEncoder.encode(password)) || !user.isEnabled()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Mail o contraseña incorrectos");
+        if (!passwordEncoder.matches(password, user.getPassword()) || !user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials");
         }
 
         return user.getId() + "123456";

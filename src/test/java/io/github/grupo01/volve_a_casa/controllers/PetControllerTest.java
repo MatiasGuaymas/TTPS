@@ -1,4 +1,4 @@
-package io.github.grupo01.volve_a_casa.persistence.controllers;
+package io.github.grupo01.volve_a_casa.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.grupo01.volve_a_casa.controllers.PetController;
@@ -66,7 +66,8 @@ public class PetControllerTest {
         PetCreateDTO dto = samplePetCreateDTO();
 
         doNothing().when(tokenValidator).validate(token);
-        when(petService.createPet(anyLong(), any(PetCreateDTO.class))).thenReturn(createPetResponse(petId, userId, "Tobby"));
+        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
+        when(petService.createPet(userId, dto)).thenReturn(createPetResponse(petId, userId, "Tobby"));
 
         mockMvc.perform(post("/pets")
                         .header("token", token)
@@ -117,7 +118,8 @@ public class PetControllerTest {
 
 
         doNothing().when(tokenValidator).validate(anyString());
-        when(petService.updatePet(anyLong(), anyLong(), eq(dto))).thenReturn(petResponseDTO);
+        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
+        when(petService.updatePet(petId, userId, dto)).thenReturn(petResponseDTO);
 
         mockMvc.perform(put("/pets/" + petId)
                         .header("token", token)
@@ -161,7 +163,8 @@ public class PetControllerTest {
 
 
         doNothing().when(tokenValidator).validate(anyString());
-        doNothing().when(petService).deletePet(eq(petId), anyLong());
+        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
+        doNothing().when(petService).deletePet(petId, userId);
 
         mockMvc.perform(delete("/pets/" + petId)
                         .header("token", token))

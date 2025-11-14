@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-// TODO: Testear
 @Service
 public class SightingService {
 
@@ -27,12 +26,14 @@ public class SightingService {
         this.petService = petService;
     }
 
+    // TODO: Test de integracion
     public Sighting findById(long id) {
         return sightingRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avistamiento no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sighting with id " + id + " not found"));
     }
 
+    // TODO: Test de integracion
     public List<SightingResponseDTO> findAll(Sort sort) {
         return sightingRepository.findAll(sort).stream()
                 .map(SightingResponseDTO::fromSighting)
