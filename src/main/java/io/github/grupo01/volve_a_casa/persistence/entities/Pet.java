@@ -1,37 +1,21 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.stereotype.Component;
-
-import io.github.grupo01.volve_a_casa.controllers.dto.PetUpdateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.embeddable.Coordinates;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
-@Table(name="pets")
+@Table(name = "pets")
 @Component
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -73,8 +57,9 @@ public class Pet {
 
     @ElementCollection
     @Setter(AccessLevel.NONE)
-    @CollectionTable(name="mascota_fotos", joinColumns=@JoinColumn(name="mascota_id")) // Crea una tabla "mascota_fotos"
-    @Column(name="foto_base64", columnDefinition = "TEXT")
+    @CollectionTable(name = "mascota_fotos", joinColumns = @JoinColumn(name = "mascota_id"))
+    // Crea una tabla "mascota_fotos"
+    @Column(name = "foto_base64", columnDefinition = "TEXT")
     private List<String> photosBase64 = new ArrayList<>();
 
     @OneToMany(
@@ -84,19 +69,19 @@ public class Pet {
     )
     private List<Sighting> sightings = new ArrayList<>();
 
-    private Pet(Builder builder) {
-        this.name = builder.nombre;
-        this.size = builder.tamano;
-        this.color = builder.color;
-        this.race = builder.raza;
-        this.description = builder.descripcion;
-        this.weight = builder.peso;
-        this.coordinates = new Coordinates(builder.latitud, builder.longitud);
-        this.lostDate = builder.fechaPerdida;
-        this.state = builder.state;
-        this.type = builder.type;
-        this.photosBase64 = builder.fotosBase64;
-        this.creator = builder.creador;
+    public Pet(String name, String size, String description, String color, String race, float weight, float latitude, float longitude, Pet.Type type, User creator, String fotoDefaultBase64) {
+        this.name = name;
+        this.size = size;
+        this.description = description;
+        this.color = color;
+        this.race = race;
+        this.weight = weight;
+        this.type = type;
+        this.creator = creator;
+        this.lostDate = LocalDate.now();
+        this.actualizarUbicacion(latitude, longitude);
+        this.addFotoBase64(fotoDefaultBase64);
+
     }
 
     public void actualizarUbicacion(float latitud, float longitud) {
@@ -132,6 +117,7 @@ public class Pet {
 
     /**
      * Devuelve los avistamientos de la mascota.
+     *
      * @return Lista de avistamientos inmodificable.
      */
     public List<Sighting> getSightings() {
@@ -146,115 +132,6 @@ public class Pet {
     public void removeAvistamiento(Sighting sighting) {
         if (sighting != null) {
             this.sightings.remove(sighting);
-        }
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    // TODO: Borrar
-    public static class Builder {
-        private String nombre;
-        private String tamano;
-        private String descripcion;
-        private String color;
-        private String raza;
-        private Float peso;
-        private Float latitud;
-        private Float longitud;
-        private LocalDate fechaPerdida;
-        private State state;
-        private Type type;
-        private User creador;
-        private List<String> fotosBase64 = new ArrayList<>();
-
-        private Builder() {}
-
-        public Builder nombre(String nombre) {
-            this.nombre = nombre;
-            return this;
-        }
-
-        public Builder tamano(String tamano) {
-            this.tamano = tamano;
-            return this;
-        }
-
-        public Builder descripcion(String descripcion) {
-            this.descripcion = descripcion;
-            return this;
-        }
-
-        public Builder color(String color) {
-            this.color = color;
-            return this;
-        }
-
-        public Builder raza(String raza) {
-            this.raza = raza;
-            return this;
-        }
-
-        public Builder peso(Float peso) {
-            this.peso = peso;
-            return this;
-        }
-
-        public Builder latitud(Float latitud) {
-            this.latitud = latitud;
-            return this;
-        }
-
-        public Builder longitud(Float longitud) {
-            this.longitud = longitud;
-            return this;
-        }
-
-        public Builder fechaPerdida(LocalDate fechaPerdida) {
-            this.fechaPerdida = fechaPerdida;
-            return this;
-        }
-
-        public Builder estado(State state) {
-            this.state = state;
-            return this;
-        }
-
-        public Builder tipo(Type type) {
-            this.type = type;
-            return this;
-        }
-
-        public Builder agregarFoto(String fotoBase64) {
-            if (this.fotosBase64 != null && !this.fotosBase64.contains(fotoBase64) && !fotoBase64.isEmpty()) {
-                this.fotosBase64.add(fotoBase64);
-            }
-            return this;
-        }
-
-        public Builder creador(User creador) {
-            this.creador = creador;
-            return this;
-        }
-
-        public Pet build() {
-            Objects.requireNonNull(nombre,       "El nombre es obligatorio");
-            Objects.requireNonNull(tamano,       "El tamano es obligatorio");
-            Objects.requireNonNull(descripcion,  "La descripcion es obligatoria");
-            Objects.requireNonNull(color,        "El color es obligatorio");
-            Objects.requireNonNull(raza,         "La raza es obligatoria");
-            Objects.requireNonNull(peso,         "El peso es obligatorio");
-            Objects.requireNonNull(latitud,      "La latitud es obligatoria");
-            Objects.requireNonNull(longitud,     "La longitud es obligatoria");
-            Objects.requireNonNull(fechaPerdida, "La fecha de perdida es obligatoria");
-            Objects.requireNonNull(state,       "El estado es obligatorio");
-            Objects.requireNonNull(type,         "El tipo es obligatorio");
-            Objects.requireNonNull(creador,      "El creador es obligatorio");
-            if (fotosBase64.isEmpty())
-                throw new IllegalArgumentException("Debe agregar al menos una foto");
-
-            return new Pet(this);
         }
     }
 

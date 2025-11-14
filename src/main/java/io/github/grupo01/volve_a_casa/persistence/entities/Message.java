@@ -1,14 +1,17 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name="messages")
+@Table(name = "messages")
 @Component
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message {
@@ -22,11 +25,11 @@ public class Message {
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name="destinatario_id")
+    @JoinColumn(name = "destinatario_id")
     private User receiver;
 
     @ManyToOne
-    @JoinColumn(name="emisor_id")
+    @JoinColumn(name = "emisor_id")
     private User sender;
 
     public Message(String content, LocalDate date, User receiver, User sender) {

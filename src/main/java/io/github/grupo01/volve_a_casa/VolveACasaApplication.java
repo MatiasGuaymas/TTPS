@@ -3,7 +3,6 @@ package io.github.grupo01.volve_a_casa;
 import org.hibernate.HibernateException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
 public class VolveACasaApplication {
@@ -14,15 +13,15 @@ public class VolveACasaApplication {
         } catch (Exception e) {
             if (containsHibernateException(e)) {
                 System.out.println("""
-                --------------------------------------------------------
-                ❌ No se pudo conectar con la base de datos.
-                👉 Asegurate de que el contenedor Docker esté corriendo
-                y que la base de datos se llame 'volve_a_casa'.
-
-                🔧 Podés iniciarla con:
-                    docker compose up -d
-                --------------------------------------------------------
-                """);
+                        --------------------------------------------------------
+                        ❌ No se pudo conectar con la base de datos.
+                        👉 Asegurate de que el contenedor Docker esté corriendo
+                        y que la base de datos se llame 'volve_a_casa'.
+                        
+                        🔧 Podés iniciarla con:
+                            docker compose up -d
+                        --------------------------------------------------------
+                        """);
             } else {
                 // Si es otro error, lo volvemos a lanzar
                 throw e;

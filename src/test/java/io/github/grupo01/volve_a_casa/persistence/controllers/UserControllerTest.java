@@ -2,54 +2,59 @@ package io.github.grupo01.volve_a_casa.persistence.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.grupo01.volve_a_casa.controllers.UserController;
-import io.github.grupo01.volve_a_casa.controllers.dto.UserCreateDTO;
-import io.github.grupo01.volve_a_casa.controllers.dto.UserUpdateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
+import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
-import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
+import io.github.grupo01.volve_a_casa.security.TokenValidator;
+import io.github.grupo01.volve_a_casa.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest extends BaseControllerTest {
-    @Mock
-    private UserRepository userRepository;
-    private ObjectMapper objectMapper;
-    private MockMvc mockMvc;
+class UserControllerTest {
 
-    @BeforeAll
-    static void init() {
-        createContext();
-    }
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Mock
+    private UserService userService;
+    @Mock
+    private TokenValidator tokenValidator;
+    @InjectMocks
+    private UserController userController;
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setup() {
-        // cleanDatabase();
-        this.objectMapper = new ObjectMapper();
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userRepository)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
+
+    // ========= LIST USERS =========
 
     @Test
     void listAllUsersOrderByName_whenEmpty_returnsNoContent() throws Exception {
-        when(userRepository.findAll(Sort.by("name"))).thenReturn(Collections.emptyList());
+        when(userService.findAll(Sort.by("name"))).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/users").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -57,24 +62,23 @@ public class UserControllerTest extends BaseControllerTest {
 
     @Test
     void listAllUsersOrderByName_whenUsersExist_returnsOkAndList() throws Exception {
-        List<User> users = Arrays.asList(
-            buildUser("Juan", "Perez", "juan.perez@test.com"),
-            buildUser("Ana", "Gomez", "ana.gomez@test.com")
-        );
+        UserResponseDTO user1 = createResponse(1L, "Juan", "Perez", "juan.perez@test.com");
+        UserResponseDTO user2 = createResponse(2L, "Ana", "Gomez", "ana.gomez@test.com");
 
-        when(userRepository.findAll(Sort.by("name"))).thenReturn(users);
+        when(userService.findAll(Sort.by("name"))).thenReturn(List.of(user1, user2));
 
-        mockMvc.perform(get("/users")
-                        .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/users").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].name").value("Juan"))
                 .andExpect(jsonPath("$[1].name").value("Ana"));
     }
 
+    // ========= CREATE =========
+
     @Test
     void createUser_whenUserDoesNotExist_returnsCreated() throws Exception {
-        UserCreateDTO newUser = new UserCreateDTO(
+
+        UserCreateDTO dto = new UserCreateDTO(
                 "luismartinez@test.com",
                 "password",
                 "nombre",
@@ -86,19 +90,20 @@ public class UserControllerTest extends BaseControllerTest {
                 -43.23f
         );
 
-        when(userRepository.findByEmail(newUser.email())).thenReturn(java.util.Optional.empty());
+        UserResponseDTO created = createResponse(10L, "nombre", "apellido", "luismartinez@test.com");
+
+        when(userService.createUser(any(UserCreateDTO.class))).thenReturn(created);
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUser)))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.email").value("luismartinez@test.com"));
     }
 
     @Test
     void createUser_whenUserExists_returnsConflict() throws Exception {
-        UserCreateDTO newUser = new UserCreateDTO(
+        UserCreateDTO dto = new UserCreateDTO(
                 "luismartinez@test.com",
                 "password",
                 "nombre",
@@ -110,27 +115,30 @@ public class UserControllerTest extends BaseControllerTest {
                 -43.23f
         );
 
-        when(userRepository.findByEmail(newUser.email())).thenReturn(java.util.Optional.of(new User(newUser)));
+        doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "El email ya está siendo utilizado por otro usuario"))
+                .when(userService).createUser(any(UserCreateDTO.class));
+
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newUser)))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict());
     }
 
+    // ========= GET USER BY ID =========
+
     @Test
     void getUserById_whenUserExistsAndTokenValid_returnsOk() throws Exception {
-        User existingUser = buildUser("Marta", "Sanchez", "martasanchez@test.com");
-        //id del usuario que hace la request
-        long idRequester = 3L;
-        //id del usuario que se quiere obtener
-        long idExistingUser = 1L;
+        long requesterId = 3L;
+        long targetUserId = 1L;
+        String token = requesterId + "123456";
 
-        // Simular que el token es válido
-        when(userRepository.existsById(idRequester)).thenReturn(true);
-        // Simular que el usuario existe
-        when(userRepository.findById(idExistingUser)).thenReturn(java.util.Optional.of(existingUser));
-        mockMvc.perform(get("/users/" + idExistingUser)
-                        .header("token", idRequester + "123456")
+        User user = createUser("Marta", "Sanchez", "martasanchez@test.com");
+
+        doNothing().when(tokenValidator).validate(anyString());
+        when(userService.findById(targetUserId)).thenReturn(user);
+
+        mockMvc.perform(get("/users/" + targetUserId)
+                        .header("token", token)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("martasanchez@test.com"));
@@ -138,80 +146,104 @@ public class UserControllerTest extends BaseControllerTest {
 
     @Test
     void getUserById_whenTokenInvalid_returnsUnauthorized() throws Exception {
-        //id del usuario que hace la request
-        long idRequester = 3L;
+        long requesterId = 3L;
+        String token = requesterId + "123456";
 
-        // Simular que el token es inválido
-        when(userRepository.existsById(idRequester)).thenReturn(false);
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido"))
+                .when(tokenValidator).validate(anyString());
+
         mockMvc.perform(get("/users/1")
-                        .header("token", idRequester + "123456")
+                        .header("token", token)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Token inválido"));
+                .andExpect(jsonPath("$.error").value("Token invalido"));
     }
 
     @Test
     void getUserById_whenUserDoesNotExist_returnsNotFound() throws Exception {
-        Long userId = 999L;
-        //id del usuario que hace la request
-        long idRequester = 3L;
+        long requesterId = 3L;
+        long targetUserId = 999L;
+        String token = requesterId + "123456";
 
-        // Simular que el token es válido
-        when(userRepository.existsById(idRequester)).thenReturn(true);
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
-        mockMvc.perform(get("/users/" + userId)
-                        .header("token", idRequester+"123456")
+        doNothing().when(tokenValidator).validate(anyString());
+        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User no encontrado"))
+                .when(userService).findById(targetUserId);
+
+        mockMvc.perform(get("/users/" + targetUserId)
+                        .header("token", token)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("User no encontrado"));
     }
 
+    // ========= UPDATE USER =========
+
     @Test
     void updateUser_whenTokenValid_returnsOk() throws Exception {
-        long idRequester = 1L;
-        String token = idRequester + "123456";
-        User existingUser = buildUser("Juan", "Perez", "juanperez@test.com");
-        existingUser.setEmail("juan@test.com");
-        existingUser.setName("Juan");
-        existingUser.setLastName("Perez");
-        existingUser.setCity("La Plata");
+        long requesterId = 1L;
+        String token = requesterId + "123456";
 
-        UserUpdateDTO dto = new UserUpdateDTO("Juan Carlos", "Gomez", null, "Buenos Aires", null, 0, 0);
+        UserUpdateDTO updateDTO =
+                new UserUpdateDTO("Juan Carlos", "Gomez", null, "Buenos Aires", null, 0f, 0f);
 
-        when(userRepository.existsById(idRequester)).thenReturn(true);
-        when(userRepository.findById(idRequester)).thenReturn(Optional.of(existingUser));
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+        UserResponseDTO updated = createResponse(requesterId, "Juan Carlos", "Gomez", "juan@test.com");
 
-        // Act
+        doNothing().when(tokenValidator).validate(anyString());
+        when(userService.updateUser(anyLong(), any(UserUpdateDTO.class))).thenReturn(updated);
+
         mockMvc.perform(put("/users/update")
                         .header("token", token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Juan Carlos"))
                 .andExpect(jsonPath("$.lastName").value("Gomez"))
-                .andExpect(jsonPath("$.city").value("Buenos Aires"));
-
-        // Assert
-        assertEquals("Juan Carlos", existingUser.getName());
-        assertEquals("Gomez", existingUser.getLastName());
-        assertEquals("Buenos Aires", existingUser.getCity());
+                .andExpect(jsonPath("$.email").value("juan@test.com"));
     }
 
-    //TODO: agregar más tests para update (token inválido, usuario no existe, etc)
+    @Test
+    void updateUser_whenTokenInvalid_returnsUnauthorized() throws Exception {
+        UserUpdateDTO updateDTO =
+                new UserUpdateDTO("Juan Carlos", "Gomez", null, "Buenos Aires", null, 0f, 0f);
 
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido"))
+                .when(tokenValidator).validate(anyString());
 
-    private User buildUser(String nombre, String apellidos, String email) {
-        return User.builder()
-                .nombre(nombre)
-                .apellidos(apellidos)
-                .email(email)
-                .contrasena("1234")
-                .telefono("123456789")
-                .ciudad("CiudadTest")
-                .barrio("BarrioTest")
-                .latitud(-34.6037f)
-                .longitud(-58.3816f)
-                .build();
+        mockMvc.perform(put("/users/update")
+                        .header("token", "Invalido")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDTO)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Token invalido"));
+    }
+
+    private UserResponseDTO createResponse(Long id, String name, String lastname, String email) {
+        return new UserResponseDTO(
+                id,
+                name,
+                lastname,
+                email,
+                "221 333-3333",
+                "Buenos Aires",
+                "Lanús",
+                -54.23f,
+                -12.32f,
+                100
+        );
+    }
+
+    private User createUser(String name, String lastname, String email) {
+        return new User(
+                name,
+                lastname,
+                email,
+                "password",
+                "221 111-1111",
+                "La Plata",
+                "La Plata",
+                -54.23f,
+                -12.32f
+        );
     }
 }
+

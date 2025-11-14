@@ -1,4 +1,4 @@
-package io.github.grupo01.volve_a_casa.persistence;
+package io.github.grupo01.volve_a_casa.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;

@@ -1,198 +1,93 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
+import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
+import io.github.grupo01.volve_a_casa.security.TokenValidator;
+import io.github.grupo01.volve_a_casa.services.PetService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.github.grupo01.volve_a_casa.controllers.dto.PetCreateDTO;
-import io.github.grupo01.volve_a_casa.controllers.dto.PetUpdateDTO;
-import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
-import io.github.grupo01.volve_a_casa.persistence.entities.User;
-import io.github.grupo01.volve_a_casa.persistence.repositories.PetRepository;
-import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
+import java.util.List;
 
 @RestController
-@RequestMapping(value="/pets", produces=MediaType.APPLICATION_JSON_VALUE, name="PetRestController")
-public class PetController{
+@RequestMapping(value = "/pets", produces = MediaType.APPLICATION_JSON_VALUE, name = "PetRestController")
+public class PetController {
 
-    private final PetRepository petRepository;
-    private final UserRepository userRepository;
+    private final TokenValidator tokenValidator;
+    private final PetService petService;
 
     @Autowired
-    public PetController(PetRepository petRepository, UserRepository userRepository){
-        this.petRepository = petRepository;
-        this.userRepository = userRepository;
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<?> createPet(@RequestHeader("token")String token, @RequestBody PetCreateDTO dto) {
-        Map<String, Object> response = new HashMap<>();
-
-        if (!dto.isValid()) {
-            response.put("error", "Datos invalidos");
-            response.put("message", "Faltan campos obligatorios.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-
-        Optional<User> optionalUser = getUserFromToken(token);
-        if (optionalUser.isEmpty()) {
-            response.put("error", "Token inválido");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-
-        User creator = optionalUser.get();
-
-        try {
-            Pet newPet = Pet.builder()
-                    .nombre(dto.name())
-                    .tamano(dto.size())
-                    .descripcion(dto.description())
-                    .color(dto.color())
-                    .raza(dto.race())
-                    .peso(dto.weight())
-                    .latitud(dto.latitude())
-                    .longitud(dto.longitude())
-                    .fechaPerdida(LocalDate.now())
-                    .estado(Pet.State.PERDIDO_PROPIO)
-                    .tipo(dto.type())
-                    .creador(creator)
-                    .agregarFoto("foto_default_base64")
-                    .build();
-            petRepository.save(newPet);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newPet);
-
-        } catch (Exception e) {
-            response.put("error", "Error al crear mascota");
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updatePet(@RequestHeader("token") String token, @PathVariable Long id, @RequestBody PetUpdateDTO dto) {
-        Map<String, String> response = new HashMap<>();
-        Optional<User> optionalUser = getUserFromToken(token);
-        if (optionalUser.isEmpty()) {
-            response.put("error", "Token inválido");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-
-        Optional<Pet> optionalPet = petRepository.findById(id);
-        if (optionalPet.isEmpty()) {
-            response.put("error", "Mascota no encontrada");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-
-        Pet pet = optionalPet.get();
-        if (!pet.getCreator().equals(optionalUser.get())) {
-            response.put("error", "No autorizado");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-        }
-
-        pet.updateFromDTO(dto);
-
-        petRepository.save(pet);
-        return ResponseEntity.ok(pet);
-    }
-
-
-    @GetMapping("/mine")
-    public ResponseEntity<?> getMyPets(@RequestHeader("token") String token) {
-        Map<String, String> response = new HashMap<>();
-        Optional<User> optionalUser = getUserFromToken(token);
-        if (optionalUser.isEmpty()) {
-            response.put("error", "Token inválido");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-        User user = optionalUser.get();
-        return ResponseEntity.ok(user.getCreatedPets());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePet(@RequestHeader("token") String token, @PathVariable Long id) {
-        Map<String, String> response = new HashMap<>();
-        Optional<User> optionalUser = getUserFromToken(token);
-        if (optionalUser.isEmpty()) {
-            response.put("error", "Token inválido");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-
-        Optional<Pet> optionalPet = petRepository.findById(id);
-        if (optionalPet.isEmpty()) {
-            response.put("error", "Mascota no encontrada");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-
-        Pet pet = optionalPet.get();
-        if (!pet.getCreator().equals(optionalUser.get())) {
-            response.put("error", "No autorizado");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-        }
-
-        petRepository.delete(pet);
-        response.put("message", "Mascota eliminada correctamente");
-        return ResponseEntity.ok(response);
-    }
-
-    private Optional<User> getUserFromToken(String token) {
-        if (token == null || !token.endsWith("123456"))
-            return Optional.empty();
-        try {
-            Long id = Long.valueOf(token.replace("123456", ""));
-            return userRepository.findById(id);
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
-
-
-    @GetMapping("/lost")
-    public ResponseEntity<List<Pet>> listAllLostPets() {
-        List<Pet> lostPets = petRepository.findAllLostPets();
-
-        if (lostPets.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        return new ResponseEntity<>(lostPets, HttpStatus.OK);
+    public PetController(TokenValidator tokenValidator, PetService petService) {
+        this.tokenValidator = tokenValidator;
+        this.petService = petService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPetById(@PathVariable("id") Long id) {
-        Map<String, String> response = new HashMap<>();
+        Pet pet = petService.findById(id);
+        return ResponseEntity.ok(PetResponseDTO.fromPet(pet));
+    }
 
-        Optional<Pet> petOptional = petRepository.findById(id);
-        if (petOptional.isEmpty()) {
-            response.put("error", "Mascota no encontrada");
-            response.put("message", "No se encontró una mascota con el ID proporcionado");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    @PostMapping
+    public ResponseEntity<?> createPet(@RequestHeader("token") String token, @Valid @RequestBody PetCreateDTO dto) {
+        tokenValidator.validate(token);
+        PetResponseDTO response = petService.createPet(tokenValidator.extractUserId(token), dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePet(@RequestHeader("token") String token, @PathVariable Long id, @Valid @RequestBody PetUpdateDTO updatedData) {
+        tokenValidator.validate(token);
+        PetResponseDTO user = petService.updatePet(id, tokenValidator.extractUserId(token), updatedData);
+        return ResponseEntity.ok(user);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePet(@RequestHeader("token") String token, @PathVariable Long id) {
+        tokenValidator.validate(token);
+        petService.deletePet(id, tokenValidator.extractUserId(token));
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/lost")
+    public ResponseEntity<?> listAllLostPets() {
+        List<PetResponseDTO> lostPets = petService.findAllLostPets();
+
+        if (lostPets.isEmpty()) {
+            return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(petOptional.get());
+        return ResponseEntity.ok(lostPets);
     }
 
     @GetMapping
-    public ResponseEntity<List<Pet>> listAllPets() {
-        List<Pet> pets = petRepository.findAll();
+    public ResponseEntity<?> listAllPets() {
+        List<PetResponseDTO> pets = petService.findAll(Sort.by(Sort.Direction.DESC, "lostDate"));
+
         if (pets.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(pets);
+    }
+
+    @GetMapping("/{id}/sightings")
+    public ResponseEntity<?> listAllSightings(@PathVariable Long id) {
+        List<SightingResponseDTO> sightings = petService.getPetSightings(id);
+
+        if (sightings.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(pets, HttpStatus.OK);
+
+        return new ResponseEntity<>(sightings, HttpStatus.OK);
     }
 }
 

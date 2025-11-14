@@ -1,13 +1,14 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
-import io.github.grupo01.volve_a_casa.controllers.dto.UserCreateDTO;
-import io.github.grupo01.volve_a_casa.controllers.dto.UserUpdateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.embeddable.Coordinates;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -88,29 +89,21 @@ public class User {
     @Setter(AccessLevel.NONE)
     private List<Sighting> sightings = new ArrayList<>();
 
-    // Constructor privado para el builder
-    private User(Builder builder) {
-        this.name = builder.nombre;
-        this.lastName = builder.apellidos;
-        this.email = builder.email;
-        this.password = new BCryptPasswordEncoder().encode(builder.contrasena);
-        this.phone = builder.telefono;
-        this.city = builder.ciudad;
-        this.neighborhood = builder.barrio;
-        this.coordinates = new Coordinates(builder.latitud, builder.longitud);
-        this.points = builder.puntos;
-        this.enabled = builder.habilitado;
-        this.role = builder.role;
+    public User(String name, String lastName, String email, String password, String phone, String city, String neighborhood, Float latitude, Float longitude) {
+        this.name = name;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.city = city;
+        this.neighborhood = neighborhood;
+        this.actualizarUbicacion(latitude, longitude);
+        this.points = 0;
+        this.enabled = true;
+        this.role = Role.USER;
     }
 
-    public User(UserCreateDTO dto) {
-        this.name = dto.name();
-        this.lastName = dto.lastName();
-        this.email = dto.email();
-        this.password = new BCryptPasswordEncoder().encode(dto.password());
-    }
-
-    public void actualizarUbicacion(float latitud, float longitud) {
+    public void actualizarUbicacion(Float latitud, Float longitud) {
         this.coordinates = new Coordinates(latitud, longitud);
     }
 
@@ -157,17 +150,14 @@ public class User {
         }
     }
 
-    public boolean checkPassword(String password) {
-        return this.password.equals(new BCryptPasswordEncoder().encode(password));
-    }
-
     public void updateFromDTO(UserUpdateDTO dto) {
         if (dto.name() != null) this.name = dto.name();
         if (dto.lastName() != null) this.lastName = dto.lastName();
         if (dto.phoneNumber() != null) this.phone = dto.phoneNumber();
         if (dto.city() != null) this.city = dto.city();
         if (dto.neighborhood() != null) this.neighborhood = dto.neighborhood();
-        if (dto.latitude() != 0 && dto.longitude() != 0) this.actualizarUbicacion(dto.latitude(), dto.longitude());
+        if (dto.latitude() != null && dto.longitude() != null)
+            this.actualizarUbicacion(dto.latitude(), dto.longitude());
     }
 
     @Override
@@ -179,103 +169,6 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getEmail());
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    // TODO: Borrar
-    public static class Builder {
-        private String nombre;
-        private String apellidos;
-        private String email;
-        private String contrasena;
-        private String telefono;
-        private String ciudad;
-        private String barrio;
-        private Float latitud;
-        private Float longitud;
-        private int puntos = 0;
-        private boolean habilitado = true;
-        private Role role = Role.USER;
-
-        private Builder() {}
-
-        public Builder nombre(String nombre) {
-            this.nombre = nombre;
-            return this;
-        }
-
-        public Builder apellidos(String apellidos) {
-            this.apellidos = apellidos;
-            return this;
-        }
-
-        public Builder email(String email) {
-            this.email = email;
-            return this;
-        }
-
-        public Builder contrasena(String contrasena) {
-            this.contrasena = contrasena;
-            return this;
-        }
-
-        public Builder telefono(String telefono) {
-            this.telefono = telefono;
-            return this;
-        }
-
-        public Builder ciudad(String ciudad) {
-            this.ciudad = ciudad;
-            return this;
-        }
-
-        public Builder barrio(String barrio) {
-            this.barrio = barrio;
-            return this;
-        }
-
-        public Builder latitud(Float latitud) {
-            this.latitud = latitud;
-            return this;
-        }
-
-        public Builder longitud(Float longitud) {
-            this.longitud = longitud;
-            return this;
-        }
-
-        public Builder puntos(int puntos) {
-            this.puntos = puntos;
-            return this;
-        }
-
-        public Builder habilitado(boolean habilitado) {
-            this.habilitado = habilitado;
-            return this;
-        }
-
-        public Builder rol(Role role) {
-            this.role = role;
-            return this;
-        }
-
-        public User build() {
-            // Valido que los campos obligatorios no sean null
-            Objects.requireNonNull(nombre,     "El nombre es obligatorio");
-            Objects.requireNonNull(apellidos,  "Los apellidos son obligatorios");
-            Objects.requireNonNull(email,      "El email es obligatorio");
-            Objects.requireNonNull(contrasena, "La contraseña es obligatoria");
-            Objects.requireNonNull(telefono,   "El teléfono es obligatorio");
-            Objects.requireNonNull(ciudad,     "La ciudad es obligatoria");
-            Objects.requireNonNull(barrio,     "El barrio es obligatorio");
-            Objects.requireNonNull(latitud,    "La latitud es obligatoria");
-            Objects.requireNonNull(longitud,   "La longitud es obligatoria");
-
-            return new User(this);
-        }
     }
 
     public enum Role {

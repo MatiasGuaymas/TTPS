@@ -1,13 +1,16 @@
 package io.github.grupo01.volve_a_casa.persistence.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 @Entity
 @Component
 @Data
-@Table(name="medals")
+@Table(name = "medals")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Medal {
     @Id
