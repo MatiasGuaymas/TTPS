@@ -2,6 +2,7 @@ package io.github.grupo01.volve_a_casa.controllers;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.interfaces.ISightingController;
 import io.github.grupo01.volve_a_casa.persistence.entities.Sighting;
 import io.github.grupo01.volve_a_casa.security.TokenValidator;
 import io.github.grupo01.volve_a_casa.services.SightingService;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/sightings", produces = MediaType.APPLICATION_JSON_VALUE, name = "SightingRestController")
-public class SightingController {
+public class SightingController implements ISightingController {
     private final TokenValidator tokenValidator;
     private final SightingService sightingService;
 
@@ -27,6 +28,7 @@ public class SightingController {
         this.sightingService = sightingService;
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<?> listAllSightings() {
         List<SightingResponseDTO> sightings = sightingService.findAll(Sort.by(Sort.Direction.DESC, "date"));
@@ -38,6 +40,7 @@ public class SightingController {
         return new ResponseEntity<>(sightings, HttpStatus.OK);
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<?> createSighting(@RequestHeader("token") String token, @Valid @RequestBody SightingCreateDTO sightingDTO) {
         tokenValidator.validate(token);
@@ -45,6 +48,7 @@ public class SightingController {
         return new ResponseEntity<>(sighting, HttpStatus.CREATED);
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> getSightingById(@PathVariable("id") Long id) {
         Sighting sighting = sightingService.findById(id);

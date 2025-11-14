@@ -4,6 +4,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.interfaces.IPetController;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.security.TokenValidator;
 import io.github.grupo01.volve_a_casa.services.PetService;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/pets", produces = MediaType.APPLICATION_JSON_VALUE, name = "PetRestController")
-public class PetController {
+public class PetController implements IPetController {
 
     private final TokenValidator tokenValidator;
     private final PetService petService;
@@ -30,12 +31,14 @@ public class PetController {
         this.petService = petService;
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> getPetById(@PathVariable("id") Long id) {
         Pet pet = petService.findById(id);
         return ResponseEntity.ok(PetResponseDTO.fromPet(pet));
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<?> createPet(@RequestHeader("token") String token, @Valid @RequestBody PetCreateDTO dto) {
         tokenValidator.validate(token);
@@ -43,6 +46,7 @@ public class PetController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePet(@RequestHeader("token") String token, @PathVariable Long id, @Valid @RequestBody PetUpdateDTO updatedData) {
         tokenValidator.validate(token);
@@ -50,6 +54,7 @@ public class PetController {
         return ResponseEntity.ok(user);
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePet(@RequestHeader("token") String token, @PathVariable Long id) {
         tokenValidator.validate(token);
@@ -57,6 +62,7 @@ public class PetController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/lost")
     public ResponseEntity<?> listAllLostPets() {
         List<PetResponseDTO> lostPets = petService.findAllLostPets();
@@ -68,6 +74,7 @@ public class PetController {
         return ResponseEntity.ok(lostPets);
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<?> listAllPets() {
         List<PetResponseDTO> pets = petService.findAll(Sort.by(Sort.Direction.DESC, "lostDate"));
@@ -79,6 +86,7 @@ public class PetController {
         return ResponseEntity.ok(pets);
     }
 
+    @Override
     @GetMapping("/{id}/sightings")
     public ResponseEntity<?> listAllSightings(@PathVariable Long id) {
         List<SightingResponseDTO> sightings = petService.getPetSightings(id);

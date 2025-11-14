@@ -4,6 +4,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
+import io.github.grupo01.volve_a_casa.controllers.interfaces.IUserController;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.security.TokenValidator;
 import io.github.grupo01.volve_a_casa.services.UserService;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE, name = "UserRestController")
-public class UserController {
+public class UserController implements IUserController {
     private final UserService userService;
     private final TokenValidator tokenValidator;
 
@@ -29,6 +30,7 @@ public class UserController {
         this.tokenValidator = tokenValidator;
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<?> listAllUsersOrderByName() {
         List<UserResponseDTO> users = userService.findAll(Sort.by("name"));
@@ -39,12 +41,14 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
         UserResponseDTO user = userService.createUser(userCreateDTO);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@RequestHeader("token") String token, @PathVariable("id") Long id) {
         tokenValidator.validate(token);
@@ -52,6 +56,7 @@ public class UserController {
         return ResponseEntity.ok(UserResponseDTO.fromUser(user));
     }
 
+    @Override
     @GetMapping("/my_pets")
     public ResponseEntity<?> getMyPets(@RequestHeader("token") String token) {
         tokenValidator.validate(token);
@@ -64,6 +69,7 @@ public class UserController {
         return ResponseEntity.ok(pets);
     }
 
+    @Override
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestHeader("token") String token, @Valid @RequestBody UserUpdateDTO updatedData) {
         tokenValidator.validate(token);
