@@ -1,6 +1,5 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
-import io.github.grupo01.volve_a_casa.controllers.AuthController;
 import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
 import io.github.grupo01.volve_a_casa.services.UserService;
 import org.junit.jupiter.api.BeforeEach;

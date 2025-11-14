@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
+import io.github.grupo01.volve_a_casa.controllers.interfaces.IAuthController;
 import io.github.grupo01.volve_a_casa.services.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE, name = "AuthController")
-public class AuthController {
+public class AuthController implements IAuthController {
 
     private final UserService userService;
 
@@ -21,6 +22,7 @@ public class AuthController {
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<?> authenticateUser(@RequestHeader("email") String email, @RequestHeader("password") String password) {
         String token = userService.authenticateUser(email, password);
         HttpHeaders headers = new HttpHeaders();

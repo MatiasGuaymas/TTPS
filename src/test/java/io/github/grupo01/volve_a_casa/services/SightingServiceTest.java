@@ -1,7 +1,5 @@
 package io.github.grupo01.volve_a_casa.services;
 
-import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
-import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
@@ -16,10 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class SightingServiceTest {
