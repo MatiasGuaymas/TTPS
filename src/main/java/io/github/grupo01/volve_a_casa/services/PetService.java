@@ -73,7 +73,7 @@ public class PetService {
         User creator = this.userService.findById(creatorId);
 
         if (!pet.getCreator().equals(creator)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No tienes permiso para editar esta mascota");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para editar esta mascota");
         }
 
         pet.updateFromDTO(dto);
@@ -85,7 +85,7 @@ public class PetService {
         Pet pet = this.findById(petId);
         User user = userService.findById(creatorId);
         if (!pet.getCreator().equals(user)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No tienes permiso para editar esta mascota");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para editar esta mascota");
         }
 
         petRepository.delete(pet);
