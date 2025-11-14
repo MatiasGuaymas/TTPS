@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+// TODO: Testear
 @Service
 public class SightingService {
 
