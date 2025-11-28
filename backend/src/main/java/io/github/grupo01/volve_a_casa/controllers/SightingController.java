@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/sightings", produces = MediaType.APPLICATION_JSON_VALUE, name = "SightingRestController")
+@RequestMapping(value = "/api/sightings", produces = MediaType.APPLICATION_JSON_VALUE, name = "SightingRestController")
 public class SightingController implements ISightingController {
     private final TokenValidator tokenValidator;
     private final SightingService sightingService;

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/pets", produces = MediaType.APPLICATION_JSON_VALUE, name = "PetRestController")
+@RequestMapping(value = "/api/pets", produces = MediaType.APPLICATION_JSON_VALUE, name = "PetRestController")
 public class PetController implements IPetController {
 
     private final TokenValidator tokenValidator;

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE, name = "UserRestController")
+@RequestMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE, name = "UserRestController")
 public class UserController implements IUserController {
     private final UserService userService;
     private final TokenValidator tokenValidator;

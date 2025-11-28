@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE, name = "AuthController")
+@RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE, name = "AuthController")
 public class AuthController implements IAuthController {
 
     private final UserService userService;
