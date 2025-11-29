@@ -4,6 +4,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
+import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,7 +25,7 @@ public interface IPetController {
             @ApiResponse(responseCode = "401", description = "Token inválido")
     })
     ResponseEntity<?> createPet(
-            @Parameter(description = "Token de autenticación", required = true) String token,
+            UserAuthentication requester,
             PetCreateDTO dto
     );
 
@@ -36,7 +37,7 @@ public interface IPetController {
             @ApiResponse(responseCode = "404", description = "Mascota no encontrada")
     })
     ResponseEntity<?> updatePet(
-            @Parameter(description = "Token de autenticación", required = true) String token,
+            UserAuthentication requester,
             @Parameter(description = "ID de la mascota", required = true) Long id,
             PetUpdateDTO dto
     );
@@ -49,7 +50,7 @@ public interface IPetController {
             @ApiResponse(responseCode = "404", description = "Mascota no encontrada")
     })
     ResponseEntity<?> deletePet(
-            @Parameter(description = "Token de autenticación", required = true) String token,
+            UserAuthentication requester,
             @Parameter(description = "ID de la mascota", required = true) Long id
     );
 

@@ -6,7 +6,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.interfaces.IPetController;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
-import io.github.grupo01.volve_a_casa.security.TokenValidator;
+import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.github.grupo01.volve_a_casa.services.PetService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +21,10 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/pets", produces = MediaType.APPLICATION_JSON_VALUE, name = "PetRestController")
 public class PetController implements IPetController {
-
-    private final TokenValidator tokenValidator;
     private final PetService petService;
 
     @Autowired
-    public PetController(TokenValidator tokenValidator, PetService petService) {
-        this.tokenValidator = tokenValidator;
+    public PetController(PetService petService) {
         this.petService = petService;
     }
 
@@ -40,25 +37,22 @@ public class PetController implements IPetController {
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createPet(@RequestHeader("token") String token, @Valid @RequestBody PetCreateDTO dto) {
-        tokenValidator.validate(token);
-        PetResponseDTO response = petService.createPet(tokenValidator.extractUserId(token), dto);
+    public ResponseEntity<?> createPet(UserAuthentication requester, @Valid @RequestBody PetCreateDTO dto) {
+        PetResponseDTO response = petService.createPet(requester.getPrincipal(), dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePet(@RequestHeader("token") String token, @PathVariable Long id, @Valid @RequestBody PetUpdateDTO updatedData) {
-        tokenValidator.validate(token);
-        PetResponseDTO user = petService.updatePet(id, tokenValidator.extractUserId(token), updatedData);
+    public ResponseEntity<?> updatePet(UserAuthentication requester, @PathVariable Long id, @Valid @RequestBody PetUpdateDTO updatedData) {
+        PetResponseDTO user = petService.updatePet(id, requester.getPrincipal(), updatedData);
         return ResponseEntity.ok(user);
     }
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePet(@RequestHeader("token") String token, @PathVariable Long id) {
-        tokenValidator.validate(token);
-        petService.deletePet(id, tokenValidator.extractUserId(token));
+    public ResponseEntity<?> deletePet(UserAuthentication requester, @PathVariable Long id) {
+        petService.deletePet(id, requester.getPrincipal());
         return ResponseEntity.noContent().build();
     }
 

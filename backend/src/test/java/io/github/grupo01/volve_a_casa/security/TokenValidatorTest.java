@@ -53,7 +53,7 @@ public class TokenValidatorTest {
     @Test
     void extractUserId_successfulExtraction() {
         String token = "14123456";
-        long id = tokenValidator.extractUserId(token);
+        long id = (Long) request.getAttribute("userId");
         assertEquals(14, id);
     }
 

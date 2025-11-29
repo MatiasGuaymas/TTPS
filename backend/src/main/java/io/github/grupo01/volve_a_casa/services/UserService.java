@@ -19,11 +19,13 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenService tokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
     }
 
     // TODO: Test de integracion
@@ -74,8 +76,7 @@ public class UserService {
         return UserResponseDTO.fromUser(userRepository.save(user));
     }
 
-    public UserResponseDTO updateUser(long id, UserUpdateDTO dto) {
-        User user = this.findById(id);
+    public UserResponseDTO updateUser(User user, UserUpdateDTO dto) {
         user.updateFromDTO(dto);
         User savedUser = userRepository.save(user);
         return UserResponseDTO.fromUser(savedUser);
@@ -85,11 +86,14 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials"));
 
-
-        if (!passwordEncoder.matches(password, user.getPassword()) || !user.isEnabled()) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials");
         }
 
-        return user.getId() + "123456";
+        if (!user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is disabled");
+        }
+
+        return tokenService.generateToken(user.getId());
     }
 }
