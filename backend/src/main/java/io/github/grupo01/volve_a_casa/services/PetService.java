@@ -30,6 +30,14 @@ public class PetService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet with id " + id + " not found"));
     }
 
+    public List<PetResponseDTO> getPetByCreator(User creator) {
+        return petRepository
+                .findAllByCreator(creator)
+                .stream()
+                .map(PetResponseDTO::fromPet)
+                .toList();
+    }
+
     // TODO: Test de integracion
     public List<PetResponseDTO> findAllLostPets() {
         return petRepository.findAllByStateInOrderByLostDate(Pet.State.PERDIDO_PROPIO, Pet.State.PERDIDO_AJENO)
@@ -56,6 +64,7 @@ public class PetService {
                 dto.latitude(),
                 dto.longitude(),
                 dto.type(),
+                dto.state(),
                 creator,
                 "foto_default_base64"
         );
