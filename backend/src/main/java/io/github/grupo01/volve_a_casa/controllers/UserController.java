@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,27 +42,15 @@ public class UserController implements IUserController {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(UserAuthentication requester, @PathVariable("id") Long id) {
+    public ResponseEntity<?> getUserById(@AuthenticationPrincipal User requester, @PathVariable("id") Long id) {
         User user = userService.findById(id);
         return ResponseEntity.ok(UserResponseDTO.fromUser(user));
     }
 
     @Override
-    @GetMapping("/my_pets")
-    public ResponseEntity<?> getMyPets(UserAuthentication requester) {
-        List<PetResponseDTO> pets = userService.getPetsCreatedByUser(requester.getDetails());
-
-        if (pets.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        return ResponseEntity.ok(pets);
-    }
-
-    @Override
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(UserAuthentication requester, @Valid @RequestBody UserUpdateDTO updatedData) {
-        UserResponseDTO user = userService.updateUser(requester.getPrincipal(), updatedData);
+    public ResponseEntity<?> updateUser(@AuthenticationPrincipal User requester, @Valid @RequestBody UserUpdateDTO updatedData) {
+        UserResponseDTO user = userService.updateUser(requester, updatedData);
         return ResponseEntity.ok(user);
     }
 

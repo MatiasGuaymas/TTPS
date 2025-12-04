@@ -35,10 +35,6 @@ public class TokenService {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        System.out.println("Token is valid.");
-        System.out.println("Subject: " + claims.getSubject());
-        System.out.println("Expiration: " + claims.getExpiration());
-
         return Long.parseLong(claims.getSubject());
     }
 }

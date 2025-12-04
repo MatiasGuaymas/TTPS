@@ -4,6 +4,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,7 +52,7 @@ public interface IUserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     ResponseEntity<?> getUserById(
-            UserAuthentication requester,
+            User requester,
             @Parameter(description = "ID del usuario", required = true, example = "1") Long id
     );
 
@@ -64,16 +65,7 @@ public interface IUserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     ResponseEntity<?> updateUser(
-            UserAuthentication requester,
+            User requester,
             @Parameter(description = "Datos actualizados del usuario", required = true) UserUpdateDTO updatedData
-    );
-
-    @Operation(summary = "Listar mis mascotas", description = "Obtiene todas las mascotas creadas por el usuario autenticado.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de mascotas obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pet.class))),
-            @ApiResponse(responseCode = "401", description = "Token inválido")
-    })
-    ResponseEntity<?> getMyPets(
-            UserAuthentication requester
     );
 }

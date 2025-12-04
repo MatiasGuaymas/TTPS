@@ -43,15 +43,6 @@ public class UserService {
                 .toList();
     }
 
-    // TODO: Test de integracion
-    public List<PetResponseDTO> getPetsCreatedByUser(long id) {
-        User user = this.findById(id);
-        return user.getCreatedPets()
-                .stream()
-                .map(PetResponseDTO::fromPet)
-                .toList();
-    }
-
     public UserResponseDTO createUser(UserCreateDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
             throw new ResponseStatusException(

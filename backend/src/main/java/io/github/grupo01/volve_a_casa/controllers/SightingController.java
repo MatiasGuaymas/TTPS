@@ -4,6 +4,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingCreateDTO
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.interfaces.ISightingController;
 import io.github.grupo01.volve_a_casa.persistence.entities.Sighting;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.github.grupo01.volve_a_casa.services.SightingService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,8 +42,8 @@ public class SightingController implements ISightingController {
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createSighting(UserAuthentication requester, @Valid @RequestBody SightingCreateDTO sightingDTO) {
-        SightingResponseDTO sighting = sightingService.createSighting(requester.getPrincipal(), sightingDTO);
+    public ResponseEntity<?> createSighting(@AuthenticationPrincipal User requester, @Valid @RequestBody SightingCreateDTO sightingDTO) {
+        SightingResponseDTO sighting = sightingService.createSighting(requester, sightingDTO);
         return new ResponseEntity<>(sighting, HttpStatus.CREATED);
     }
 

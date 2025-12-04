@@ -2,6 +2,7 @@ package io.github.grupo01.volve_a_casa.controllers.interfaces;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,7 +42,7 @@ public interface ISightingController {
             @ApiResponse(responseCode = "404", description = "Usuario reportador o mascota no encontrados", content = @Content(mediaType = "application/json"))
     })
     ResponseEntity<?> createSighting(
-            UserAuthentication requester,
+            User requester,
             @Parameter(description = "Datos del avistamiento a crear", required = true) SightingCreateDTO sightingDTO
     );
 
