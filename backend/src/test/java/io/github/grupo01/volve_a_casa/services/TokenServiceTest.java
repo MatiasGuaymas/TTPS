@@ -163,24 +163,6 @@ public class TokenServiceTest {
     }
 
     @Test
-    void getUserIdFromToken_shouldThrowExpiredJwtException_whenTokenIsExpired() {
-        // Arrange
-        // We need to create an expired token using reflection or by creating one with past expiration
-        // Since TokenService uses a static key, we can create an expired token manually
-        Long userId = 123L;
-        Date expiredDate = Date.from(Instant.now().minus(1, ChronoUnit.HOURS));
-
-        // This is tricky because the key is static and private
-        // We'll create a token that's already expired
-        String expiredToken = tokenService.generateToken(userId);
-
-        // Since we can't easily create an expired token without accessing the static key,
-        // we'll just verify that the service can handle the ExpiredJwtException
-        // by checking the normal token works first
-        assertDoesNotThrow(() -> tokenService.getUserIdFromToken(expiredToken));
-    }
-
-    @Test
     void roundTrip_generateAndExtractUserId_shouldPreserveUserId() {
         // Arrange
         Long[] userIds = {1L, 100L, 999999L, 12345678L};

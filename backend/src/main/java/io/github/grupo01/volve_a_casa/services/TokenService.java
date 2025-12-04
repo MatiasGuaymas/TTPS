@@ -43,4 +43,5 @@ public class TokenService {
             // Option 2: throw a runtime exception with a clear message
             throw new IllegalArgumentException("Token subject is not a valid user ID", e);
         }
+    }
 }

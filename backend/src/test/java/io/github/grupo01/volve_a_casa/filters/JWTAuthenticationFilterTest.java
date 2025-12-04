@@ -147,7 +147,7 @@ public class JWTAuthenticationFilterTest {
         verify(tokenService).getUserIdFromToken(token);
         verify(userService, never()).findById(anyLong());
         verify(filterChain, never()).doFilter(request, response);
-        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token invalido");
+        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token inválido");
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
@@ -170,7 +170,7 @@ public class JWTAuthenticationFilterTest {
         verify(tokenService).getUserIdFromToken(token);
         verify(userService).findById(userId);
         verify(filterChain, never()).doFilter(request, response);
-        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token invalido");
+        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token inválido");
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
@@ -190,7 +190,7 @@ public class JWTAuthenticationFilterTest {
         verify(tokenService).getUserIdFromToken(token);
         verify(userService, never()).findById(anyLong());
         verify(filterChain, never()).doFilter(request, response);
-        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token invalido");
+        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Token inválido");
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
@@ -199,7 +199,7 @@ public class JWTAuthenticationFilterTest {
     void doFilterInternal_success_withValidTokenWithoutBearerPrefix() throws Exception {
         // Arrange
         String token = "valid.jwt.token.without.bearer";
-        Long userId = 1L;
+        long userId = 1L;
         User user = mock(User.class);
 
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(token);
