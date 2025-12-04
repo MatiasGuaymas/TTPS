@@ -23,7 +23,10 @@ import java.io.IOException;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String[] EXCLUDED_URLS = {"/api/auth", "/swagger-ui/", "/v3/api-docs/", "/swagger-ui.html",};
+    private static final String[] EXCLUDED_URLS = {
+            "/api/auth"
+    };
+
     private final TokenService tokenService;
     private final UserService userService;
 
@@ -46,6 +49,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             Long userId = tokenService.getUserIdFromToken(token);
