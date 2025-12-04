@@ -64,14 +64,14 @@ class UserControllerTest {
     private final HandlerMethodArgumentResolver putPrincipalResolver = new HandlerMethodArgumentResolver() {
         @Override
         public boolean supportsParameter(MethodParameter parameter) {
-            // Si el argumento del controlador es de tipo User, este resolver se activa
+            // Activate this resolver if the controller argument is of type User
             return parameter.getParameterType().isAssignableFrom(User.class);
         }
 
         @Override
         public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                       NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-            // Retorna siempre nuestro usuario dummy
+            // Always returns our dummy user
             return dummyUser;
         }
     };

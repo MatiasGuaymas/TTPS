@@ -35,6 +35,12 @@ public class TokenService {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return Long.parseLong(claims.getSubject());
-    }
+        try {
+            return Long.parseLong(claims.getSubject());
+        } catch (NumberFormatException e) {
+            // Option 1: return null to indicate invalid token
+            // return null;
+            // Option 2: throw a runtime exception with a clear message
+            throw new IllegalArgumentException("Token subject is not a valid user ID", e);
+        }
 }

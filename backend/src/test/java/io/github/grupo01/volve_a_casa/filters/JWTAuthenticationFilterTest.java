@@ -89,7 +89,7 @@ public class JWTAuthenticationFilterTest {
     void doFilterInternal_success_whenTokenIsValid() throws Exception {
         // Arrange
         String token = "Bearer valid.jwt.token";
-        Long userId = 1L;
+        long userId = 1L;
         User user = mock(User.class);
 
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(token);
@@ -156,7 +156,7 @@ public class JWTAuthenticationFilterTest {
     void doFilterInternal_returnsForbidden_whenUserNotFound() throws Exception {
         // Arrange
         String token = "Bearer valid.jwt.token";
-        Long userId = 999L;
+        long userId = 999L;
         RuntimeException userNotFoundException = new RuntimeException("User not found");
 
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(token);

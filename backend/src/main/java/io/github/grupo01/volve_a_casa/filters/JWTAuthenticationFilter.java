@@ -63,7 +63,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expirado");
             return;
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Token invalido");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Token inválido");
             return;
         }
 

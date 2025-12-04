@@ -1,6 +1,5 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
-import com.zaxxer.hikari.util.Credentials;
 import io.github.grupo01.volve_a_casa.controllers.dto.auth.TokenDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserLoginDTO;

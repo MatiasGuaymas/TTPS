@@ -70,7 +70,7 @@ public class SightingControllerTest {
         @Override
         public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                       NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-            // Retorna siempre nuestro usuario dummy
+            // Always returns our dummy user
             return dummyUser;
         }
     };

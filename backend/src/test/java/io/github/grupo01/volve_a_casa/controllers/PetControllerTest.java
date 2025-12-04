@@ -64,14 +64,14 @@ public class PetControllerTest {
     private final HandlerMethodArgumentResolver putPrincipalResolver = new HandlerMethodArgumentResolver() {
         @Override
         public boolean supportsParameter(MethodParameter parameter) {
-            // Si el argumento del controlador es de tipo User, este resolver se activa
+            // If the controller argument is of type User, this resolver is activated
             return parameter.getParameterType().isAssignableFrom(User.class);
         }
 
         @Override
         public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                       NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-            // Retorna siempre nuestro usuario dummy
+            // Always returns our dummy user
             return dummyUser;
         }
     };
@@ -111,7 +111,7 @@ public class PetControllerTest {
                 -58.4f
         );
 
-        PetResponseDTO petResponseDTO = createPetResponse(1L, dummyUser.getId(), "Pepe");
+        PetResponseDTO petResponseDTO = createPetResponse(1L, 1L, "Pepe");
 
         when(petService.updatePet(petId, dummyUser, dto)).thenReturn(petResponseDTO);
 
