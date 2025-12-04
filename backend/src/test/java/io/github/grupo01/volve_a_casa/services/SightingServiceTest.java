@@ -36,7 +36,6 @@ class SightingServiceTest {
     public void createSighting_success() {
         long userId = 1L;
         User user = mock(User.class);
-        when(userService.findById(userId)).thenReturn(user);
         when(user.getId()).thenReturn(userId);
 
         long petId = 1L;
@@ -63,7 +62,7 @@ class SightingServiceTest {
         );
 
         when(sightingRepository.save(any(Sighting.class))).thenReturn(sighting);
-        SightingResponseDTO response = sightingService.createSighting(userId, dto);
+        SightingResponseDTO response = sightingService.createSighting(user, dto);
         assertEquals(petId, response.petId());
         assertEquals(userId, response.reporterId());
         verify(sightingRepository, times(1)).save(any(Sighting.class));

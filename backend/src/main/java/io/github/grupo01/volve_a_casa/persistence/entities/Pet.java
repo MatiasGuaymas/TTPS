@@ -69,7 +69,7 @@ public class Pet {
     )
     private List<Sighting> sightings = new ArrayList<>();
 
-    public Pet(String name, String size, String description, String color, String race, float weight, float latitude, float longitude, Pet.Type type, User creator, String fotoDefaultBase64) {
+    public Pet(String name, String size, String description, String color, String race, float weight, float latitude, float longitude, Pet.Type type, Pet.State state, User creator, String fotoDefaultBase64) {
         this.name = name;
         this.size = size;
         this.description = description;
@@ -77,6 +77,7 @@ public class Pet {
         this.race = race;
         this.weight = weight;
         this.type = type;
+        this.state = state;
         this.creator = creator;
         this.lostDate = LocalDate.now();
         this.actualizarUbicacion(latitude, longitude);

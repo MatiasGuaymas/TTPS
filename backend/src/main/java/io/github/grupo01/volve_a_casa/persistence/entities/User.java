@@ -21,7 +21,6 @@ import java.util.Objects;
 @Table(name = "usuarios")
 @Component
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//TODO: Cambiar todos los new BCryptPasswordEncoder() por un bean singleton
 public class User {
 
     @Id
