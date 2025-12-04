@@ -29,6 +29,9 @@ class UserServiceTest {
     @Mock
     PasswordEncoder passwordEncoder;
 
+    @Mock
+    TokenService tokenService;
+
     @InjectMocks
     UserService userService;
 
@@ -86,26 +89,13 @@ class UserServiceTest {
         User user = createUser("Juan", "test@gmail.com");
         UserUpdateDTO dto = new UserUpdateDTO("NuevoNombre", null, null, null, null, null, null);
 
-        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
         when(userRepository.save(user)).thenReturn(user);
 
-        UserResponseDTO response = userService.updateUser(10L, dto);
+        UserResponseDTO response = userService.updateUser(user, dto);
 
         assertEquals("NuevoNombre", user.getName());
         assertEquals(response.name(), user.getName());
         verify(userRepository).save(user);
-    }
-
-    @Test
-    void updateUser_userNotFound_throws() {
-        when(userRepository.findById(10L)).thenReturn(Optional.empty());
-
-        UserUpdateDTO dto = new UserUpdateDTO("NuevoNombre", null, null, null, null, null, null);
-
-        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> userService.updateUser(10L, dto));
-
-        assertEquals("404 NOT_FOUND \"User with id 10 not found\"", ex.getMessage());
     }
 
     @Test
@@ -142,7 +132,7 @@ class UserServiceTest {
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
                 () -> userService.authenticateUser("test@test.com", "123456"));
         assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
-        assertEquals("Invalid credentials", ex.getReason());
+        assertEquals("User account is disabled", ex.getReason());
     }
 
     @Test
@@ -154,6 +144,7 @@ class UserServiceTest {
 
         when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("123456", "123456")).thenReturn(true);
+        when(tokenService.generateToken(user.getId())).thenReturn("10123456");
 
         String token = userService.authenticateUser("test@test.com", "123456");
         assertEquals("10123456", token);

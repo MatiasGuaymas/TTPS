@@ -8,7 +8,6 @@ import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseD
 import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
-import io.github.grupo01.volve_a_casa.security.TokenValidator;
 import io.github.grupo01.volve_a_casa.services.PetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,18 +15,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,66 +41,62 @@ public class PetControllerTest {
     @Mock
     private PetService petService;
 
-    @Mock
-    private TokenValidator tokenValidator;
-
     @InjectMocks
     private PetController petController;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
+    private User dummyUser;
+
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
+
+        dummyUser = mock(User.class);
+
         mockMvc = MockMvcBuilders.standaloneSetup(petController)
                 .setControllerAdvice(new GlobalExceptionHandler())
+                .setCustomArgumentResolvers(putPrincipalResolver)
                 .build();
     }
 
+    private final HandlerMethodArgumentResolver putPrincipalResolver = new HandlerMethodArgumentResolver() {
+        @Override
+        public boolean supportsParameter(MethodParameter parameter) {
+            // Si el argumento del controlador es de tipo User, este resolver se activa
+            return parameter.getParameterType().isAssignableFrom(User.class);
+        }
+
+        @Override
+        public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+                                      NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+            // Retorna siempre nuestro usuario dummy
+            return dummyUser;
+        }
+    };
+
     @Test
-    void createPet_whenValidDataAndToken_returnsCreated() throws Exception {
+    void createPet_whenValidData_returnsCreated() throws Exception {
         long petId = 1L;
-        long userId = 1L;
-        String token = tokenFor(userId);
 
         PetCreateDTO dto = samplePetCreateDTO();
 
-        doNothing().when(tokenValidator).validate(token);
-        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
-        when(petService.createPet(userId, dto)).thenReturn(createPetResponse(petId, userId, "Tobby"));
+        when(petService.createPet(dummyUser, dto)).thenReturn(createPetResponse(petId, 1L, "Tobby"));
 
-        mockMvc.perform(post("/pets")
-                        .header("token", token)
+        mockMvc.perform(post("/api/pets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(petId))
                 .andExpect(jsonPath("$.name").value("Tobby"))
-                .andExpect(jsonPath("$.creatorId").value(userId));
+                .andExpect(jsonPath("$.creatorId").value(1L));
     }
 
     @Test
-    void createPet_whenInvalidToken_returnsUnauthorized() throws Exception {
-        PetCreateDTO dto = samplePetCreateDTO();
-
-        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido"))
-                .when(tokenValidator).validate(anyString());
-
-        mockMvc.perform(post("/pets")
-                        .header("token", "INVALIDO")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Token invalido"));
-    }
-
-    @Test
-    void updatePet_whenTokenValid_updatesPet() throws Exception {
+    void updatePet_returnsOk() throws Exception {
         long petId = 1L;
-        long userId = 1L;
-        String token = tokenFor(userId);
 
         PetUpdateDTO dto = new PetUpdateDTO(
                 "Pepe",
@@ -112,15 +111,11 @@ public class PetControllerTest {
                 -58.4f
         );
 
-        PetResponseDTO petResponseDTO = createPetResponse(1L, userId, "Pepe");
+        PetResponseDTO petResponseDTO = createPetResponse(1L, dummyUser.getId(), "Pepe");
 
+        when(petService.updatePet(petId, dummyUser, dto)).thenReturn(petResponseDTO);
 
-        doNothing().when(tokenValidator).validate(anyString());
-        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
-        when(petService.updatePet(petId, userId, dto)).thenReturn(petResponseDTO);
-
-        mockMvc.perform(put("/pets/" + petId)
-                        .header("token", token)
+        mockMvc.perform(put("/api/pets/" + petId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -128,44 +123,12 @@ public class PetControllerTest {
     }
 
     @Test
-    void updatePet_whenTokenInvalid_throwsUnauthorized() throws Exception {
-        PetUpdateDTO dto = new PetUpdateDTO(
-                "Pepe",
-                "Nueva descripción",
-                "Nuevo color",
-                "Pequeño",
-                "Poodle",
-                10.0f,
-                Pet.Type.PERRO,
-                Pet.State.PERDIDO_PROPIO,
-                -34.6f,
-                -58.4f
-        );
-
-        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido"))
-                .when(tokenValidator).validate(anyString());
-
-        mockMvc.perform(put("/pets/1")
-                        .header("token", "Invalido")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Token invalido"));
-    }
-
-    @Test
-    void deletePet_whenTokenValid_returnsOk() throws Exception {
+    void deletePet_returnsOk() throws Exception {
         long petId = 1L;
-        long userId = 1L;
-        String token = tokenFor(userId);
 
+        doNothing().when(petService).deletePet(petId, dummyUser);
 
-        doNothing().when(tokenValidator).validate(anyString());
-        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
-        doNothing().when(petService).deletePet(petId, userId);
-
-        mockMvc.perform(delete("/pets/" + petId)
-                        .header("token", token))
+        mockMvc.perform(delete("/api/pets/" + petId))
                 .andExpect(status().isNoContent());
     }
 
@@ -174,7 +137,7 @@ public class PetControllerTest {
     void listAllLostPets_whenEmpty_returnsNoContent() throws Exception {
         when(petService.findAllLostPets()).thenReturn(List.of());
 
-        mockMvc.perform(get("/pets/lost")
+        mockMvc.perform(get("/api/pets/lost")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -186,7 +149,7 @@ public class PetControllerTest {
 
         when(petService.findAllLostPets()).thenReturn(List.of(pet1, pet2));
 
-        mockMvc.perform(get("/pets/lost")
+        mockMvc.perform(get("/api/pets/lost")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -218,13 +181,14 @@ public class PetControllerTest {
                 -54.23f,
                 -23.12f,
                 Pet.Type.PERRO,
+                Pet.State.PERDIDO_PROPIO,
                 user,
                 "test"
         );
 
         when(petService.findById(petId)).thenReturn(pet);
 
-        mockMvc.perform(get("/pets/" + petId)
+        mockMvc.perform(get("/api/pets/" + petId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Bigotes"));
@@ -236,7 +200,7 @@ public class PetControllerTest {
 
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Mascota no encontrada")).when(petService).findById(petId);
 
-        mockMvc.perform(get("/pets/" + petId)
+        mockMvc.perform(get("/api/pets/" + petId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Mascota no encontrada"));
@@ -246,7 +210,7 @@ public class PetControllerTest {
     void listAllPets_whenEmpty_returnsNoContent() throws Exception {
         when(petService.findAll(Sort.by(Sort.Direction.DESC, "lostDate"))).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/pets")
+        mockMvc.perform(get("/api/pets")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -259,7 +223,7 @@ public class PetControllerTest {
 
         when(petService.findAll(Sort.by(Sort.Direction.DESC, "lostDate"))).thenReturn(List.of(pet1, pet2, pet3));
 
-        mockMvc.perform(get("/pets")
+        mockMvc.perform(get("/api/pets")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -273,7 +237,7 @@ public class PetControllerTest {
         long petId = 1L;
         when(petService.getPetSightings(petId)).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/pets/" + petId + "/sightings")
+        mockMvc.perform(get("/api/pets/" + petId + "/sightings")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -287,7 +251,7 @@ public class PetControllerTest {
 
         when(petService.getPetSightings(petId)).thenReturn(List.of(pet1, pet2, pet3));
 
-        mockMvc.perform(get("/pets/1/sightings")
+        mockMvc.perform(get("/api/pets/1/sightings")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -296,8 +260,20 @@ public class PetControllerTest {
                 .andExpect(jsonPath("$[2].id").value(3L));
     }
 
-    private String tokenFor(long userId) {
-        return userId + "123456";
+    @Test
+    void getMyPets_whenPetExists_returnsOkAndList() throws Exception {
+        PetResponseDTO pet1 = createPetResponse(1L, 1L, "Bigotes");
+        PetResponseDTO pet2 = createPetResponse(3L, 1L, "Firulais");
+        PetResponseDTO pet3 = createPetResponse(8L, 1L, "Misha");
+
+        when(petService.getPetByCreator(dummyUser)).thenReturn(List.of(pet1, pet2, pet3));
+
+        mockMvc.perform(get("/api/pets/my_pets")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Bigotes"))
+                .andExpect(jsonPath("$[1].name").value("Firulais"))
+                .andExpect(jsonPath("$[2].name").value("Misha"));
     }
 
     private PetCreateDTO samplePetCreateDTO() {
@@ -310,6 +286,7 @@ public class PetControllerTest {
                 12.5f,
                 -34.6f,
                 -58.4f,
+                Pet.State.PERDIDO_PROPIO,
                 Pet.Type.PERRO
         );
     }

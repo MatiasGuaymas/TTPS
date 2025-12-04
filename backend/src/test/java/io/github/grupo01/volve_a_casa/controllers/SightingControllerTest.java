@@ -8,19 +8,24 @@ import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.Sighting;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
-import io.github.grupo01.volve_a_casa.security.TokenValidator;
 import io.github.grupo01.volve_a_casa.services.SightingService;
+import io.github.grupo01.volve_a_casa.services.TokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -37,14 +42,13 @@ public class SightingControllerTest {
     @Mock
     private SightingService sightingService;
 
-    @Mock
-    private TokenValidator tokenValidator;
-
     @InjectMocks
     private SightingController sightingController;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+
+    private final User dummyUser = mock(User.class);
 
     @BeforeEach
     void setup() {
@@ -52,14 +56,30 @@ public class SightingControllerTest {
         this.objectMapper.registerModule(new JavaTimeModule());
         this.mockMvc = MockMvcBuilders.standaloneSetup(sightingController)
                 .setControllerAdvice(new GlobalExceptionHandler())
+                .setCustomArgumentResolvers(putPrincipalResolver)
                 .build();
     }
+
+    private final HandlerMethodArgumentResolver putPrincipalResolver = new HandlerMethodArgumentResolver() {
+        @Override
+        public boolean supportsParameter(MethodParameter parameter) {
+            // Si el argumento del controlador es de tipo User, este resolver se activa
+            return parameter.getParameterType().isAssignableFrom(User.class);
+        }
+
+        @Override
+        public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
+                                      NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+            // Retorna siempre nuestro usuario dummy
+            return dummyUser;
+        }
+    };
 
     @Test
     void listAllSightings_whenEmpty_returnsNoContent() throws Exception {
         when(sightingService.findAll(Sort.by(Sort.Direction.DESC, "date"))).thenReturn(List.of());
 
-        mockMvc.perform(get("/sightings")
+        mockMvc.perform(get("/api/sightings")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
@@ -72,8 +92,7 @@ public class SightingControllerTest {
 
         when(sightingService.findAll(Sort.by(Sort.Direction.DESC, "date"))).thenReturn(List.of(pet1, pet2, pet3));
 
-
-        mockMvc.perform(get("/sightings")
+        mockMvc.perform(get("/api/sightings")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -103,7 +122,7 @@ public class SightingControllerTest {
 
         when(sightingService.findById(sightingId)).thenReturn(sighting);
 
-        mockMvc.perform(get("/sightings/" + sightingId)
+        mockMvc.perform(get("/api/sightings/" + sightingId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.reporterId").value(20L))
@@ -117,17 +136,15 @@ public class SightingControllerTest {
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Avistamiento no encontrada"))
                 .when(sightingService).findById(sightingId);
 
-        mockMvc.perform(get("/sightings/" + sightingId)
+        mockMvc.perform(get("/api/sightings/" + sightingId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Avistamiento no encontrada"));
     }
 
     @Test
-    void createSighting_whenValidDataAndToken_returnsCreated() throws Exception {
+    void createSighting_whenValidData_returnsCreated() throws Exception {
         long petId = 1L;
-        long userId = 1L;
-        String token = userId + "123456";
 
         SightingCreateDTO dto = new SightingCreateDTO(
                 petId,
@@ -138,42 +155,17 @@ public class SightingControllerTest {
                 "comment"
         );
 
-        doNothing().when(tokenValidator).validate(token);
-        when(tokenValidator.extractUserId(userId + "123456")).thenReturn(userId);
-        when(sightingService.createSighting(userId, dto))
-                .thenReturn(createSightingResponse(1L, petId, userId));
+        when(sightingService.createSighting(dummyUser, dto))
+                .thenReturn(createSightingResponse(1L, petId, 1L));
 
-        mockMvc.perform(post("/sightings")
-                        .header("token", token)
+        mockMvc.perform(post("/api/sightings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.petId").value(petId))
-                .andExpect(jsonPath("$.reporterId").value(userId));
-    }
-
-    @Test
-    void createPet_whenInvalidToken_returnsUnauthorized() throws Exception {
-        SightingCreateDTO dto = new SightingCreateDTO(
-                1L,
-                -54f,
-                -27f,
-                "foto",
-                LocalDate.now(),
-                "comment"
-        );
-
-        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token invalido"))
-                .when(tokenValidator).validate(anyString());
-
-        mockMvc.perform(post("/sightings")
-                        .header("token", "INVALIDO")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Token invalido"));
+                .andExpect(jsonPath("$.reporterId").value(1L));
     }
 
     private SightingResponseDTO createSightingResponse(long id, long petId, long reporterId) {
