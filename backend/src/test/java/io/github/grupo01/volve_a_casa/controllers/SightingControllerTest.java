@@ -63,7 +63,7 @@ public class SightingControllerTest {
     private final HandlerMethodArgumentResolver putPrincipalResolver = new HandlerMethodArgumentResolver() {
         @Override
         public boolean supportsParameter(MethodParameter parameter) {
-            // Si el argumento del controlador es de tipo User, este resolver se activa
+            // If the controller argument is of type User, this resolver is activated
             return parameter.getParameterType().isAssignableFrom(User.class);
         }
 
