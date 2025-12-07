@@ -26,6 +26,8 @@ export class CarouselComponent {
 
     startAutoSlide() {
         this.intervalId = setInterval(() => {
+            // Este next se ejecuta porque cambia el activeIndex
+            // pero no se emite ningun evento por ende no se actualiza el HTML
             this.next();
         }, 4000); // Cambia cada 4 segundos
     }
@@ -37,14 +39,14 @@ export class CarouselComponent {
     }
 
     next() {
-        this.activeIndex = (this.activeIndex < this.images.length - 1) 
-            ? this.activeIndex + 1 
+        this.activeIndex = (this.activeIndex < this.images.length - 1)
+            ? this.activeIndex + 1
             : 0;
     }
 
     prev() {
-        this.activeIndex = (this.activeIndex > 0) 
-            ? this.activeIndex - 1 
+        this.activeIndex = (this.activeIndex > 0)
+            ? this.activeIndex - 1
             : this.images.length - 1;
     }
 
@@ -58,7 +60,7 @@ export class CarouselComponent {
     getCardClasses(index: number): string {
         const diff = index - this.activeIndex;
         const total = this.images.length;
-        
+
         // Calcular la distancia circular
         let distance = diff;
         if (Math.abs(diff) > total / 2) {
