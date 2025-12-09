@@ -5,6 +5,7 @@ import { initFlowbite } from 'flowbite';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet, NavbarComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
