@@ -1,3 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
+@import "flowbite/src/themes/default";
+
+@theme {
+    /* WHITE */
+    --color-background: oklch(98.7% 0.026 102.212);
+    --color-primary:oklch(94.5% 0.129 101.54);
+    --color-navbar: oklch(84.5% 0.143 164.978);
+    --color-text: #000000;
+    /* DARK */
+    --color-background-dark: oklch(21% 0.034 264.665);
+    --color-primary-dark: oklch(13% 0.028 261.692);
+    --color-border-dark: oklch(25.7% 0.09 281.288);
+    --color-navbar-dark: oklch(50.8% 0.118 165.612);
+    --color-text-dark: oklch(96.7% 0.003 264.542);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}

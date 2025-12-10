@@ -1,0 +1,32 @@
+<main>
+  <div class="min-h-screen w-full bg-background dark:bg-background-dark flex flex-col items-center justify-center px-6 py-12">
+    
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-4 text-center">
+      {{ title }}
+    </h1>
+    
+    <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 text-center">
+      Plataforma colaborativa para búsqueda de mascotas perdidas
+    </p>
+    
+    <button class="inline-flex items-center mb-4 bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition">
+      <i class="fa-brands fa-telegram mr-2"></i>
+      <p>Telegram Bot</p>
+    </button>
+  
+    <carousel class="w-full max-w-4xl mt- mb-4"></carousel>
+    
+    <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8">
+      Ranking de rescatistas
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 w-full max-w-6xl"> 
+      <user-card class="col-span-1 md:col-span-2 p-4">User 1</user-card>
+      <user-card class="col-span-1 md:col-span-2 p-4">User 2</user-card>
+      <user-card class="col-span-1 md:col-span-2 p-4">User 3</user-card>
+      <user-card class="col-span-1 md:col-start-2 md:col-span-2 p-4">User 4</user-card>
+      <user-card class="col-span-1 md:col-span-2 p-4">User 5</user-card>
+    </div>
+
+  </div>
+</main>
