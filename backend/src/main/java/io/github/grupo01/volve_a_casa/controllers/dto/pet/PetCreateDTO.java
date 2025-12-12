@@ -1,7 +1,12 @@
 package io.github.grupo01.volve_a_casa.controllers.dto.pet;
 
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 public record PetCreateDTO(
 
@@ -36,7 +41,11 @@ public record PetCreateDTO(
         Pet.State state,
 
         @NotNull(message = "Type is required")
-        Pet.Type type
+        Pet.Type type,
+
+        //agrego esto para poder subir una foto de la mascota
+        @NotBlank(message = "Photo Base64 is required")
+        String photoBase64
 ) {
 }
 

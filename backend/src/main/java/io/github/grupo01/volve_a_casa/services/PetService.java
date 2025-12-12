@@ -66,7 +66,7 @@ public class PetService {
                 dto.type(),
                 dto.state(),
                 creator,
-                "foto_default_base64"
+                dto.photoBase64()
         );
         return PetResponseDTO.fromPet(petRepository.save(newPet));
     }

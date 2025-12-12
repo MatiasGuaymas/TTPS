@@ -287,7 +287,8 @@ public class PetControllerTest {
                 -34.6f,
                 -58.4f,
                 Pet.State.PERDIDO_PROPIO,
-                Pet.Type.PERRO
+                Pet.Type.PERRO,
+                "photo_base64_placeholder"
         );
     }
 

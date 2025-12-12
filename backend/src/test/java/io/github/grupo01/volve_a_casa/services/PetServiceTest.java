@@ -156,7 +156,8 @@ public class PetServiceTest {
                 -34.6f,
                 -58.4f,
                 Pet.State.PERDIDO_PROPIO,
-                Pet.Type.PERRO
+                Pet.Type.PERRO,
+                "foto_default_base64"
         );
     }
 
