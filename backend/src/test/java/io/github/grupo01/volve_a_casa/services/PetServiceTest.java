@@ -148,7 +148,7 @@ public class PetServiceTest {
     private PetCreateDTO samplePetCreateDTO() {
         return new PetCreateDTO(
                 "Tobby",
-                "Mediano",
+                Pet.Size.MEDIANO,
                 "Perro marrón con manchas",
                 "Marrón",
                 "Labrador",
@@ -164,7 +164,7 @@ public class PetServiceTest {
     private Pet createPet(String nombre, User user) {
         return new Pet(
                 nombre,
-                "test",
+                Pet.Size.MEDIANO,
                 "test",
                 "test",
                 "test",

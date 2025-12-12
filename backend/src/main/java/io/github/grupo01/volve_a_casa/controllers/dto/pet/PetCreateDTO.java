@@ -13,7 +13,7 @@ public record PetCreateDTO(
         @NotBlank(message = "Name is required")
         String name,
 
-        @NotBlank(message = "Size is required")
+        @NotNull(message = "Size is required")
         Pet.Size size,
 
         @NotBlank(message = "Description is required")

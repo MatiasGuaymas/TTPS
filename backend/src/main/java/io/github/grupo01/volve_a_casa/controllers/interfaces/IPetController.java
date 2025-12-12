@@ -92,8 +92,8 @@ public interface IPetController {
             @ApiResponse(responseCode = "204", description = "No hay mascotas registradas")
     })
     ResponseEntity<?> listAllPets(
-            @ParameterObject @ModelAttribute PetFilter filter,
-            @ParameterObject @PageableDefault(sort = "lostDate", direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject PetFilter filter,
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "Obtener avistamientos por mascota", description = "Obtiene todos los avistamientos de una mascota específica. "

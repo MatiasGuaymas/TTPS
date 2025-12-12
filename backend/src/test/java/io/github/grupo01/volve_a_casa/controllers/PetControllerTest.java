@@ -8,6 +8,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseD
 import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
 import io.github.grupo01.volve_a_casa.services.PetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,7 +60,10 @@ public class PetControllerTest {
 
         mockMvc = MockMvcBuilders.standaloneSetup(petController)
                 .setControllerAdvice(new GlobalExceptionHandler())
-                .setCustomArgumentResolvers(putPrincipalResolver)
+                .setCustomArgumentResolvers(
+                        new PageableHandlerMethodArgumentResolver(),
+                        putPrincipalResolver
+                )
                 .build();
     }
 
@@ -102,7 +108,7 @@ public class PetControllerTest {
                 "Pepe",
                 "Nueva descripción",
                 "Nuevo color",
-                "Pequeño",
+                Pet.Size.PEQUENO,
                 "Poodle",
                 10.0f,
                 Pet.Type.PERRO,
@@ -173,7 +179,7 @@ public class PetControllerTest {
         );
         Pet pet = new Pet(
                 "Bigotes",
-                "test",
+                Pet.Size.PEQUENO,
                 "test",
                 "test",
                 "test",
@@ -208,7 +214,7 @@ public class PetControllerTest {
 
     @Test
     void listAllPets_whenEmpty_returnsNoContent() throws Exception {
-        when(petService.findAll(Sort.by(Sort.Direction.DESC, "lostDate"))).thenReturn(Collections.emptyList());
+        when(petService.findAll(any(PetFilter.class), any(Pageable.class))).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/pets")
                         .accept(MediaType.APPLICATION_JSON))
@@ -221,7 +227,7 @@ public class PetControllerTest {
         PetResponseDTO pet2 = createPetResponse(2L, 1L, "Negrito");
         PetResponseDTO pet3 = createPetResponse(3L, 2L, "Rocky");
 
-        when(petService.findAll(Sort.by(Sort.Direction.DESC, "lostDate"))).thenReturn(List.of(pet1, pet2, pet3));
+        when(petService.findAll(any(PetFilter.class), any(Pageable.class))).thenReturn(List.of(pet1, pet2, pet3));
 
         mockMvc.perform(get("/api/pets")
                         .accept(MediaType.APPLICATION_JSON))
@@ -279,7 +285,7 @@ public class PetControllerTest {
     private PetCreateDTO samplePetCreateDTO() {
         return new PetCreateDTO(
                 "Tobby",
-                "Mediano",
+                Pet.Size.MEDIANO,
                 "Perro marrón con manchas",
                 "Marrón",
                 "Labrador",
@@ -296,7 +302,7 @@ public class PetControllerTest {
         return new PetResponseDTO(
                 id,
                 name,
-                "mediano",
+                Pet.Size.MEDIANO,
                 "perro mediano",
                 "color",
                 "race",

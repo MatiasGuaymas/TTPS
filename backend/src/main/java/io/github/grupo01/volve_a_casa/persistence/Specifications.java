@@ -11,45 +11,45 @@ public class Specifications {
         return (root, query, cb) -> {
             var predicates = cb.conjunction();
 
-            if (filter.name() != null && !filter.name().isEmpty()) {
+            if (filter.getName() != null && !filter.getName().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("name"), filter.name()));
+                        cb.like(root.get("name"), filter.getName()));
             }
-            if (filter.color() != null && !filter.color().isEmpty()) {
+            if (filter.getColor() != null && !filter.getColor().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("color"), filter.color()));
+                        cb.like(root.get("color"), filter.getColor()));
             }
-            if (filter.state() != null) {
+            if (filter.getState() != null) {
                 predicates = cb.and(predicates,
-                        cb.equal(root.get("state"), filter.state()));
+                        cb.equal(root.get("state"), filter.getState()));
             }
-            if (filter.type() != null) {
+            if (filter.getType() != null) {
                 predicates = cb.and(predicates,
-                        cb.equal(root.get("type"), filter.type()));
+                        cb.equal(root.get("type"), filter.getType()));
             }
-            if (filter.size() != null) {
+            if (filter.getSize() != null) {
                 predicates = cb.and(predicates,
-                        cb.equal(root.get("size"), filter.size()));
+                        cb.equal(root.get("size"), filter.getSize()));
             }
-            if (filter.race() != null && !filter.race().isEmpty()) {
+            if (filter.getRace() != null && !filter.getRace().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("race"), filter.race()));
+                        cb.like(root.get("race"), filter.getRace()));
             }
-            if (filter.finalLostDate() != null) {
+            if (filter.getFinalLostDate() != null) {
                 predicates = cb.and(predicates,
-                        cb.lessThanOrEqualTo(root.get("lostDate"), filter.finalLostDate()));
+                        cb.lessThanOrEqualTo(root.get("lostDate"), filter.getFinalLostDate()));
             }
-            if (filter.initialLostDate() != null) {
+            if (filter.getInitialLostDate() != null) {
                 predicates = cb.and(predicates,
-                        cb.greaterThanOrEqualTo(root.get("lostDate"), filter.initialLostDate()));
+                        cb.greaterThanOrEqualTo(root.get("lostDate"), filter.getInitialLostDate()));
             }
-            if (filter.weightMin() > 0) {
+            if (filter.getWeightMin() > 0) {
                 predicates = cb.and(predicates,
-                        cb.greaterThanOrEqualTo(root.get("weight"), filter.weightMin()));
+                        cb.greaterThanOrEqualTo(root.get("weight"), filter.getWeightMin()));
             }
-            if (filter.weightMax() > 0) {
+            if (filter.getWeightMax() > 0) {
                 predicates = cb.and(predicates,
-                        cb.lessThanOrEqualTo(root.get("weight"), filter.weightMax()));
+                        cb.lessThanOrEqualTo(root.get("weight"), filter.getWeightMax()));
             }
 
             return predicates;
@@ -60,37 +60,37 @@ public class Specifications {
         return (root, query, cb) -> {
             var predicates = cb.conjunction();
 
-            if (user.email() != null && !user.email().isEmpty()) {
+            if (user.getEmail() != null && !user.getEmail().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("email"), user.email()));
+                        cb.like(root.get("email"), user.getEmail()));
             }
-            if (user.name() != null && !user.name().isEmpty()) {
+            if (user.getName() != null && !user.getName().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("name"), user.name()));
+                        cb.like(root.get("name"), user.getName()));
             }
-            if (user.lastName() != null && !user.lastName().isEmpty()) {
+            if (user.getLastName() != null && !user.getLastName().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("lastName"), user.lastName()));
+                        cb.like(root.get("lastName"), user.getLastName()));
             }
-            if (user.city() != null && !user.city().isEmpty()) {
+            if (user.getCity() != null && !user.getCity().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("city"), user.city()));
+                        cb.like(root.get("city"), user.getCity()));
             }
-            if (user.neighborhood() != null && !user.neighborhood().isEmpty()) {
+            if (user.getNeighborhood() != null && !user.getNeighborhood().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("neighborhood"), user.neighborhood()));
+                        cb.like(root.get("neighborhood"), user.getNeighborhood()));
             }
-            if (user.minPoints() > 0) {
+            if (user.getMinPoints() > 0) {
                 predicates = cb.and(predicates,
-                        cb.greaterThanOrEqualTo(root.get("points"), user.minPoints()));
+                        cb.greaterThanOrEqualTo(root.get("points"), user.getMinPoints()));
             }
-            if (user.maxPoints() > 0) {
+            if (user.getMaxPoints() > 0) {
                 predicates = cb.and(predicates,
-                        cb.lessThanOrEqualTo(root.get("points"), user.maxPoints()));
+                        cb.lessThanOrEqualTo(root.get("points"), user.getMaxPoints()));
             }
-            if (user.role() != null) {
+            if (user.getRole() != null) {
                 predicates = cb.and(predicates,
-                        cb.equal(root.get("role"), user.role()));
+                        cb.equal(root.get("role"), user.getRole()));
             }
 
             return predicates;

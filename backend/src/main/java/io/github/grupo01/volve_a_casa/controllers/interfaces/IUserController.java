@@ -42,8 +42,8 @@ public interface IUserController {
             )
     })
     ResponseEntity<?> listAllUsers(
-            @ParameterObject @ModelAttribute UserFilter filter,
-            @ParameterObject @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject UserFilter filter,
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "Obtener usuario por ID", description = "Obtiene los detalles de un usuario específico (requiere token de autenticación en formato {userId}123456). "

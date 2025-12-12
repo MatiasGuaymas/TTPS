@@ -16,7 +16,6 @@ public record PetUpdateDTO(
         @Size(max = 50, message = "Color must have at most 50 characters")
         String color,
 
-        @Size(max = 50, message = "Size must have at most 50 characters")
         Pet.Size size,
 
         @Size(max = 100, message = "Race must have at most 100 characters")
