@@ -1,6 +1,6 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
-import io.github.grupo01.volve_a_casa.controllers.dto.auth.TokenDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserLoginDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
@@ -8,7 +8,6 @@ import io.github.grupo01.volve_a_casa.controllers.interfaces.IAuthController;
 import io.github.grupo01.volve_a_casa.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +30,8 @@ public class AuthController implements IAuthController {
     @PostMapping
     @Override
     public ResponseEntity<?> authenticateUser(@RequestBody UserLoginDTO userLoginDTO) {
-        String token = userService.authenticateUser(userLoginDTO.email(), userLoginDTO.password());
-        return ResponseEntity.ok(new TokenDTO(token));
+        AuthResponseDTO authResponse = userService.authenticateUser(userLoginDTO.email(), userLoginDTO.password());
+        return ResponseEntity.ok(authResponse);
     }
 
     // @Override

@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.services;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
@@ -139,6 +140,9 @@ class UserServiceTest {
     void authenticateUser_success_returnsToken() {
         User user = mock(User.class);
         when(user.getId()).thenReturn(10L);
+        when(user.getEmail()).thenReturn("test@test.com");
+        when(user.getName()).thenReturn("Test User");
+        when(user.getRole()).thenReturn(User.Role.USER);
         when(user.getPassword()).thenReturn("123456");
         when(user.isEnabled()).thenReturn(true);
 
@@ -146,8 +150,9 @@ class UserServiceTest {
         when(passwordEncoder.matches("123456", "123456")).thenReturn(true);
         when(tokenService.generateToken(user.getId())).thenReturn("10123456");
 
-        String token = userService.authenticateUser("test@test.com", "123456");
-        assertEquals("10123456", token);
+        AuthResponseDTO authResponse = userService.authenticateUser("test@test.com", "123456");
+        assertEquals("10123456", authResponse.token());
+        assertEquals(10L, authResponse.user().id());
     }
 
     public User createUser(String name, String email) {

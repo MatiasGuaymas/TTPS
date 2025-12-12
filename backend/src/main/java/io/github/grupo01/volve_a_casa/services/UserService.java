@@ -1,6 +1,7 @@
 package io.github.grupo01.volve_a_casa.services;
 
-import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.auth.UserAuthDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
@@ -73,7 +74,7 @@ public class UserService {
         return UserResponseDTO.fromUser(savedUser);
     }
 
-    public String authenticateUser(String email, String password) {
+    public AuthResponseDTO authenticateUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials"));
 
@@ -85,6 +86,9 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is disabled");
         }
 
-        return tokenService.generateToken(user.getId());
+        String token = tokenService.generateToken(user.getId());
+        UserAuthDTO userAuthDTO = new UserAuthDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
+
+        return new AuthResponseDTO(token, userAuthDTO);
     }
 }

@@ -1,10 +1,13 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.auth.UserAuthDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserLoginDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +51,9 @@ public class AuthControllerTest {
 
     @Test
     void authenticateUser_whenValid_returnsTokenInBody() throws Exception {
-        when(userService.authenticateUser("test@test.com", "pass")).thenReturn(JWT_TOKEN);
+        when(userService.authenticateUser("test@test.com", "pass")).thenReturn(
+                new AuthResponseDTO(JWT_TOKEN, new UserAuthDTO(1L, "test", "test@test.com", User.Role.USER))
+        );
 
         UserLoginDTO loginDTO = new UserLoginDTO("test@test.com", "pass");
 
@@ -56,7 +61,8 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value(JWT_TOKEN));
+                .andExpect(jsonPath("$.token").value(JWT_TOKEN))
+                .andExpect(jsonPath("$.user.id").value(1L));
     }
 
     @Test
