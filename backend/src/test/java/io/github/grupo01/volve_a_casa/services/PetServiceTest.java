@@ -82,11 +82,12 @@ public class PetServiceTest {
     @Test
     void updatePet_petNotFound_throws() {
         when(petRepository.findById(10L)).thenReturn(Optional.empty());
+        User user = mock(User.class);
 
         PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> petService.updatePet(10L, 1L, dto));
+                () -> petService.updatePet(10L, user, dto));
 
         assertEquals("404 NOT_FOUND \"Pet with id 10 not found\"", ex.getMessage());
         verify(petRepository, never()).save(any(Pet.class));
@@ -100,12 +101,11 @@ public class PetServiceTest {
         User otherUser = mock(User.class);
 
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
-        when(userService.findById(2L)).thenReturn(otherUser);
 
         PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> petService.updatePet(10L, 2L, dto));
+                () -> petService.updatePet(10L, otherUser, dto));
 
         assertTrue(ex.getMessage().contains("No tienes permiso para editar esta mascota"));
         verify(petRepository, never()).save(any(Pet.class));
@@ -125,10 +125,9 @@ public class PetServiceTest {
 
         // Mock de los métodos del service
         when(petRepository.findById(petId)).thenReturn(Optional.of(pet));
-        when(userService.findById(creatorId)).thenReturn(creator);
 
         // Llamada al método
-        assertDoesNotThrow(() -> petService.deletePet(petId, creatorId));
+        assertDoesNotThrow(() -> petService.deletePet(petId, creator));
 
         // Verificar que se llamó al repositorio para borrar
         verify(petRepository).delete(pet);
@@ -161,8 +160,13 @@ public class PetServiceTest {
                 12.5f,
                 -34.6f,
                 -58.4f,
+<<<<<<< HEAD
                 Pet.Type.PERRO,
                 "photo_base64_placeholder"
+=======
+                Pet.State.PERDIDO_PROPIO,
+                Pet.Type.PERRO
+>>>>>>> origin/master
         );
     }
 
@@ -177,6 +181,7 @@ public class PetServiceTest {
                 -54f,
                 -27f,
                 Pet.Type.PERRO,
+                Pet.State.PERDIDO_PROPIO,
                 user,
                 "foto"
         );

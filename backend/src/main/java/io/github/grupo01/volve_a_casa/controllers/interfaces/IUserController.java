@@ -4,6 +4,8 @@ import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,18 +28,18 @@ public interface IUserController {
     })
     ResponseEntity<?> listAllUsersOrderByName();
 
-    @Operation(summary = "Crear usuario", description = "Registra un nuevo usuario en el sistema. El email debe ser único. "
-            +
-            "Tests: UserControllerTest.createUser_whenUserDoesNotExist_returnsCreated(), " +
-            "UserControllerTest.createUser_whenUserExists_returnsConflict()")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos o incompletos"),
-            @ApiResponse(responseCode = "409", description = "El email ya está registrado")
-    })
-    ResponseEntity<?> createUser(
-            @Parameter(description = "Datos del usuario a crear", required = true) UserCreateDTO userCreateDTO
-    );
+//    @Operation(summary = "Crear usuario", description = "Registra un nuevo usuario en el sistema. El email debe ser único. "
+//            +
+//            "Tests: UserControllerTest.createUser_whenUserDoesNotExist_returnsCreated(), " +
+//            "UserControllerTest.createUser_whenUserExists_returnsConflict()")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+//            @ApiResponse(responseCode = "400", description = "Datos inválidos o incompletos"),
+//            @ApiResponse(responseCode = "409", description = "El email ya está registrado")
+//    })
+//    ResponseEntity<?> createUser(
+//            @Parameter(description = "Datos del usuario a crear", required = true) UserCreateDTO userCreateDTO
+//    );
 
     @Operation(summary = "Obtener usuario por ID", description = "Obtiene los detalles de un usuario específico (requiere token de autenticación en formato {userId}123456). "
             +
@@ -50,7 +52,7 @@ public interface IUserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     ResponseEntity<?> getUserById(
-            @Parameter(description = "Token de autenticación (formato: {userId}123456)", required = true, example = "1123456") String token,
+            User requester,
             @Parameter(description = "ID del usuario", required = true, example = "1") Long id
     );
 
@@ -63,16 +65,7 @@ public interface IUserController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     ResponseEntity<?> updateUser(
-            @Parameter(description = "Token de autenticación (formato: {userId}123456)", required = true, example = "1123456") String token,
+            User requester,
             @Parameter(description = "Datos actualizados del usuario", required = true) UserUpdateDTO updatedData
-    );
-
-    @Operation(summary = "Listar mis mascotas", description = "Obtiene todas las mascotas creadas por el usuario autenticado.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de mascotas obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pet.class))),
-            @ApiResponse(responseCode = "401", description = "Token inválido")
-    })
-    ResponseEntity<?> getMyPets(
-            @Parameter(description = "Token de autenticación", required = true) String token
     );
 }

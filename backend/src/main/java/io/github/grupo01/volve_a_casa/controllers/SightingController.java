@@ -4,7 +4,8 @@ import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingCreateDTO
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.interfaces.ISightingController;
 import io.github.grupo01.volve_a_casa.persistence.entities.Sighting;
-import io.github.grupo01.volve_a_casa.security.TokenValidator;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.github.grupo01.volve_a_casa.services.SightingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +21,10 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/sightings", produces = MediaType.APPLICATION_JSON_VALUE, name = "SightingRestController")
 public class SightingController implements ISightingController {
-    private final TokenValidator tokenValidator;
     private final SightingService sightingService;
 
     @Autowired
-    public SightingController(TokenValidator tokenValidator, SightingService sightingService) {
-        this.tokenValidator = tokenValidator;
+    public SightingController(SightingService sightingService) {
         this.sightingService = sightingService;
     }
 
@@ -42,9 +42,8 @@ public class SightingController implements ISightingController {
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createSighting(@RequestHeader("token") String token, @Valid @RequestBody SightingCreateDTO sightingDTO) {
-        tokenValidator.validate(token);
-        SightingResponseDTO sighting = sightingService.createSighting(tokenValidator.extractUserId(token), sightingDTO);
+    public ResponseEntity<?> createSighting(@AuthenticationPrincipal User requester, @Valid @RequestBody SightingCreateDTO sightingDTO) {
+        SightingResponseDTO sighting = sightingService.createSighting(requester, sightingDTO);
         return new ResponseEntity<>(sighting, HttpStatus.CREATED);
     }
 

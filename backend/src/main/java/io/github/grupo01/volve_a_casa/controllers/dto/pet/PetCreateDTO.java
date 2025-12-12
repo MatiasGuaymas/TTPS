@@ -37,6 +37,9 @@ public record PetCreateDTO(
         @DecimalMax(value = "180.0", message = "Longitude must be <= 180")
         float longitude,
 
+        @NotNull(message = "State is required")
+        Pet.State state,
+
         @NotNull(message = "Type is required")
         Pet.Type type,
 

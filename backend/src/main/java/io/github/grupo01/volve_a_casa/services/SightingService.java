@@ -40,8 +40,7 @@ public class SightingService {
                 .toList();
     }
 
-    public SightingResponseDTO createSighting(long creatorId, SightingCreateDTO dto) {
-        User creator = userService.findById(creatorId);
+    public SightingResponseDTO createSighting(User creator, SightingCreateDTO dto) {
         Pet pet = petService.findById(dto.petId());
 
         Sighting newSighting = new Sighting(
