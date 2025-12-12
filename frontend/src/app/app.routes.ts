@@ -11,5 +11,5 @@ export const routes: Routes = [
     { path: 'register', component: RegisterComponent },
     { path: 'login', component: LoginComponent },
     { path: 'profile', component: ProfileComponent },
-    { path: 'alta-mascota', component: AltaMascota},
+    { path: 'mascota-perdida', component: AltaMascota},
 ];
