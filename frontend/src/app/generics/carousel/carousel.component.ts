@@ -1,11 +1,13 @@
-import { Component } from "@angular/core";
+import { Component, OnDestroy, OnInit, signal } from "@angular/core";
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'carousel',
+    imports: [NgClass],
     templateUrl: 'carousel.component.html',
 })
-export class CarouselComponent {
-    activeIndex = 0;
+export class CarouselComponent implements OnInit, OnDestroy {
+    activeIndex = signal(0);
     intervalId: any;
 
     images = [
@@ -19,67 +21,76 @@ export class CarouselComponent {
     ngOnInit() {
         this.startAutoSlide();
     }
-
+    
     ngOnDestroy() {
         this.stopAutoSlide();
     }
-
+    
     startAutoSlide() {
+        this.stopAutoSlide(); 
         this.intervalId = setInterval(() => {
-            this.next();
-        }, 4000); // Cambia cada 4 segundos
+            this.next(); 
+        }, 4000); 
     }
-
+    
     stopAutoSlide() {
         if (this.intervalId) {
             clearInterval(this.intervalId);
+            this.intervalId = null; 
         }
     }
-
-    next() {
-        this.activeIndex = (this.activeIndex < this.images.length - 1) 
-            ? this.activeIndex + 1 
-            : 0;
-    }
-
-    prev() {
-        this.activeIndex = (this.activeIndex > 0) 
-            ? this.activeIndex - 1 
-            : this.images.length - 1;
-    }
-
-    goTo(index: number) {
-        this.activeIndex = index;
+    
+    resetTimer() {
         this.stopAutoSlide();
         this.startAutoSlide();
     }
 
-    // Función que determina las clases CSS según la posición
+    next() {
+        this.activeIndex.update(i =>
+            i < this.images.length - 1 ? i + 1 : 0
+        );
+        this.resetTimer();
+    }
+
+    prev() {
+        this.activeIndex.update(i =>
+            i > 0 ? i - 1 : this.images.length - 1
+        );
+        this.resetTimer();
+    }
+
+    goTo(index: number) {
+        this.activeIndex.set(index);
+        this.resetTimer();
+    }
+
     getCardClasses(index: number): string {
-        const diff = index - this.activeIndex;
+        const diff = index - this.activeIndex(); 
         const total = this.images.length;
-        
-        // Calcular la distancia circular
+
         let distance = diff;
         if (Math.abs(diff) > total / 2) {
             distance = diff > 0 ? diff - total : diff + total;
         }
+        const baseSize = 'w-[280px] h-[280px] md:w-[500px] md:h-[350px]';
+        
+        const translateLeft = '-translate-x-[60px] md:-translate-x-[280px]';
+        const translateRight = 'translate-x-[60px] md:translate-x-[280px]';
 
-        // Imagen central (activa)
         if (distance === 0) {
-            return 'z-30 scale-100 translate-x-0 w-[500px] h-[350px] opacity-100';
-        }
-        // Imagen a la izquierda
+            return `z-20 scale-100 translate-x-0 opacity-100 ${baseSize}`;
+        } 
+        
         else if (distance === -1 || (distance === total - 1)) {
-            return 'z-20 scale-75 -translate-x-[280px] w-[500px] h-[350px] opacity-60';
-        }
-        // Imagen a la derecha
+            return `z-10 scale-75 ${translateLeft} opacity-60 ${baseSize}`;
+        } 
+        
         else if (distance === 1 || (distance === -(total - 1))) {
-            return 'z-20 scale-75 translate-x-[280px] w-[500px] h-[350px] opacity-60';
-        }
-        // Imágenes ocultas
+            return `z-10 scale-75 ${translateRight} opacity-60 ${baseSize}`;
+        } 
+        
         else {
-            return 'z-0 scale-50 opacity-0 w-[500px] h-[350px]';
+            return `z-0 scale-50 opacity-0 ${baseSize}`;
         }
     }
 }
