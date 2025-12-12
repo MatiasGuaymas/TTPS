@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public record PetResponseDTO(
         Long id,
         String name,
-        String size,
+        Pet.Size size,
         String description,
         String color,
         String race,
