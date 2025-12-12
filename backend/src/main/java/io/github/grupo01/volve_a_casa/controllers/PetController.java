@@ -53,6 +53,7 @@ public class PetController implements IPetController {
     @Override
     @PostMapping
     public ResponseEntity<?> createPet(@RequestHeader("token") String token, @Valid @RequestBody PetCreateDTO dto) {
+        // TODO: Sacar este comentario cuando se use el token en frontend
         //lo comento porque todavia no hay tal token
         //tokenValidator.validate(token);
         //PetResponseDTO response = petService.createPet(tokenValidator.extractUserId(token), dto);
@@ -113,6 +114,3 @@ public class PetController implements IPetController {
         return new ResponseEntity<>(sightings, HttpStatus.OK);
     }
 }
-
-
-
