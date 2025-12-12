@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,8 +12,9 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 export class NavbarComponent {
   profileMenuOpen = false;
   mobileMenuOpen = false;
+  isLoggedIn = computed(() => this.authService.isLoggedIn());
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
 
   toggleProfileMenu() {
     this.profileMenuOpen = !this.profileMenuOpen;
@@ -31,10 +33,8 @@ export class NavbarComponent {
   }
 
   logout() {
-    // Acá va a estar la lógica del logout
-    console.log('Cerrando sesión...');
     this.closeProfileMenu();
     this.closeMobileMenu();
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

@@ -1,0 +1,52 @@
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.models';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private http = inject(HttpClient);
+  private apiUrl = '/api/auth';
+
+  private currentUserSig = signal<AuthResponse['user'] | null | undefined>(undefined);
+
+  isLoggedIn = computed(() => !!this.currentUserSig());
+
+  constructor() {
+    const token = localStorage.getItem('token');
+    const userStored = localStorage.getItem('user');
+
+    if (token && userStored) {
+      this.currentUserSig.set(JSON.parse(userStored));
+    } else {
+        this.currentUserSig.set(null);
+    }
+  }
+
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}`, credentials).pipe(
+      tap((response) => {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+
+        this.currentUserSig.set(response.user);
+      })
+    );
+  }
+
+  register(datos: RegisterRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, datos);
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSig.set(null);
+  }
+
+  get currentUser() {
+      return this.currentUserSig();
+  }
+}

@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { LoginFormContent } from '../../../core/models/auth.models';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -10,23 +12,30 @@ import { Router, RouterLink } from '@angular/router';
     templateUrl: 'login.component.html'
 })
 export class LoginComponent {
-    loginForm: FormGroup;
+    loginForm: FormGroup<LoginFormContent>;
 
     constructor(
-        private fb: FormBuilder,
-        private router: Router
+        private fb: NonNullableFormBuilder,
+        private router: Router,
+        private authService: AuthService
     ) {
         this.loginForm = this.fb.group({
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
-            rememberMe: [false]
+            email: this.fb.control<string>('', [Validators.required, Validators.email]),
+            password: this.fb.control<string>('', [Validators.required, Validators.minLength(6)])
         });
     }
 
     onSubmit() {
         if (this.loginForm.valid) {
             console.log('Formulario válido:', this.loginForm.value);
-            // Acá va la lógica de autenticación
+            this.authService.login(this.loginForm.getRawValue()).subscribe({
+                next: (response) => {
+                    this.router.navigate(['/']);
+                },
+                error: (error) => {
+                    console.error('Error en el login:', error);
+                }
+            });
         } else {
             Object.keys(this.loginForm.controls).forEach(key => {
                 const control = this.loginForm.get(key);
