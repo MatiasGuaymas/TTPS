@@ -1,7 +1,7 @@
 package io.github.grupo01.volve_a_casa.services;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
-import io.github.grupo01.volve_a_casa.controllers.dto.auth.UserAuthDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
@@ -21,22 +21,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final GeorefService georefService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenService tokenService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenService tokenService, GeorefService georefService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.georefService = georefService;
     }
 
-    // TODO: Test de integracion
     public User findById(long id) {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
     }
 
-    // TODO: Test de integracion
     public List<UserResponseDTO> findAll(Sort sorted) {
         return userRepository.findAll(sorted)
                 .stream()
@@ -53,19 +53,30 @@ public class UserService {
         }
 
         String hashedPassword = passwordEncoder.encode(dto.password());
-        User user = new User(
+        GeorefResponse response = georefService.getUbication(dto.latitude(), dto.longitude());
+
+        User user = getUser(dto, response, hashedPassword);
+
+        return UserResponseDTO.fromUser(userRepository.save(user));
+    }
+
+    private User getUser(UserCreateDTO dto, GeorefResponse response, String hashedPassword) {
+        String ciudad = (response.ubicacion().municipio() != null && response.ubicacion().municipio().nombre() != null)
+                ? response.ubicacion().municipio().nombre()
+                : response.ubicacion().departamento().nombre();
+        String barrio = response.ubicacion().departamento().nombre();
+
+        return new User(
                 dto.name(),
                 dto.lastName(),
                 dto.email(),
                 hashedPassword,
                 dto.phoneNumber(),
-                dto.city(),
-                dto.neighborhood(),
+                ciudad,
+                barrio,
                 dto.latitude(),
                 dto.longitude()
         );
-
-        return UserResponseDTO.fromUser(userRepository.save(user));
     }
 
     public UserResponseDTO updateUser(User user, UserUpdateDTO dto) {
@@ -87,7 +98,7 @@ public class UserService {
         }
 
         String token = tokenService.generateToken(user.getId());
-        UserAuthDTO userAuthDTO = new UserAuthDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        AuthResponseDTO.UserAuthDTO userAuthDTO = new AuthResponseDTO.UserAuthDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
 
         return new AuthResponseDTO(token, userAuthDTO);
     }

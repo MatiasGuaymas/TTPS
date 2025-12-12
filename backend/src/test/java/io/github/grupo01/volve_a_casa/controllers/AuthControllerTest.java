@@ -2,7 +2,6 @@ package io.github.grupo01.volve_a_casa.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
-import io.github.grupo01.volve_a_casa.controllers.dto.auth.UserAuthDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserLoginDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
@@ -52,7 +51,7 @@ public class AuthControllerTest {
     @Test
     void authenticateUser_whenValid_returnsTokenInBody() throws Exception {
         when(userService.authenticateUser("test@test.com", "pass")).thenReturn(
-                new AuthResponseDTO(JWT_TOKEN, new UserAuthDTO(1L, "test", "test@test.com", User.Role.USER))
+                new AuthResponseDTO(JWT_TOKEN, new AuthResponseDTO.UserAuthDTO(1L, "test", "test@test.com", User.Role.USER))
         );
 
         UserLoginDTO loginDTO = new UserLoginDTO("test@test.com", "pass");
@@ -89,8 +88,6 @@ public class AuthControllerTest {
                 "nombre",
                 "apellido",
                 "11 1234-5678",
-                "La Plata",
-                "Manuel B. Gonnet",
                 -51.03f,
                 -43.23f
         );
@@ -125,8 +122,6 @@ public class AuthControllerTest {
                 "nombre",
                 "apellido",
                 "11 1234-5678",
-                "La Plata",
-                "Manuel B. Gonnet",
                 -51.03f,
                 -43.23f
         );

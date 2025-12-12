@@ -1,6 +1,7 @@
 package io.github.grupo01.volve_a_casa.services;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
@@ -33,6 +34,9 @@ class UserServiceTest {
     @Mock
     TokenService tokenService;
 
+    @Mock
+    GeorefService georefService;
+
     @InjectMocks
     UserService userService;
 
@@ -46,8 +50,6 @@ class UserServiceTest {
                 "name",
                 "lastName",
                 "221 111-1111",
-                "city",
-                "neighborhood",
                 -54f,
                 -27f
         );
@@ -55,6 +57,16 @@ class UserServiceTest {
 
         when(userRepository.existsByEmail(email)).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(user);
+        when(georefService.getUbication(-54f, -27f)).thenReturn(new GeorefResponse(
+                new GeorefResponse.Ubicacion(
+                        new GeorefResponse.Entidad("1", "La Plata"),
+                        new GeorefResponse.Entidad("1", "La Plata"),
+                        new GeorefResponse.Entidad("1", "Buenos Aires"),
+                        -54f,
+                        -27f
+                )
+        ));
+
         UserResponseDTO response = userService.createUser(dto);
         assertEquals(user.getName(), response.name());
         verify(passwordEncoder, times(1)).encode("password");
@@ -70,8 +82,6 @@ class UserServiceTest {
                 "name",
                 "lastName",
                 "221 111-1111",
-                "city",
-                "neighborhood",
                 -54f,
                 -27f
         );
