@@ -7,16 +7,17 @@ import { PetCreate } from "./mascota.model";
   providedIn: 'root'
 })
 export class MascotaService {
-    private apiUrl = '/api/pets'; 
+    private apiUrl = '/api/pets';
 
     constructor(private http: HttpClient) { }
 
-    
-    crearMascota(petDto: PetCreate, token: string): Observable<any> {        
+
+    crearMascota(petDto: PetCreate, token: string): Observable<any> {
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
-            'token': token 
+            'token': token
         });
-       
-        return this.http.post(this.apiUrl, petDto, { headers });    }
+
+        return this.http.post(this.apiUrl, petDto, { headers });
+      }
 }
