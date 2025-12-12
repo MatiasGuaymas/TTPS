@@ -6,7 +6,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.interfaces.IUserController;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
-import io.github.grupo01.volve_a_casa.security.TokenValidator;
+import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.github.grupo01.volve_a_casa.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +23,10 @@ import java.util.List;
 @RequestMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE, name = "UserRestController")
 public class UserController implements IUserController {
     private final UserService userService;
-    private final TokenValidator tokenValidator;
 
     @Autowired
-    public UserController(UserService userService, TokenValidator tokenValidator) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.tokenValidator = tokenValidator;
     }
 
     @Override
@@ -42,38 +41,16 @@ public class UserController implements IUserController {
     }
 
     @Override
-    @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
-        UserResponseDTO user = userService.createUser(userCreateDTO);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
-    }
-
-    @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@RequestHeader("token") String token, @PathVariable("id") Long id) {
-        tokenValidator.validate(token);
+    public ResponseEntity<?> getUserById(@AuthenticationPrincipal User requester, @PathVariable("id") Long id) {
         User user = userService.findById(id);
         return ResponseEntity.ok(UserResponseDTO.fromUser(user));
     }
 
     @Override
-    @GetMapping("/my_pets")
-    public ResponseEntity<?> getMyPets(@RequestHeader("token") String token) {
-        tokenValidator.validate(token);
-        List<PetResponseDTO> pets = userService.getPetsCreatedByUser(tokenValidator.extractUserId(token));
-
-        if (pets.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-
-        return ResponseEntity.ok(pets);
-    }
-
-    @Override
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestHeader("token") String token, @Valid @RequestBody UserUpdateDTO updatedData) {
-        tokenValidator.validate(token);
-        UserResponseDTO user = userService.updateUser(tokenValidator.extractUserId(token), updatedData);
+    public ResponseEntity<?> updateUser(@AuthenticationPrincipal User requester, @Valid @RequestBody UserUpdateDTO updatedData) {
+        UserResponseDTO user = userService.updateUser(requester, updatedData);
         return ResponseEntity.ok(user);
     }
 

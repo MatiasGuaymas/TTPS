@@ -25,12 +25,6 @@ public record UserCreateDTO(
         )
         String phoneNumber,
 
-        @NotBlank(message = "City is required")
-        String city,
-
-        @NotBlank(message = "Neighborhood is required")
-        String neighborhood,
-
         @NotNull(message = "Latitude is required")
         @DecimalMin(value = "-90.0", message = "Latitude must be >= -90")
         @DecimalMax(value = "90.0", message = "Latitude must be <= 90")

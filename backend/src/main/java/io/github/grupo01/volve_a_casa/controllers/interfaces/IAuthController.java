@@ -1,10 +1,12 @@
 package io.github.grupo01.volve_a_casa.controllers.interfaces;
 
 
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserLoginDTO;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,8 +22,16 @@ public interface IAuthController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado - El email no está registrado", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = "{\"error\": \"Usuario no encontrado\", \"message\": \"El correo ingresado no corresponde a ningún usuario registrado\"}"))),
             @ApiResponse(responseCode = "403", description = "Acceso denegado - Credenciales incorrectas o usuario deshabilitado", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = "{\"error\": \"Acceso denegado\", \"message\": \"credenciales incorrectas o usuario deshabilitado\"}")))
     })
+    @RequestBody(
+            description = "Cuerpo con email y contraseña para autenticación",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserLoginDTO.class),
+                    examples = @ExampleObject(value = "{\"email\":\"user@example.com\",\"password\":\"P@ssw0rd\"}")
+            )
+    )
     ResponseEntity<?> authenticateUser(
-            @Parameter(description = "Email del usuario", required = true, example = "usuario@example.com") String mail,
-            @Parameter(description = "Contraseña del usuario", required = true, example = "password123") String password
+            UserLoginDTO userLoginDTO
     );
 }

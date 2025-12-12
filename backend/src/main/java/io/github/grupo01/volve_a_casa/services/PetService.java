@@ -17,14 +17,10 @@ import java.util.List;
 // TODO: Testear
 @Service
 public class PetService {
-
-
     private final PetRepository petRepository;
-    private final UserService userService;
 
-    public PetService(PetRepository petRepository, UserService userService) {
+    public PetService(PetRepository petRepository) {
         this.petRepository = petRepository;
-        this.userService = userService;
     }
 
     // TODO: Test de integracion
@@ -32,6 +28,14 @@ public class PetService {
         return petRepository
                 .findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet with id " + id + " not found"));
+    }
+
+    public List<PetResponseDTO> getPetByCreator(User creator) {
+        return petRepository
+                .findAllByCreator(creator)
+                .stream()
+                .map(PetResponseDTO::fromPet)
+                .toList();
     }
 
     // TODO: Test de integracion
@@ -49,9 +53,7 @@ public class PetService {
                 .toList();
     }
 
-    public PetResponseDTO createPet(long creatorId, PetCreateDTO dto) {
-        User creator = userService.findById(creatorId);
-
+    public PetResponseDTO createPet(User creator, PetCreateDTO dto) {
         Pet newPet = new Pet(
                 dto.name(),
                 dto.size(),
@@ -62,15 +64,15 @@ public class PetService {
                 dto.latitude(),
                 dto.longitude(),
                 dto.type(),
+                dto.state(),
                 creator,
-                "foto_default_base64"
+                dto.photoBase64()
         );
         return PetResponseDTO.fromPet(petRepository.save(newPet));
     }
 
-    public PetResponseDTO updatePet(long petId, long creatorId, PetUpdateDTO dto) {
+    public PetResponseDTO updatePet(long petId, User creator, PetUpdateDTO dto) {
         Pet pet = this.findById(petId);
-        User creator = this.userService.findById(creatorId);
 
         if (!pet.getCreator().equals(creator)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para editar esta mascota");
@@ -81,10 +83,9 @@ public class PetService {
         return PetResponseDTO.fromPet(savedPet);
     }
 
-    public void deletePet(long petId, long creatorId) {
+    public void deletePet(long petId, User creator) {
         Pet pet = this.findById(petId);
-        User user = userService.findById(creatorId);
-        if (!pet.getCreator().equals(user)) {
+        if (!pet.getCreator().equals(creator)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para editar esta mascota");
         }
 

@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
-import { CarouselComponent } from "../generics/carousel/carousel.component";
-import { UserCardComponent } from "../generics/userCard/userCard.component";    
+import { UserCardComponent } from "../../shared/components/userCard/userCard.component";
+import { CarouselComponent } from "../../shared/components/carousel/carousel.component";
 
 @Component({
     selector: 'app-home',

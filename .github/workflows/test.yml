@@ -3,13 +3,21 @@ name: Test Java
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - 'backend/**'
   pull_request:
     branches: [ "master" ]
+    paths:
+      - 'backend/**'
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./backend
 
     steps:
     - uses: actions/checkout@v4
@@ -19,5 +27,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+        cache-dependency-path: backend/pom.xml
+
     - name: Build with Maven
       run: mvn -B -U test

@@ -24,9 +24,6 @@ public class PetServiceTest {
     @Mock
     PetRepository petRepository;
 
-    @Mock
-    UserService userService;
-
     @InjectMocks
     PetService petService;
 
@@ -34,7 +31,6 @@ public class PetServiceTest {
     public void createPet_success() {
         long userId = 1L;
         User user = mock(User.class);
-        when(userService.findById(userId)).thenReturn(user);
         when(user.getId()).thenReturn(userId);
 
         PetCreateDTO dto = samplePetCreateDTO();
@@ -48,12 +44,13 @@ public class PetServiceTest {
                 dto.latitude(),
                 dto.longitude(),
                 dto.type(),
+                dto.state(),
                 user,
                 "foto_default_base64"
         );
 
         when(petRepository.save(any(Pet.class))).thenReturn(pet);
-        PetResponseDTO response = petService.createPet(userId, dto);
+        PetResponseDTO response = petService.createPet(user, dto);
         assertEquals(userId, response.creatorId());
         assertEquals(pet.getName(), response.name());
         verify(petRepository, times(1)).save(any(Pet.class));
@@ -63,7 +60,6 @@ public class PetServiceTest {
     void updatePet_success() {
         long userId = 1L;
         User user = mock(User.class);
-        when(userService.findById(userId)).thenReturn(user);
         when(user.getId()).thenReturn(userId);
 
         Pet pet = createPet("NombreViejo", user);
@@ -72,7 +68,7 @@ public class PetServiceTest {
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
         when(petRepository.save(pet)).thenReturn(pet);
 
-        PetResponseDTO response = petService.updatePet(10L, 1L, dto);
+        PetResponseDTO response = petService.updatePet(10L, user, dto);
 
         assertEquals("NuevoNombre", pet.getName());
         assertEquals(response.name(), pet.getName());
@@ -82,11 +78,12 @@ public class PetServiceTest {
     @Test
     void updatePet_petNotFound_throws() {
         when(petRepository.findById(10L)).thenReturn(Optional.empty());
+        User user = mock(User.class);
 
         PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> petService.updatePet(10L, 1L, dto));
+                () -> petService.updatePet(10L, user, dto));
 
         assertEquals("404 NOT_FOUND \"Pet with id 10 not found\"", ex.getMessage());
         verify(petRepository, never()).save(any(Pet.class));
@@ -100,12 +97,11 @@ public class PetServiceTest {
         User otherUser = mock(User.class);
 
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
-        when(userService.findById(2L)).thenReturn(otherUser);
 
         PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> petService.updatePet(10L, 2L, dto));
+                () -> petService.updatePet(10L, otherUser, dto));
 
         assertTrue(ex.getMessage().contains("No tienes permiso para editar esta mascota"));
         verify(petRepository, never()).save(any(Pet.class));
@@ -125,10 +121,9 @@ public class PetServiceTest {
 
         // Mock de los métodos del service
         when(petRepository.findById(petId)).thenReturn(Optional.of(pet));
-        when(userService.findById(creatorId)).thenReturn(creator);
 
         // Llamada al método
-        assertDoesNotThrow(() -> petService.deletePet(petId, creatorId));
+        assertDoesNotThrow(() -> petService.deletePet(petId, creator));
 
         // Verificar que se llamó al repositorio para borrar
         verify(petRepository).delete(pet);
@@ -142,10 +137,9 @@ public class PetServiceTest {
         User otherUser = mock(User.class);
 
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
-        when(userService.findById(2L)).thenReturn(otherUser);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
-                () -> petService.deletePet(10L, 2L));
+                () -> petService.deletePet(10L, otherUser));
 
         assertTrue(ex.getMessage().contains("No tienes permiso para editar esta mascota"));
         verify(petRepository, never()).delete(any(Pet.class));
@@ -161,7 +155,9 @@ public class PetServiceTest {
                 12.5f,
                 -34.6f,
                 -58.4f,
-                Pet.Type.PERRO
+                Pet.State.PERDIDO_PROPIO,
+                Pet.Type.PERRO,
+                "foto_default_base64"
         );
     }
 
@@ -176,6 +172,7 @@ public class PetServiceTest {
                 -54f,
                 -27f,
                 Pet.Type.PERRO,
+                Pet.State.PERDIDO_PROPIO,
                 user,
                 "foto"
         );

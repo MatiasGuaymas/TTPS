@@ -23,10 +23,20 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
               "src/styles.css"
+            ]
+            ,
+            "allowedCommonJsDependencies": [
+              "leaflet",
+              "sweetalert2"
             ]
           },
           "configurations": {
@@ -55,6 +65,10 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "volve-a-casa:build",
+            "proxyConfig": "src/proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "volve-a-casa:build:production"

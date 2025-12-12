@@ -1,0 +1,132 @@
+<div class="min-h-screen flex items-center justify-center p-6 bg-gray-100">
+    <div class="max-w-6xl w-full bg-white shadow-2xl rounded-lg overflow-hidden md:flex">
+        
+       <div class="md:w-1/2 p-4 hidden md:block bg-cover bg-center" 
+           style="background-image: url('/assets/alta.jpg'); min-height: 700px;"> 
+        </div>
+        <div class="md:w-1/2 p-10">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Ayudanos A Encontrar A Tu Mascota!</h2>
+
+            <form [formGroup]="formMascota" (ngSubmit)="onSubmit()">
+                
+                <div class="mb-6 flex flex-col items-center">
+                    
+                    <input type="file" 
+                           #fileInput 
+                           (change)="onFileSelected($event)" 
+                           accept="image/*" 
+                           class="hidden"
+                           formControlName="photoFile"> 
+
+                    <div (click)="fileInput.click()" 
+                         class="flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors w-full max-w-xs"
+                         [ngClass]="{
+                            'border-blue-500 bg-blue-50': imagenPreVisualizacion,
+                            'border-gray-300 hover:bg-gray-100': !imagenPreVisualizacion
+                         }">
+
+                        <ng-container *ngIf="imagenPreVisualizacion; else uploadPlaceholder">
+                            <img [src]="imagenPreVisualizacion" 
+                                 alt="Previsualización de Mascota" 
+                                 class="max-h-40 max-w-full object-contain rounded-md shadow-md mb-2">
+                            <p class="text-xs text-blue-600 font-medium">Click para cambiar foto</p>
+                        </ng-container>
+
+                        <ng-template #uploadPlaceholder>
+                            <i class="fas fa-cloud-upload-alt text-2xl text-blue-600 mb-2"></i>
+                            <p class="text-sm font-medium text-blue-600">Subi Una Foto De Tu Mascota</p>
+                            <p class="text-xs text-gray-500 mt-1">(Haz click aquí)</p>
+                        </ng-template>
+
+                    </div>
+                    <div *ngIf="formMascota.get('photoFile')?.invalid && formMascota.get('photoFile')?.touched" class="text-red-500 text-xs mt-1">
+                        La foto es obligatoria.
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700">Nombre De Tu Mascota</label>
+                        <input type="text" formControlName="name" placeholder="Toby" class="w-full p-2 border border-gray-300 rounded-md">
+                        <div *ngIf="formMascota.get('name')?.invalid && formMascota.get('name')?.touched" class="text-red-500 text-xs mt-1">
+                            El nombre es requerido.
+                        </div>
+
+                        <label class="block text-sm font-medium text-gray-700">Tamaño (cm)</label>
+                        <input type="text" formControlName="size" placeholder="35 Cm" class="w-full p-2 border border-gray-300 rounded-md">
+                        
+                        <label class="block text-sm font-medium text-gray-700">Fecha Desaparicion</label>
+                        <input type="date" formControlName="fechaDesaparicion" placeholder="DD/MM/YYYY" class="w-full p-2 border border-gray-300 rounded-md">
+
+                        <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                        <select formControlName="type" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option *ngFor="let tipo of tiposMascota" [value]="tipo">{{ tipo }}</option>
+                        </select>
+                        
+                        <label class="block text-sm font-medium text-gray-700">Peso (kg)</label>
+                        <input type="number" formControlName="weight" placeholder="5.5" step="0.1" class="w-full p-2 border border-gray-300 rounded-md">
+                        <div *ngIf="formMascota.get('weight')?.hasError('min')" class="text-red-500 text-xs mt-1">
+                            El peso debe ser mayor a 0.
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700">Tu Nombre</label>
+                        <input type="text" formControlName="ownerName" placeholder="Jose Benito" class="w-full p-2 border border-gray-300 rounded-md">
+                        
+                        <label class="block text-sm font-medium text-gray-700">Estado</label>
+                        <div class="grid grid-cols-2 gap-2"> 
+                            <button type="button" 
+                                    *ngFor="let estado of estados" 
+                                    (click)="seleccionarEstado(estado)"
+                                    [ngClass]="{
+                                        'bg-blue-600 text-white': formMascota.get('estado')?.value === estado,
+                                        'bg-gray-200 text-gray-700 hover:bg-gray-300': formMascota.get('estado')?.value !== estado
+                                    }"
+                                    class="px-2 py-2 rounded-md font-semibold transition-colors text-xs text-center">
+                                
+                                {{ estado }} 
+                                
+                            </button>
+                        </div>
+                        
+                        <label class="block text-sm font-medium text-gray-700">COLOR</label>
+                        <input type="color" formControlName="color" class="w-full h-10 p-1 border border-gray-300 rounded-md">
+                        
+                        <label class="block text-sm font-medium text-gray-700">Raza</label>
+                        <input type="text" formControlName="race" placeholder="Border Collie" class="w-full p-2 border border-gray-300 rounded-md">
+                        
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ubicacion Donde Fue Visto Por Ultima Vez</label>
+                    <div class="w-full h-48 rounded-md relative overflow-hidden border border-gray-300">
+                        <div #mapContainer id="map" class="w-full h-full"></div>
+                        <p class="absolute top-2 left-2 text-xs text-gray-500 z-10 bg-white/60 px-2 py-0.5 rounded">
+                            Lat: {{formMascota.get('latitude')?.value | number:'1.4-4'}}, Lon: {{formMascota.get('longitude')?.value | number:'1.4-4'}}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700">Descripcion Adicional</label>
+                    <textarea formControlName="description" rows="3" placeholder="Descripción Adicional (Máx. 500 caracteres)" class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                    <div *ngIf="formMascota.get('description')?.hasError('maxlength')" class="text-red-500 text-xs mt-1">
+                        Máximo 500 caracteres.
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-end">
+                    <button type="submit" 
+                            [disabled]="formMascota.invalid || !imagenBase64"
+                            class="px-8 py-3 bg-blue-600 text-white font-bold rounded-md shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Subir
+                    </button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>

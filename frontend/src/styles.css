@@ -1,3 +1,7 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "sweetalert2/dist/sweetalert2.min.css";
+@import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 @import "flowbite/src/themes/default";
 

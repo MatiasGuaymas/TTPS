@@ -4,6 +4,9 @@ import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
+import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,7 +27,7 @@ public interface IPetController {
             @ApiResponse(responseCode = "401", description = "Token inválido")
     })
     ResponseEntity<?> createPet(
-            @Parameter(description = "Token de autenticación", required = true) String token,
+            User requester,
             PetCreateDTO dto
     );
 
@@ -36,7 +39,7 @@ public interface IPetController {
             @ApiResponse(responseCode = "404", description = "Mascota no encontrada")
     })
     ResponseEntity<?> updatePet(
-            @Parameter(description = "Token de autenticación", required = true) String token,
+            User requester,
             @Parameter(description = "ID de la mascota", required = true) Long id,
             PetUpdateDTO dto
     );
@@ -49,7 +52,7 @@ public interface IPetController {
             @ApiResponse(responseCode = "404", description = "Mascota no encontrada")
     })
     ResponseEntity<?> deletePet(
-            @Parameter(description = "Token de autenticación", required = true) String token,
+            User requester,
             @Parameter(description = "ID de la mascota", required = true) Long id
     );
 
@@ -96,5 +99,14 @@ public interface IPetController {
     })
     ResponseEntity<?> listAllSightings(
             @Parameter(description = "ID de la mascota", required = true, example = "1") Long id
+    );
+
+    @Operation(summary = "Listar mis mascotas", description = "Obtiene todas las mascotas creadas por el usuario autenticado.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de mascotas obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pet.class))),
+            @ApiResponse(responseCode = "401", description = "Token inválido")
+    })
+    ResponseEntity<?> getMyPets(
+            User requester
     );
 }

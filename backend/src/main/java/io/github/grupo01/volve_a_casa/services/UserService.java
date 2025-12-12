@@ -1,6 +1,7 @@
 package io.github.grupo01.volve_a_casa.services;
 
-import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
@@ -19,34 +20,27 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
+    private final GeorefService georefService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TokenService tokenService, GeorefService georefService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
+        this.georefService = georefService;
     }
 
-    // TODO: Test de integracion
     public User findById(long id) {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
     }
 
-    // TODO: Test de integracion
     public List<UserResponseDTO> findAll(Sort sorted) {
         return userRepository.findAll(sorted)
                 .stream()
                 .map(UserResponseDTO::fromUser)
-                .toList();
-    }
-
-    // TODO: Test de integracion
-    public List<PetResponseDTO> getPetsCreatedByUser(long id) {
-        User user = this.findById(id);
-        return user.getCreatedPets()
-                .stream()
-                .map(PetResponseDTO::fromPet)
                 .toList();
     }
 
@@ -59,37 +53,53 @@ public class UserService {
         }
 
         String hashedPassword = passwordEncoder.encode(dto.password());
-        User user = new User(
+        GeorefResponse response = georefService.getUbication(dto.latitude(), dto.longitude());
+
+        User user = getUser(dto, response, hashedPassword);
+
+        return UserResponseDTO.fromUser(userRepository.save(user));
+    }
+
+    private User getUser(UserCreateDTO dto, GeorefResponse response, String hashedPassword) {
+        String ciudad = (response.ubicacion().municipio() != null && response.ubicacion().municipio().nombre() != null)
+                ? response.ubicacion().municipio().nombre()
+                : response.ubicacion().departamento().nombre();
+        String barrio = response.ubicacion().departamento().nombre();
+
+        return new User(
                 dto.name(),
                 dto.lastName(),
                 dto.email(),
                 hashedPassword,
                 dto.phoneNumber(),
-                dto.city(),
-                dto.neighborhood(),
+                ciudad,
+                barrio,
                 dto.latitude(),
                 dto.longitude()
         );
-
-        return UserResponseDTO.fromUser(userRepository.save(user));
     }
 
-    public UserResponseDTO updateUser(long id, UserUpdateDTO dto) {
-        User user = this.findById(id);
+    public UserResponseDTO updateUser(User user, UserUpdateDTO dto) {
         user.updateFromDTO(dto);
         User savedUser = userRepository.save(user);
         return UserResponseDTO.fromUser(savedUser);
     }
 
-    public String authenticateUser(String email, String password) {
+    public AuthResponseDTO authenticateUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials"));
 
-
-        if (!passwordEncoder.matches(password, user.getPassword()) || !user.isEnabled()) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials");
         }
 
-        return user.getId() + "123456";
+        if (!user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is disabled");
+        }
+
+        String token = tokenService.generateToken(user.getId());
+        AuthResponseDTO.UserAuthDTO userAuthDTO = new AuthResponseDTO.UserAuthDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
+
+        return new AuthResponseDTO(token, userAuthDTO);
     }
 }
