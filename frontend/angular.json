@@ -23,10 +23,20 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
               "src/styles.css"
+            ]
+            ,
+            "allowedCommonJsDependencies": [
+              "leaflet",
+              "sweetalert2"
             ]
           },
           "configurations": {
