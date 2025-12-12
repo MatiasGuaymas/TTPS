@@ -67,7 +67,7 @@
 
                     <button type="button"
                         (click)="getLocation()"
-                        [disabled]="cargandoUbicacion() || ubicacionLista   ()"
+                        [disabled]="cargandoUbicacion() || ubicacionLista()"
                         [ngClass]="{
                             'bg-green-100 border-[#37B47D] text-[#008A88] dark:bg-[#37B47D]/20 dark:text-[#37B47D]': ubicacionLista(),
                             'bg-gray-50 dark:bg-primary-dark border-gray-200 dark:border-border-dark text-gray-900 dark:text-gray-200 hover:border-[#37B47D]': !ubicacionLista()
@@ -96,7 +96,7 @@
                         }
                     </button>
 
-                    @if (registerForm.get('lat')?.invalid && (registerForm.touched || registerForm.dirty)) {
+                    @if (registerForm.get('latitude')?.invalid && (registerForm.touched || registerForm.dirty)) {
                         <p class="mt-1 text-xs text-red-500">Debes obtener tu ubicación para continuar.</p>
                     }
                 </div>

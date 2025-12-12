@@ -30,7 +30,6 @@ export class LoginComponent {
             console.log('Formulario válido:', this.loginForm.value);
             this.authService.login(this.loginForm.getRawValue()).subscribe({
                 next: (response) => {
-                    console.log('Login exitoso:', response);
                     this.router.navigate(['/']);
                 },
                 error: (error) => {

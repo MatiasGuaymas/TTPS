@@ -27,7 +27,7 @@ export class RegisterComponent {
             name: this.fb.control('', [Validators.required, Validators.minLength(2)]),
             lastName: this.fb.control('', [Validators.required, Validators.minLength(2)]),
             email: this.fb.control('', [Validators.required, Validators.email]),
-            phoneNumber: this.fb.control('', [Validators.required, Validators.pattern(/^[0-9+ -]{6,20}$/)]),
+            phoneNumber: this.fb.control('', [Validators.required, Validators.pattern(/^\+?\d{7,15}$/)]),
             password: this.fb.control('', [Validators.required, Validators.minLength(6)]),
             latitude: this.fb.control(0, [Validators.required]),
             longitude: this.fb.control(0, [Validators.required])
@@ -39,11 +39,11 @@ export class RegisterComponent {
             console.log('Formulario válido:', this.registerForm.value);
             this.authService.register(this.registerForm.getRawValue()).subscribe({
                 next: (response) => {
-                    console.log('Registro exitoso:', response);
                     this.router.navigate(['/login']);
                 },
                 error: (error) => {
                     console.error('Error en el registro:', error);
+                    this.alerts.error('No se pudo completar el registro. Intenta nuevamente.');
                 }
             });
         } else {
@@ -73,7 +73,6 @@ export class RegisterComponent {
 
                     this.ubicacionLista.set(true);
                     this.cargandoUbicacion.set(false);
-                    console.log("Coordenadas obtenidas:", lat, lng);
                 },
                 (error) => {
                     // Error

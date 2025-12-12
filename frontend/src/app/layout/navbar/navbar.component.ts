@@ -33,7 +33,6 @@ export class NavbarComponent {
   }
 
   logout() {
-    console.log('Cerrando sesión...');
     this.closeProfileMenu();
     this.closeMobileMenu();
     this.authService.logout();
