@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './navbar/navbar.component';
+import { NavbarComponent } from './layout/navbar/navbar.component';
 import { initFlowbite } from 'flowbite';
 
 @Component({
@@ -12,7 +12,7 @@ import { initFlowbite } from 'flowbite';
 })
 export class App implements OnInit {
   protected readonly title = signal('volve-a-casa');
-  
+
   ngOnInit(): void {
     initFlowbite();
   }

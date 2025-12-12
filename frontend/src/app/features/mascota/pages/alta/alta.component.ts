@@ -1,9 +1,9 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
-import { PetCreate, TipoMascota } from "../mascota.model";
-import { MascotaService } from "../mascota.service";
-import { AlertService } from '../../helpers/alert.service';
+import { PetCreate, TipoMascota } from "../../mascota.model";
+import { MascotaService } from "../../mascota.service";
+import { AlertService } from '../../../../core/services/alert.service';
 import * as L from 'leaflet';
 
 @Component({

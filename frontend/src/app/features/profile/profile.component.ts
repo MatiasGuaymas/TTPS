@@ -6,7 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [CommonModule, ReactiveFormsModule],
     templateUrl: 'profile.component.html'
 })
 export class ProfileComponent {
@@ -113,5 +113,5 @@ export class ProfileComponent {
         }
         return '';
     }
-    
+
 }

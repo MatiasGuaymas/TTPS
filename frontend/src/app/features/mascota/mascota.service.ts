@@ -19,5 +19,5 @@ export class MascotaService {
         });
 
         return this.http.post(this.apiUrl, petDto, { headers });
-      }
+    }
 }
