@@ -31,7 +31,6 @@ export class LoginComponent {
 
     onSubmit() {
         if (this.loginForm.valid) {
-            console.log('Formulario válido:', this.loginForm.value);
             this.authService.login(this.loginForm.getRawValue()).subscribe({
                 next: (response) => {
                     this.alerts.success('¡Bienvenido!', 'Inicio de sesión exitoso').then(() => {
