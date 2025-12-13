@@ -4,12 +4,32 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { HomeComponent } from './features/home/home.component';
 import { AltaMascota } from './features/mascota/pages/alta/alta.component';
+import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: 'home', component: HomeComponent },
-    { path: 'register', component: RegisterComponent },
-    { path: 'login', component: LoginComponent },
-    { path: 'profile', component: ProfileComponent },
-    { path: 'mascota-perdida', component: AltaMascota},
+    // Rutas para usuarios NO autenticados
+    { 
+        path: 'register', 
+        component: RegisterComponent,
+        canActivate: [guestGuard]
+    },
+    { 
+        path: 'login', 
+        component: LoginComponent,
+        canActivate: [guestGuard]
+    },
+    // Rutas para usuarios autenticados
+    { 
+        path: 'profile', 
+        component: ProfileComponent,
+        canActivate: [authGuard]
+    },
+    { 
+        path: 'mascota-perdida', 
+        component: AltaMascota,
+        canActivate: [authGuard]
+    },
 ];

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LoginFormContent } from '../../../core/models/auth.models';
 import { AuthService } from '../../../core/services/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-login',
@@ -12,6 +13,7 @@ import { AuthService } from '../../../core/services/auth.service';
     templateUrl: 'login.component.html'
 })
 export class LoginComponent {
+    private route = inject(ActivatedRoute);
     loginForm: FormGroup<LoginFormContent>;
 
     constructor(
@@ -30,7 +32,8 @@ export class LoginComponent {
             console.log('Formulario válido:', this.loginForm.value);
             this.authService.login(this.loginForm.getRawValue()).subscribe({
                 next: (response) => {
-                    this.router.navigate(['/']);
+                    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+                    this.router.navigateByUrl(returnUrl);
                 },
                 error: (error) => {
                     console.error('Error en el login:', error);
