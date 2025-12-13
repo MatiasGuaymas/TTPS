@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { AlertService } from '../../../core/services/alert.service';
     templateUrl: 'register.component.html'
 })
 export class RegisterComponent {
+    private alerts = inject(AlertService);
     registerForm: FormGroup<RegisterFormContent>;
     ubicacionLista = signal(false);
     cargandoUbicacion = signal(false);
@@ -20,8 +21,7 @@ export class RegisterComponent {
     constructor(
         private fb: NonNullableFormBuilder,
         private router: Router,
-        private authService: AuthService,
-        private alerts: AlertService
+        private authService: AuthService
     ) {
         this.registerForm = this.fb.group<RegisterFormContent>({
             name: this.fb.control('', [Validators.required, Validators.minLength(2)]),
@@ -39,7 +39,9 @@ export class RegisterComponent {
             console.log('Formulario válido:', this.registerForm.value);
             this.authService.register(this.registerForm.getRawValue()).subscribe({
                 next: (response) => {
-                    this.router.navigate(['/login']);
+                    this.alerts.success('¡Cuenta creada!', 'Te has registrado exitosamente').then(() => {
+                        this.router.navigate(['/login']);
+                    });
                 },
                 error: (error) => {
                     console.error('Error en el registro:', error);
@@ -47,6 +49,7 @@ export class RegisterComponent {
                 }
             });
         } else {
+            this.alerts.info('Formulario incompleto', 'Por favor completa todos los campos correctamente');
             Object.keys(this.registerForm.controls).forEach(key => {
                 const control = this.registerForm.get(key);
                 if (control?.invalid) {
@@ -73,6 +76,7 @@ export class RegisterComponent {
 
                     this.ubicacionLista.set(true);
                     this.cargandoUbicacion.set(false);
+                    this.alerts.success('¡Ubicación obtenida!', 'Tu ubicación se cargó correctamente');
                 },
                 (error) => {
                     // Error
