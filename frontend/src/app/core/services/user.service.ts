@@ -32,7 +32,7 @@ export class UserService {
   }
 
   getUserProfile(): Observable<UserProfile> {
-    const userId = this.authService.currentUser?.id;
+    const userId = this.authService.currentUser()?.id;
     
     if (!userId) {
       throw new Error('No hay usuario autenticado');
