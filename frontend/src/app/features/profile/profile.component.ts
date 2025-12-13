@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { UserService, UserUpdateDTO } from '../../core/services/user.service';
+import { AlertService } from '../../core/services/alert.service';
 
 @Component({
     selector: 'app-profile',
@@ -9,98 +11,122 @@ import { Router, RouterLink } from '@angular/router';
     imports: [CommonModule, ReactiveFormsModule],
     templateUrl: 'profile.component.html'
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
+    private fb = inject(FormBuilder);
+    private router = inject(Router);
+    private userService = inject(UserService);
+    private alerts = inject(AlertService);
+
     profileForm: FormGroup;
-    isEditing = false;
+    isEditing = signal(false);
+    cargando = signal(true);
+    userData = computed(() => { return this.userService.currentUser(); })
 
-    // Datos del usuario (esto vendría de un servicio)
-    userData = {
-        nombre: 'Juan Pablo',
-        apellido: 'Perez',
-        email: 'juanpablo@gmail.com',
-        telefono: '+54 9 221234567',
-        barrio: 'City Bell',
-        ciudad: 'La Plata'
-    };
-
-    constructor(
-        private fb: FormBuilder,
-        private router: Router
-    ) {
+    constructor() {
         this.profileForm = this.fb.group({
-            nombre: [{ value: this.userData.nombre, disabled: true }, [Validators.required, Validators.minLength(2)]],
-            apellido: [{ value: this.userData.apellido, disabled: true }, [Validators.required, Validators.minLength(2)]],
-            barrio: [{ value: this.userData.barrio, disabled: true }, [Validators.required]],
-            ciudad: [{ value: this.userData.ciudad, disabled: true }, [Validators.required]],
-            contrasenaActual: [{ value: '', disabled: true }, []],
-            contrasenaNueva: [{ value: '', disabled: true }, []]
+            name: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(2)]],
+            lastName: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(2)]],
+            email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
+            phoneNumber: [{ value: '', disabled: true }, [Validators.required, Validators.pattern(/^[0-9+ -]{6,20}$/)]],
+            city: [{ value: '', disabled: true }, []],
+            neighborhood: [{ value: '', disabled: true }, []],
+            latitude: [{ value: 0, disabled: true }, [Validators.required, Validators.min(-90), Validators.max(90)]],
+            longitude: [{ value: 0, disabled: true }, [Validators.required, Validators.min(-180), Validators.max(180)]],
+        });
+    }
+
+    ngOnInit() {
+        this.cargarDatosUsuario();
+    }
+
+    cargarDatosUsuario() {
+        this.cargando.set(true);
+        this.userService.getUserProfile().subscribe({
+            next: (user) => {
+                this.profileForm.patchValue({
+                    name: user.name,
+                    lastName: user.lastName,
+                    email: user.email,
+                    phoneNumber: user.phone,
+                    city: user.city || '',
+                    neighborhood: user.neighborhood || '',
+                    latitude: user.latitude,
+                    longitude: user.longitude
+                });
+                this.cargando.set(false);
+            },
+            error: (error) => {
+                console.error('Error al cargar datos del usuario:', error);
+                this.alerts.error('Error', 'No se pudieron cargar los datos del perfil');
+                this.cargando.set(false);
+            }
         });
     }
 
     toggleEdit() {
-        this.isEditing = !this.isEditing;
+        this.isEditing.update(value => !value);
 
-        if (this.isEditing) {
+        if (this.isEditing()) {
             // Habilitar campos editables
-            this.profileForm.get('nombre')?.enable();
-            this.profileForm.get('apellido')?.enable();
-            this.profileForm.get('barrio')?.enable();
-            this.profileForm.get('ciudad')?.enable();
-            this.profileForm.get('contrasenaActual')?.enable();
-            this.profileForm.get('contrasenaNueva')?.enable();
+            this.profileForm.get('name')?.enable();
+            this.profileForm.get('lastName')?.enable();
+            this.profileForm.get('phoneNumber')?.enable();
+            this.profileForm.get('city')?.enable();
+            this.profileForm.get('neighborhood')?.enable();
+            this.profileForm.get('latitude')?.enable();
+            this.profileForm.get('longitude')?.enable();
         } else {
             // Deshabilitar y resetear
-            this.profileForm.patchValue({
-                nombre: this.userData.nombre,
-                apellido: this.userData.apellido,
-                barrio: this.userData.barrio,
-                ciudad: this.userData.ciudad,
-                contrasenaActual: '',
-                contrasenaNueva: ''
-            });
+            this.profileForm.get('name')?.disable();
+            this.profileForm.get('lastName')?.disable();
+            this.profileForm.get('phoneNumber')?.disable();
+            this.profileForm.get('city')?.disable();
+            this.profileForm.get('neighborhood')?.disable();
+            this.profileForm.get('latitude')?.disable();
+            this.profileForm.get('longitude')?.disable();
 
-            this.profileForm.get('nombre')?.disable();
-            this.profileForm.get('apellido')?.disable();
-            this.profileForm.get('barrio')?.disable();
-            this.profileForm.get('ciudad')?.disable();
-            this.profileForm.get('contrasenaActual')?.disable();
-            this.profileForm.get('contrasenaNueva')?.disable();
+            // Recargar datos originales
+            this.cargarDatosUsuario();
         }
     }
 
     onSave() {
         if (this.profileForm.valid) {
-            const formValue = this.profileForm.getRawValue();
-
-            // Validar cambio de contraseña
-            if (formValue.contrasenaActual || formValue.contrasenaNueva) {
-                if (!formValue.contrasenaActual || !formValue.contrasenaNueva) {
-                    alert('Debes completar ambos campos de contraseña');
-                    return;
-                }
-                if (formValue.contrasenaNueva.length < 6) {
-                    alert('La nueva contraseña debe tener al menos 6 caracteres');
-                    return;
-                }
-            }
-
-            console.log('Datos a guardar:', formValue);
-
-            // Actualizar datos locales (esto debería ser una llamada al backend)
-            this.userData = {
-                ...this.userData,
-                nombre: formValue.nombre,
-                apellido: formValue.apellido,
-                barrio: formValue.barrio,
-                ciudad: formValue.ciudad
+            const datosActualizados: UserUpdateDTO = {
+                name: this.profileForm.get('name')?.value,
+                lastName: this.profileForm.get('lastName')?.value,
+                phoneNumber: this.profileForm.get('phoneNumber')?.value,
+                city: this.profileForm.get('city')?.value,
+                neighborhood: this.profileForm.get('neighborhood')?.value,
+                latitude: this.profileForm.get('latitude')?.value,
+                longitude: this.profileForm.get('longitude')?.value
             };
 
-            // Salir del modo edición
-            this.isEditing = false;
-            this.toggleEdit();
-
-            alert('Perfil actualizado correctamente');
+            this.actualizarPerfil(datosActualizados);
+        } else {
+            this.alerts.info('Formulario incompleto', 'Por favor completa todos los campos requeridos correctamente');
+            Object.keys(this.profileForm.controls).forEach(key => {
+                const control = this.profileForm.get(key);
+                if (control?.invalid) {
+                    control.markAsTouched();
+                }
+            });
         }
+    }
+
+    private actualizarPerfil(datos: UserUpdateDTO) {
+        this.userService.updateUserProfile(datos).subscribe({
+            next: () => {
+                this.alerts.success('¡Perfil actualizado!', 'Tus datos se guardaron correctamente').then(() => {
+                    this.toggleEdit();
+                });
+            },
+            error: (error) => {
+                console.error('Error al actualizar perfil:', error);
+                const message = error.error?.message || 'No se pudo actualizar el perfil';
+                this.alerts.error('Error', message);
+            }
+        });
     }
 
     getErrorMessage(fieldName: string): string {
@@ -111,7 +137,41 @@ export class ProfileComponent {
         if (control?.hasError('minlength')) {
             return `Mínimo ${control.errors?.['minlength'].requiredLength} caracteres`;
         }
+        if (control?.hasError('email')) {
+            return 'Email inválido';
+        }
+        if (control?.hasError('pattern')) {
+            return 'Formato inválido (solo números, espacios, guiones y +)';
+        }
+        if (control?.hasError('min')) {
+            return `Valor mínimo: ${control.errors?.['min'].min}`;
+        }
+        if (control?.hasError('max')) {
+            return `Valor máximo: ${control.errors?.['max'].max}`;
+        }
         return '';
+    }
+
+    getLocation() {
+        if (navigator.geolocation) {
+            this.alerts.info('Obteniendo ubicación...', 'Por favor permite el acceso a tu ubicación');
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.profileForm.patchValue({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    });
+                    this.alerts.success('¡Ubicación obtenida!', 'Tu ubicación se actualizó correctamente');
+                },
+                (error) => {
+                    console.error('Error al obtener ubicación:', error);
+                    this.alerts.error('Error de ubicación', 'No se pudo obtener tu ubicación. Verifica los permisos.');
+                }
+            );
+        } else {
+            this.alerts.error('Navegador no compatible', 'Tu navegador no soporta geolocalización.');
+        }
     }
 
 }

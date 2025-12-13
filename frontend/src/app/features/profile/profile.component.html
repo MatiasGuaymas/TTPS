@@ -1,156 +1,158 @@
 <div class="min-h-screen bg-gray-50 dark:bg-background-dark py-8">
-
-    <!-- Contenido del perfil -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-primary-dark rounded-xl shadow-lg p-8">
+
+        <div *ngIf="cargando()" class="flex justify-center items-center h-screen">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+
+        <!-- Contenido del perfil -->
+        <div *ngIf="!cargando()" class="bg-white dark:bg-primary-dark rounded-xl shadow-lg p-8">
 
             <!-- Avatar y datos principales -->
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
                 <div class="flex items-center gap-4">
                     <!-- Avatar -->
                     <div
-                        class="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                clip-rule="evenodd"></path>
-                        </svg>
+                        class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                        {{ userData()?.name?.charAt(0) }}{{ userData()?.lastName?.charAt(0) }}
                     </div>
 
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-900 dark:text-text-dark">
-                            {{ userData.nombre }} {{ userData.apellido }}
-                        </h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ userData.email }}
-                        </p>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                            {{ userData()?.name }} {{ userData()?.lastName }}
+                        </h1>
+                        <p class="text-gray-600 dark:text-gray-400">{{ userData()?.email }}</p>
+                        <p class="text-sm text-yellow-600 dark:text-yellow-400">⭐ {{ userData()?.points }} puntos</p>
                     </div>
                 </div>
 
-                <!-- Botón Editar/Guardar/Cancelar -->
+                <!-- Botones -->
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <button *ngIf="!isEditing" (click)="toggleEdit()"
-                        class="flex-1 sm:flex-none px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
-                        Editar
+                    <button *ngIf="!isEditing()" (click)="toggleEdit()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        Editar Perfil
                     </button>
 
-                    <button *ngIf="isEditing" (click)="onSave()"
-                        class="flex-1 sm:flex-none px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
+                    <button *ngIf="isEditing()" (click)="onSave()"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                         Guardar
                     </button>
 
-                    <button *ngIf="isEditing" (click)="toggleEdit()"
-                        class="flex-1 sm:flex-none px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
+                    <button *ngIf="isEditing()" (click)="toggleEdit()"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
                         Cancelar
                     </button>
                 </div>
             </div>
 
             <!-- Formulario -->
-            <form [formGroup]="profileForm" class="space-y-4">
+            <form [formGroup]="profileForm" class="space-y-6">
 
                 <!-- Nombre y Apellido -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Nombre -->
                     <div>
-                        <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Nombre
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Nombre *
                         </label>
-                        <input type="text" id="nombre" formControlName="nombre"
-                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
-                            [class.border-red-500]="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched && isEditing">
-                        <div class="h-4 mt-0.5">
-                            <p *ngIf="profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched && isEditing"
-                                class="text-xs text-red-500">
-                                {{ getErrorMessage('nombre') }}
-                            </p>
-                        </div>
+                        <input type="text" formControlName="name"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-primary-dark dark:text-white">
+                        <p *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched"
+                            class="text-red-500 text-sm mt-1">
+                            {{ getErrorMessage('name') }}
+                        </p>
                     </div>
 
-                    <!-- Apellido -->
                     <div>
-                        <label for="apellido" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Apellido
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Apellido *
                         </label>
-                        <input type="text" id="apellido" formControlName="apellido"
-                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
-                            [class.border-red-500]="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched && isEditing">
-                        <div class="h-4 mt-0.5">
-                            <p *ngIf="profileForm.get('apellido')?.invalid && profileForm.get('apellido')?.touched && isEditing"
-                                class="text-xs text-red-500">
-                                {{ getErrorMessage('apellido') }}
-                            </p>
-                        </div>
+                        <input type="text" formControlName="lastName"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-primary-dark dark:text-white">
+                        <p *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched"
+                            class="text-red-500 text-sm mt-1">
+                            {{ getErrorMessage('lastName') }}
+                        </p>
                     </div>
                 </div>
 
-                <!-- Barrio y Ciudad -->
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Email
+                    </label>
+                    <input type="email" formControlName="email"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed">
+                </div>
+
+                <!-- Teléfono -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Teléfono *
+                    </label>
+                    <input type="tel" formControlName="phoneNumber"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-primary-dark dark:text-white"
+                        placeholder="+54 11 1234-5678">
+                    <p *ngIf="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched"
+                        class="text-red-500 text-sm mt-1">
+                        {{ getErrorMessage('phoneNumber') }}
+                    </p>
+                </div>
+
+                <!-- Ciudad y Barrio -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Barrio -->
                     <div>
-                        <label for="barrio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Barrio
-                        </label>
-                        <input type="text" id="barrio" formControlName="barrio"
-                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
-                            [class.border-red-500]="profileForm.get('barrio')?.invalid && profileForm.get('barrio')?.touched && isEditing">
-                        <div class="h-4 mt-0.5">
-                            <p *ngIf="profileForm.get('barrio')?.invalid && profileForm.get('barrio')?.touched && isEditing"
-                                class="text-xs text-red-500">
-                                {{ getErrorMessage('barrio') }}
-                            </p>
-                        </div>
-                    </div>
-                
-                    <!-- Ciudad -->
-                    <div>
-                        <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Ciudad
                         </label>
-                        <input type="text" id="ciudad" formControlName="ciudad"
-                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
-                            [class.border-red-500]="profileForm.get('ciudad')?.invalid && profileForm.get('ciudad')?.touched && isEditing">
-                        <div class="h-4 mt-0.5">
-                            <p *ngIf="profileForm.get('ciudad')?.invalid && profileForm.get('ciudad')?.touched && isEditing"
-                                class="text-xs text-red-500">
-                                {{ getErrorMessage('ciudad') }}
+                        <input type="text" formControlName="city"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-primary-dark dark:text-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Barrio
+                        </label>
+                        <input type="text" formControlName="neighborhood"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-primary-dark dark:text-white">
+                    </div>
+                </div>
+
+                <!-- Ubicación (Latitud y Longitud) -->
+                <div *ngIf="isEditing()" class="border-t border-gray-300 dark:border-gray-600 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        Ubicación
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Latitud *
+                            </label>
+                            <input type="number" step="0.0001" formControlName="latitude"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-primary-dark dark:text-white">
+                            <p *ngIf="profileForm.get('latitude')?.invalid && profileForm.get('latitude')?.touched"
+                                class="text-red-500 text-sm mt-1">
+                                {{ getErrorMessage('latitude') }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Longitud *
+                            </label>
+                            <input type="number" step="0.0001" formControlName="longitude"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-primary-dark dark:text-white">
+                            <p *ngIf="profileForm.get('longitude')?.invalid && profileForm.get('longitude')?.touched"
+                                class="text-red-500 text-sm mt-1">
+                                {{ getErrorMessage('longitude') }}
                             </p>
                         </div>
                     </div>
-                </div>
 
-                <!-- Teléfono (no editable) -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Teléfono
-                    </label>
-                    <input type="text" [value]="userData.telefono" disabled
-                        class="px-4 py-2.5 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark cursor-not-allowed">
-                </div>
-
-                <!-- Contraseñas (solo visible en modo edición) -->
-                <div *ngIf="isEditing"
-                    class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800 mt-4">
-                    <!-- Contraseña Actual -->
-                    <div>
-                        <label for="contrasenaActual"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Contraseña Actual
-                        </label>
-                        <input type="password" id="contrasenaActual" formControlName="contrasenaActual"
-                            placeholder="Dejar vacío si no deseas cambiarla"
-                            class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    </div>
-
-                    <!-- Contraseña Nueva -->
-                    <div>
-                        <label for="contrasenaNueva"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Contraseña Nueva
-                        </label>
-                        <input type="password" id="contrasenaNueva" formControlName="contrasenaNueva"
-                            placeholder="Mínimo 6 caracteres"
-                            class="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    </div>
+                    <button type="button" (click)="getLocation()"
+                        class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        📍 Obtener mi ubicación actual
+                    </button>
                 </div>
 
             </form>
