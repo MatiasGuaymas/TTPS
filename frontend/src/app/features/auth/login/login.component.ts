@@ -16,13 +16,11 @@ import { ActivatedRoute } from '@angular/router';
 export class LoginComponent {
     private route = inject(ActivatedRoute);
     private alerts = inject(AlertService);
+    private authService = inject(AuthService);
+    private router = inject(Router);
     loginForm: FormGroup<LoginFormContent>;
 
-    constructor(
-        private fb: NonNullableFormBuilder,
-        private router: Router,
-        private authService: AuthService
-    ) {
+    constructor(private fb: NonNullableFormBuilder) {
         this.loginForm = this.fb.group({
             email: this.fb.control<string>('', [Validators.required, Validators.email]),
             password: this.fb.control<string>('', [Validators.required, Validators.minLength(6)])

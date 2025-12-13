@@ -43,8 +43,9 @@
     <div class="relative hidden md:block profile-menu-container">
       <button (click)="toggleProfileMenu()"
         class="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-all duration-200 group">
-        <img src="https://i.pravatar.cc/150?img=32" alt="User Profile"
-          class="w-9 h-9 rounded-full border-2 border-white object-cover shadow-md">
+        <div class="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-white shadow-md">
+        {{ userInitials() }}
+        </div>
         <svg class="w-4 h-4 text-white transition-transform duration-200" [class.rotate-180]="profileMenuOpen" fill="none"
           stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -114,6 +115,16 @@
     </a>
     <div class="border-t border-white/20 pt-2 mt-2">
       @if (isLoggedIn()) {
+        <div class="flex items-center px-4 py-3 text-white">
+          <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 border-2 border-white">
+            {{ userInitials() }}
+          </div>
+          <div>
+            <p class="font-semibold">{{ userData()?.name }} {{ userData()?.lastName }}</p>
+            <p class="text-xs text-white/70">{{ userData()?.email }}</p>
+          </div>
+        </div>
+
         <a routerLink="/profile" (click)="closeMobileMenu()"
           class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
           <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

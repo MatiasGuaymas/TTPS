@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 import { AlertService } from '../../core/services/alert.service';
 
 @Component({
@@ -11,12 +12,22 @@ import { AlertService } from '../../core/services/alert.service';
   templateUrl: 'navbar.component.html'
 })
 export class NavbarComponent {
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private alertService = inject(AlertService);
+  private router = inject(Router);
+
   profileMenuOpen = false;
   mobileMenuOpen = false;
-  isLoggedIn = computed(() => this.authService.isLoggedIn());
-  private alertService = inject(AlertService);
 
-  constructor(private router: Router, private authService: AuthService) { }
+  isLoggedIn = computed(() => this.authService.isLoggedIn());
+  userData = computed(() => this.userService.currentUser());
+
+  userInitials = computed(() => {
+    const user = this.userData();
+    if (!user?.name || !user?.lastName) return '?';
+    return `${user.name.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+  });
 
   toggleProfileMenu() {
     this.profileMenuOpen = !this.profileMenuOpen;

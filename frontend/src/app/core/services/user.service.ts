@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -29,7 +29,24 @@ export class UserService {
     } else {
       this.currentUserSig.set(null);
     }
+
+    // Cuando el usuario se loguea, cargar el perfil automáticamente
+    effect(() => {
+      const isLoggedIn = this.authService.isLoggedIn();
+      const currentAuthUser = this.authService.currentUser();
+      
+      if (isLoggedIn && currentAuthUser && !this.currentUserSig()) {
+        this.getUserProfile().subscribe({
+          error: (error) => {
+            console.error('Error al cargar perfil automáticamente:', error);
+          }
+        });
+      } else if (!isLoggedIn) {
+        this.currentUserSig.set(null);
+      }
+    });
   }
+  
 
   getUserProfile(): Observable<UserProfile> {
     const userId = this.authService.currentUser()?.id;

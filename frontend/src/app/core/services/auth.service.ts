@@ -22,7 +22,12 @@ export class AuthService {
     const userStored = localStorage.getItem('user');
 
     if (token && userStored) {
-      this.currentUserSig.set(JSON.parse(userStored));
+      try {
+        this.currentUserSig.set(JSON.parse(userStored));
+      } catch (error) {
+        console.error('Error al parsear usuario:', error);
+        this.currentUserSig.set(null);
+      }
     } else {
         this.currentUserSig.set(null);
     }
