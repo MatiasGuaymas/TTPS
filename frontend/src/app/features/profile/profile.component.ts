@@ -2,8 +2,9 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService, UserUpdateDTO } from '../../core/services/user.service';
+import { UserService} from '../../core/services/user.service';
 import { AlertService } from '../../core/services/alert.service';
+import { UserUpdateDTO } from '../../core/models/user.models';
 
 @Component({
     selector: 'app-profile',

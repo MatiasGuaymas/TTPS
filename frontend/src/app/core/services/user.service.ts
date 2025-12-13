@@ -2,29 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { AuthService } from './auth.service';
-
-export interface UserProfile {
-  id: number;
-  name: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  city: string;
-  neighborhood: string;
-  latitude: number;
-  longitude: number;
-  points: number;
-}
-
-export interface UserUpdateDTO {
-  name?: string;
-  lastName?: string;
-  phoneNumber?: string;
-  city?: string;
-  neighborhood?: string;
-  latitude?: number;
-  longitude?: number;
-}
+import { UserProfile, UserUpdateDTO } from '../models/user.models';
 
 @Injectable({
   providedIn: 'root'
