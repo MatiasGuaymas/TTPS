@@ -8,6 +8,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.exceptions.GlobalExceptionHandler;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
 import io.github.grupo01.volve_a_casa.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,7 +60,10 @@ class UserControllerTest {
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalExceptionHandler())
-                .setCustomArgumentResolvers(putPrincipalResolver)
+                .setCustomArgumentResolvers(
+                        new PageableHandlerMethodArgumentResolver(),
+                        putPrincipalResolver
+                )
                 .build();
     }
 
@@ -80,7 +86,7 @@ class UserControllerTest {
 
     @Test
     void listAllUsersOrderByName_whenEmpty_returnsNoContent() throws Exception {
-        when(userService.findAll(Sort.by("name"))).thenReturn(Collections.emptyList());
+        when(userService.findAllFiltered(any(UserFilter.class), any(Pageable.class))).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/users").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -91,7 +97,7 @@ class UserControllerTest {
         UserResponseDTO user1 = createResponse(1L, "Juan", "Perez", "juan.perez@test.com");
         UserResponseDTO user2 = createResponse(2L, "Ana", "Gomez", "ana.gomez@test.com");
 
-        when(userService.findAll(Sort.by("name"))).thenReturn(List.of(user1, user2));
+        when(userService.findAllFiltered(any(UserFilter.class), any(Pageable.class))).thenReturn(List.of(user1, user2));
 
         mockMvc.perform(get("/api/users").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -181,7 +187,7 @@ class UserControllerTest {
         return new PetResponseDTO(
                 id,
                 name,
-                "mediano",
+                Pet.Size.MEDIANO,
                 "perro mediano",
                 "color",
                 "race",

@@ -4,10 +4,13 @@ import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
+import io.github.grupo01.volve_a_casa.persistence.Specifications;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
 import io.github.grupo01.volve_a_casa.persistence.repositories.PetRepository;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -47,8 +50,11 @@ public class PetService {
     }
 
     // TODO: Test de integracion
-    public List<PetResponseDTO> findAll(Sort sort) {
-        return petRepository.findAll(sort).stream()
+    public List<PetResponseDTO> findAll(PetFilter filter, Pageable pageable) {
+        Specification<Pet> specification = Specifications.getPetSpecification(filter);
+
+        return petRepository.findAll(specification, pageable)
+                .stream()
                 .map(PetResponseDTO::fromPet)
                 .toList();
     }

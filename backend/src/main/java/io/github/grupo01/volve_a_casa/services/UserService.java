@@ -6,9 +6,12 @@ import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
 import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
+import io.github.grupo01.volve_a_casa.persistence.Specifications;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,8 +40,17 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
     }
 
-    public List<UserResponseDTO> findAll(Sort sorted) {
-        return userRepository.findAll(sorted)
+    public List<UserResponseDTO> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .stream()
+                .map(UserResponseDTO::fromUser)
+                .toList();
+    }
+
+    public List<UserResponseDTO> findAllFiltered(UserFilter filter, Pageable pageable) {
+        Specification<User> spec = Specifications.getUserSpecification(filter);
+
+        return userRepository.findAll(spec, pageable)
                 .stream()
                 .map(UserResponseDTO::fromUser)
                 .toList();

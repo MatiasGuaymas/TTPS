@@ -6,11 +6,14 @@ import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.interfaces.IUserController;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
 import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.github.grupo01.volve_a_casa.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +34,11 @@ public class UserController implements IUserController {
 
     @Override
     @GetMapping
-    public ResponseEntity<?> listAllUsersOrderByName() {
-        List<UserResponseDTO> users = userService.findAll(Sort.by("name"));
+    public ResponseEntity<?> listAllUsers(
+            @ModelAttribute UserFilter filter,
+            @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        List<UserResponseDTO> users = userService.findAllFiltered(filter, pageable);
         if (users.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
