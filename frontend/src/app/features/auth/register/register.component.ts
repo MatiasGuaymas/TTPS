@@ -1,10 +1,13 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { RegisterFormContent } from '../../../core/models/auth.models';
 import { AlertService } from '../../../core/services/alert.service';
+
+type RegisterFormContent = {
+  [K in keyof RegisterRequest]: FormControl<RegisterRequest[K]>;
+};
 
 @Component({
     selector: 'app-register',

@@ -1,11 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AlertService } from '../../../core/services/alert.service';
-import { LoginFormContent } from '../../../core/models/auth.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
+
+type LoginFormContent = {
+  [K in keyof LoginRequest]: FormControl<LoginRequest[K]>;
+};
 
 @Component({
     selector: 'app-login',

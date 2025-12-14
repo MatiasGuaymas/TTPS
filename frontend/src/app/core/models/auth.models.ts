@@ -1,11 +1,9 @@
-import { FormControl } from "@angular/forms";
-
-export interface LoginRequest {
+interface LoginRequest {
   email: string;
   password: string;
 }
 
-export interface RegisterRequest {
+interface RegisterRequest {
   email: string;
   password: string;
   name: string;
@@ -15,7 +13,7 @@ export interface RegisterRequest {
   longitude: number;
 }
 
-export interface AuthResponse {
+interface AuthResponse {
   token: string;
   user: {
     id: number;
@@ -24,11 +22,3 @@ export interface AuthResponse {
     role: string;
   };
 }
-
-export type RegisterFormContent = {
-  [K in keyof RegisterRequest]: FormControl<RegisterRequest[K]>;
-};
-
-export type LoginFormContent = {
-  [K in keyof LoginRequest]: FormControl<LoginRequest[K]>;
-};
