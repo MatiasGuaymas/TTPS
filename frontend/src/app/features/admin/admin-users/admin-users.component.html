@@ -66,6 +66,10 @@
                                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Estado
                             </th>
+                            <th
+                                class="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                Acciones
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -103,6 +107,40 @@
                                     {{ user.enabled ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="flex justify-center gap-2">
+                                    <!-- Botón Editar -->
+                                    <button (click)="openEditModal(user)"
+                                        class="inline-flex items-center px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        title="Editar usuario">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                            </path>
+                                        </svg>
+                                        Editar
+                                    </button>
+
+                                    <!-- Botón Habilitar/Deshabilitar -->
+                                    <button (click)="toggleUserStatus(user)"
+                                        [ngClass]="user.enabled ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'"
+                                        class="inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                        [title]="user.enabled ? 'Deshabilitar usuario' : 'Habilitar usuario'">
+                                        <svg *ngIf="user.enabled" class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                            </path>
+                                        </svg>
+                                        <svg *ngIf="!user.enabled" class="w-4 h-4 mr-1" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{ user.enabled ? 'Deshabilitar' : 'Habilitar' }}
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -123,6 +161,133 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edición -->
+    <div *ngIf="showEditModal()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Editar Usuario
+                </h2>
+                <button (click)="closeEditModal()"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form [formGroup]="editForm" (ngSubmit)="saveUserEdit()" class="p-6">
+                <div class="space-y-4">
+                    <!-- Nombre y Apellido -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nombre *
+                            </label>
+                            <input type="text" formControlName="name"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched"
+                                class="text-red-500 text-sm mt-1">
+                                El nombre es requerido (mínimo 2 caracteres)
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Apellido *
+                            </label>
+                            <input type="text" formControlName="lastName"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p *ngIf="editForm.get('lastName')?.invalid && editForm.get('lastName')?.touched"
+                                class="text-red-500 text-sm mt-1">
+                                El apellido es requerido (mínimo 2 caracteres)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Teléfono *
+                        </label>
+                        <input type="tel" formControlName="phoneNumber"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="+54 11 1234-5678">
+                        <p *ngIf="editForm.get('phoneNumber')?.invalid && editForm.get('phoneNumber')?.touched"
+                            class="text-red-500 text-sm mt-1">
+                            Formato de teléfono inválido
+                        </p>
+                    </div>
+
+                    <!-- Ciudad y Barrio -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Ciudad *
+                            </label>
+                            <input type="text" formControlName="city"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Barrio *
+                            </label>
+                            <input type="text" formControlName="neighborhood"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <!-- Latitud y Longitud -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Latitud *
+                            </label>
+                            <input type="number" step="any" formControlName="latitude"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Longitud *
+                            </label>
+                            <input type="number" step="any" formControlName="longitude"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <!-- Rol -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Rol *
+                        </label>
+                        <select formControlName="role"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="USER">Usuario</option>
+                            <option value="ADMIN">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 mt-6">
+                    <button type="submit"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Guardar Cambios
+                    </button>
+                    <button type="button" (click)="closeEditModal()"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

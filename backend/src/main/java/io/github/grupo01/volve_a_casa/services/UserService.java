@@ -2,6 +2,7 @@ package io.github.grupo01.volve_a_casa.services;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.AdminUserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
@@ -113,5 +114,41 @@ public class UserService {
         AuthResponseDTO.UserAuthDTO userAuthDTO = new AuthResponseDTO.UserAuthDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
 
         return new AuthResponseDTO(token, userAuthDTO);
+    }
+
+    public UserResponseDTO updateUserStatus(Long userId, Boolean enabled) {
+        User user = findById(userId);
+        
+        if (user.getRole() == User.Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot modify admin user status");
+        }
+        
+        user.setEnabled(enabled);
+        User savedUser = userRepository.save(user);
+        return UserResponseDTO.fromUser(savedUser);
+    }
+
+    public UserResponseDTO adminUpdateUser(Long userId, AdminUserUpdateDTO dto) {
+        User user = findById(userId);
+
+        UserUpdateDTO basicUpdate = new UserUpdateDTO(
+            dto.name(),
+            dto.lastName(),
+            dto.phoneNumber(),
+            dto.city(),
+            dto.neighborhood(),
+            dto.latitude(),
+            dto.longitude()
+        );
+
+        user.updateFromDTO(basicUpdate);
+        
+        // Actualizar el rol 
+        if (dto.role() != null) {
+            user.setRole(dto.role());
+        }
+        
+        User savedUser = userRepository.save(user);
+        return UserResponseDTO.fromUser(savedUser);
     }
 }

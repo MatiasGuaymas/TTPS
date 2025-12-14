@@ -75,4 +75,12 @@ export class UserService {
     return this.http.get<UserProfile[]>(this.apiUrl);
   }
 
+  updateUserStatus(userId: number, enabled: boolean): Observable<UserProfile> {
+    return this.http.put<UserProfile>(`${this.apiUrl}/admin/${userId}/status?enabled=${enabled}`, {});
+  }
+
+  adminUpdateUser(userId: number, userData: AdminUserUpdateRequest): Observable<UserProfile> {
+    return this.http.put<UserProfile>(`${this.apiUrl}/admin/${userId}`, userData);
+  }
+
 }
