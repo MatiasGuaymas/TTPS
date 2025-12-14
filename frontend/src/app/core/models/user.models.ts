@@ -1,4 +1,4 @@
-export interface UserProfile {
+interface UserProfile {
     id: number;
     name: string;
     lastName: string;
@@ -11,7 +11,7 @@ export interface UserProfile {
     points: number;
 }
 
-export interface UserUpdateDTO {
+interface UserUpdateRequest {
     name?: string;
     lastName?: string;
     phoneNumber?: string;

@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { UserService} from '../../core/services/user.service';
 import { AlertService } from '../../core/services/alert.service';
-import { UserUpdateDTO } from '../../core/models/user.models';
 
 @Component({
     selector: 'app-profile',
@@ -93,7 +92,7 @@ export class ProfileComponent implements OnInit {
 
     onSave() {
         if (this.profileForm.valid) {
-            const datosActualizados: UserUpdateDTO = {
+            const datosActualizados: UserUpdateRequest = {
                 name: this.profileForm.get('name')?.value,
                 lastName: this.profileForm.get('lastName')?.value,
                 phoneNumber: this.profileForm.get('phoneNumber')?.value,
@@ -115,7 +114,7 @@ export class ProfileComponent implements OnInit {
         }
     }
 
-    private actualizarPerfil(datos: UserUpdateDTO) {
+    private actualizarPerfil(datos: UserUpdateRequest) {
         this.userService.updateUserProfile(datos).subscribe({
             next: () => {
                 this.alerts.success('¡Perfil actualizado!', 'Tus datos se guardaron correctamente').then(() => {

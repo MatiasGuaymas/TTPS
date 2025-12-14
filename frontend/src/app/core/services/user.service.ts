@@ -2,7 +2,6 @@ import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { AuthService } from './auth.service';
-import { UserProfile, UserUpdateDTO } from '../models/user.models';
 
 @Injectable({
   providedIn: 'root'
@@ -63,7 +62,7 @@ export class UserService {
     );
   }
 
-  updateUserProfile(userData: UserUpdateDTO): Observable<UserProfile> {
+  updateUserProfile(userData: UserUpdateRequest): Observable<UserProfile> {
     return this.http.put<UserProfile>(`${this.apiUrl}/update`, userData).pipe(
       tap((userActualizado) => {
         this.currentUserSig.set(userActualizado);
