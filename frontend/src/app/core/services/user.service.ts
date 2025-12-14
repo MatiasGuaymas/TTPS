@@ -83,4 +83,8 @@ export class UserService {
     return this.http.put<UserProfile>(`${this.apiUrl}/admin/${userId}`, userData);
   }
 
+  createAdmin(userData: RegisterRequest): Observable<UserProfile> {
+    return this.http.post<UserProfile>(`${this.apiUrl}/admin`, userData);
+  }
+
 }

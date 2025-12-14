@@ -95,4 +95,19 @@ public class UserController implements IUserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @PostMapping("/admin")
+    public ResponseEntity<?> createAdmin(
+            Authentication authentication,
+            @Valid @RequestBody UserCreateDTO userData
+    ) {
+        User requester = (User) authentication.getPrincipal();
+        
+        if (requester.getRole() != User.Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can create admin users");
+        }
+
+        UserResponseDTO createdAdmin = userService.createAdminUser(userData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAdmin);
+    }
+
 }

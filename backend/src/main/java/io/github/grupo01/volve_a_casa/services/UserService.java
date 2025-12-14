@@ -119,6 +119,7 @@ public class UserService {
     public UserResponseDTO updateUserStatus(Long userId, Boolean enabled) {
         User user = findById(userId);
         
+        // No se pueden deshabilitar Administradores
         if (user.getRole() == User.Role.ADMIN) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot modify admin user status");
         }
@@ -150,5 +151,22 @@ public class UserService {
         
         User savedUser = userRepository.save(user);
         return UserResponseDTO.fromUser(savedUser);
+    }
+
+    public UserResponseDTO createAdminUser(UserCreateDTO dto) {
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El email ya está siendo utilizado por otro usuario"
+            );
+        }
+
+        String hashedPassword = passwordEncoder.encode(dto.password());
+        GeorefResponse response = georefService.getUbication(dto.latitude(), dto.longitude());
+
+        User user = getUser(dto, response, hashedPassword);
+        user.setRole(User.Role.ADMIN);
+
+        return UserResponseDTO.fromUser(userRepository.save(user));
     }
 }

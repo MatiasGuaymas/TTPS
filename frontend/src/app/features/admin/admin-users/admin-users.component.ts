@@ -25,10 +25,14 @@ export class AdminUsersComponent implements OnInit {
     showEditModal = signal(false);
     editingUser = signal<UserProfile | null>(null);
     editForm!: FormGroup;
+    
+    showCreateModal = signal(false);
+    createForm!: FormGroup;
 
     ngOnInit(): void {
         this.loadUsers();
         this.initializeForm();
+        this.initializeCreateForm();
     }
 
     initializeForm(): void {
@@ -155,6 +159,51 @@ export class AdminUsersComponent implements OnInit {
             error: (error) => {
                 console.error('Error al actualizar usuario:', error);
                 this.alertService.error('Error', 'No se pudo actualizar el usuario');
+            }
+        });
+    }
+
+    initializeCreateForm(): void {
+        this.createForm = this.fb.group({
+            name: ['', [Validators.required, Validators.minLength(2)]],
+            lastName: ['', [Validators.required, Validators.minLength(2)]],
+            email: ['', [Validators.required, Validators.email]],
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9+ -]{6,20}$/)]],
+            latitude: [null, [Validators.required, Validators.min(-90), Validators.max(90)]],
+            longitude: [null, [Validators.required, Validators.min(-180), Validators.max(180)]]
+        });
+    }
+
+    openCreateModal(): void {
+        this.createForm.reset();
+        this.showCreateModal.set(true);
+    }
+
+    closeCreateModal(): void {
+        this.showCreateModal.set(false);
+        this.createForm.reset();
+    }
+
+    saveNewAdmin(): void {
+        if (this.createForm.invalid) {
+            this.alertService.error('Error', 'Por favor complete todos los campos correctamente');
+            return;
+        }
+
+        const adminData = this.createForm.value;
+
+        this.userService.createAdmin(adminData).subscribe({
+            next: (newAdmin) => {
+                const currentUsers = this.users();
+                this.users.set([...currentUsers, newAdmin]);
+                this.alertService.success('Éxito', 'Administrador creado exitosamente');
+                this.closeCreateModal();
+            },
+            error: (error) => {
+                console.error('Error al crear administrador:', error);
+                const message = error.error?.message || 'No se pudo crear el administrador';
+                this.alertService.error('Error', message);
             }
         });
     }
