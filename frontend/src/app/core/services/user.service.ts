@@ -12,7 +12,7 @@ export class UserService {
   private authService = inject(AuthService);
   private apiUrl = '/api/users';
 
-  private currentUserSig = signal<UserProfile | null | undefined>(undefined);
+  private currentUserSig = signal<UserProfile | null>(null);
 
   currentUser = computed(() => this.currentUserSig());
 
@@ -34,7 +34,7 @@ export class UserService {
     effect(() => {
       const isLoggedIn = this.authService.isLoggedIn();
       const currentAuthUser = this.authService.currentUser();
-      
+
       if (isLoggedIn && currentAuthUser && !this.currentUserSig()) {
         this.getUserProfile().subscribe({
           error: (error) => {
@@ -46,11 +46,11 @@ export class UserService {
       }
     });
   }
-  
+
 
   getUserProfile(): Observable<UserProfile> {
     const userId = this.authService.currentUser()?.id;
-    
+
     if (!userId) {
       throw new Error('No hay usuario autenticado');
     }

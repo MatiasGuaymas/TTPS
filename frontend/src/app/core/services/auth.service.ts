@@ -12,7 +12,7 @@ export class AuthService {
   private router = inject(Router);
   private apiUrl = '/api/auth';
 
-  private currentUserSig = signal<AuthResponse['user'] | null | undefined>(undefined);
+  private currentUserSig = signal<AuthResponse['user'] | null>(null);
 
   currentUser = computed(() => this.currentUserSig());
   isLoggedIn = computed(() => !!this.currentUserSig());
