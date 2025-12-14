@@ -22,6 +22,7 @@ export class NavbarComponent {
 
   isLoggedIn = computed(() => this.authService.isLoggedIn());
   userData = computed(() => this.userService.currentUser());
+  isAdmin = computed(() => this.userData()?.role === 'ADMIN');
 
   userInitials = computed(() => {
     const user = this.userData();
