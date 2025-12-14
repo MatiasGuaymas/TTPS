@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NonNullableFormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { LoginFormContent } from '../../../core/models/auth.models';
+import { AlertService } from '../../../core/services/alert.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ActivatedRoute } from '@angular/router';
+
+type LoginFormContent = {
+  [K in keyof LoginRequest]: FormControl<LoginRequest[K]>;
+};
 
 @Component({
     selector: 'app-login',
@@ -12,13 +17,13 @@ import { AuthService } from '../../../core/services/auth.service';
     templateUrl: 'login.component.html'
 })
 export class LoginComponent {
+    private route = inject(ActivatedRoute);
+    private alerts = inject(AlertService);
+    private authService = inject(AuthService);
+    private router = inject(Router);
     loginForm: FormGroup<LoginFormContent>;
 
-    constructor(
-        private fb: NonNullableFormBuilder,
-        private router: Router,
-        private authService: AuthService
-    ) {
+    constructor(private fb: NonNullableFormBuilder) {
         this.loginForm = this.fb.group({
             email: this.fb.control<string>('', [Validators.required, Validators.email]),
             password: this.fb.control<string>('', [Validators.required, Validators.minLength(6)])
@@ -27,16 +32,20 @@ export class LoginComponent {
 
     onSubmit() {
         if (this.loginForm.valid) {
-            console.log('Formulario válido:', this.loginForm.value);
             this.authService.login(this.loginForm.getRawValue()).subscribe({
                 next: (response) => {
-                    this.router.navigate(['/']);
+                    this.alerts.success('¡Bienvenido!', 'Inicio de sesión exitoso').then(() => {
+                        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+                        this.router.navigateByUrl(returnUrl);
+                    });
                 },
                 error: (error) => {
                     console.error('Error en el login:', error);
+                    this.alerts.error('Error de autenticación', 'Email o contraseña incorrectos');
                 }
             });
         } else {
+            this.alerts.info('Formulario incompleto', 'Por favor completa todos los campos correctamente');
             Object.keys(this.loginForm.controls).forEach(key => {
                 const control = this.loginForm.get(key);
                 if (control?.invalid) {

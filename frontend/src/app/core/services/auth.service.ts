@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.models';
 
 @Injectable({
@@ -8,10 +9,12 @@ import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.mode
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private router = inject(Router);
   private apiUrl = '/api/auth';
 
-  private currentUserSig = signal<AuthResponse['user'] | null | undefined>(undefined);
+  private currentUserSig = signal<AuthResponse['user'] | null>(null);
 
+  currentUser = computed(() => this.currentUserSig());
   isLoggedIn = computed(() => !!this.currentUserSig());
 
   constructor() {
@@ -19,7 +22,12 @@ export class AuthService {
     const userStored = localStorage.getItem('user');
 
     if (token && userStored) {
-      this.currentUserSig.set(JSON.parse(userStored));
+      try {
+        this.currentUserSig.set(JSON.parse(userStored));
+      } catch (error) {
+        console.error('Error al parsear usuario:', error);
+        this.currentUserSig.set(null);
+      }
     } else {
         this.currentUserSig.set(null);
     }
@@ -44,9 +52,6 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUserSig.set(null);
-  }
-
-  get currentUser() {
-      return this.currentUserSig();
+    this.router.navigate(['/home']);
   }
 }
