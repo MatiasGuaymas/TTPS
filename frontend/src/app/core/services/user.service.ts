@@ -70,4 +70,9 @@ export class UserService {
       })
     );
   }
+
+  getAllUsers(): Observable<UserProfile[]> {
+    return this.http.get<UserProfile[]>(this.apiUrl);
+  }
+
 }
