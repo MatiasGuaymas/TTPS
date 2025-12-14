@@ -8,7 +8,8 @@ interface UserProfile {
     neighborhood: string;
     latitude: number;
     longitude: number;
-    points: number;
+    points: number; enabled: boolean;
+    role: 'USER' | 'ADMIN';
 }
 
 interface UserUpdateRequest {

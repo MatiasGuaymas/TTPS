@@ -102,7 +102,9 @@ public class AuthControllerTest {
                 "Lanús",
                 -54.23f,
                 -12.32f,
-                100
+                100,
+                true,
+                User.Role.USER
         );
 
         when(userService.createUser(any(UserCreateDTO.class))).thenReturn(created);

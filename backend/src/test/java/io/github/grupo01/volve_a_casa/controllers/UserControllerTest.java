@@ -165,7 +165,9 @@ class UserControllerTest {
                 "Lanús",
                 -54.23f,
                 -12.32f,
-                100
+                100,
+                true,
+                User.Role.USER
         );
     }
 
