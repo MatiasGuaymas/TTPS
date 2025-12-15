@@ -159,13 +159,31 @@
                                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Teléfono
                             </th>
-                            <th
-                                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                Ciudad
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                (click)="sortBy('city')">
+                                <div class="flex items-center gap-2">
+                                    Ciudad
+                                    <svg *ngIf="sortField() === 'city'" class="w-4 h-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path *ngIf="sortDirection() === 'ASC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        <path *ngIf="sortDirection() === 'DESC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
                             </th>
-                            <th
-                                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                Puntos
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                (click)="sortBy('points')">
+                                <div class="flex items-center gap-2">
+                                    Puntos
+                                    <svg *ngIf="sortField() === 'points'" class="w-4 h-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path *ngIf="sortDirection() === 'ASC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        <path *ngIf="sortDirection() === 'DESC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
                             </th>
                             <th
                                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
