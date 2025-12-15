@@ -26,3 +26,14 @@ interface UserUpdateRequest {
 interface AdminUserUpdateRequest extends UserUpdateRequest {
     role?: 'USER' | 'ADMIN';
 }
+
+interface UserFilter {
+    email?: string;
+    name?: string;
+    lastName?: string;
+    city?: string;
+    neighborhood?: string;
+    minPoints?: number;
+    maxPoints?: number;
+    role?: 'USER' | 'ADMIN';
+}

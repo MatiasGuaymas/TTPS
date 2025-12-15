@@ -25,14 +25,42 @@ export class AdminUsersComponent implements OnInit {
     showEditModal = signal(false);
     editingUser = signal<UserProfile | null>(null);
     editForm!: FormGroup;
-    
+
     showCreateModal = signal(false);
     createForm!: FormGroup;
+
+    // Paginación
+    currentPage = signal(0);
+    pageSize = signal(10);
+    totalUsers = signal(0);
+    totalPages = signal(0);
+
+    // Filtros
+    filters = signal<UserFilter>({});
+    filterForm!: FormGroup;
+
+    // Ordenamiento
+    sortField = signal('name');
+    sortDirection = signal<'ASC' | 'DESC'>('DESC');
 
     ngOnInit(): void {
         this.loadUsers();
         this.initializeForm();
         this.initializeCreateForm();
+        this.initializeFilterForm();
+    }
+
+    initializeFilterForm(): void {
+        this.filterForm = this.fb.group({
+            email: [''],
+            name: [''],
+            lastName: [''],
+            city: [''],
+            neighborhood: [''],
+            minPoints: [null],
+            maxPoints: [null],
+            role: ['']
+        });
     }
 
     initializeForm(): void {
@@ -50,13 +78,94 @@ export class AdminUsersComponent implements OnInit {
 
     loadUsers(): void {
         this.loading.set(true);
-        this.userService.getAllUsers().subscribe({
+        const currentFilters = this.filters();
+        this.userService.getAllUsersFiltered(
+            currentFilters,
+            this.currentPage(),
+            this.pageSize(),
+            this.sortField(),
+            this.sortDirection()
+        ).subscribe({
             next: users => {
-                this.users.set(users);
+                this.users.set(users || []);
+                this.totalUsers.set(users ? users.length : 0);
                 this.loading.set(false);
             },
-            error: () => this.loading.set(false)
+            error: (error) => {
+                console.error('Error al cargar usuarios:', error);
+                // Sin contenido
+                if (error.status === 204) {
+                    this.users.set([]);
+                    this.totalUsers.set(0);
+                }
+                this.loading.set(false);
+            }
         });
+    }
+
+    applyFilters(): void {
+        // Limpiar valores vacíos del formulario
+        const formValues = this.filterForm.value;
+        const cleanedFilters: UserFilter = {};
+
+        if (formValues.email?.trim()) cleanedFilters.email = formValues.email.trim();
+        if (formValues.name?.trim()) cleanedFilters.name = formValues.name.trim();
+        if (formValues.lastName?.trim()) cleanedFilters.lastName = formValues.lastName.trim();
+        if (formValues.city?.trim()) cleanedFilters.city = formValues.city.trim();
+        if (formValues.neighborhood?.trim()) cleanedFilters.neighborhood = formValues.neighborhood.trim();
+        if (formValues.minPoints !== null && formValues.minPoints !== undefined && formValues.minPoints !== '' && formValues.minPoints > 0) {
+            cleanedFilters.minPoints = Number(formValues.minPoints);
+        }
+        if (formValues.maxPoints !== null && formValues.maxPoints !== undefined && formValues.maxPoints !== '' && formValues.maxPoints > 0) {
+            cleanedFilters.maxPoints = Number(formValues.maxPoints);
+        }
+        if (formValues.role?.trim()) cleanedFilters.role = formValues.role.trim();
+
+        this.filters.set(cleanedFilters);
+        this.currentPage.set(0); // Resetear a la primera página
+        this.loadUsers();
+    }
+
+    clearFilters(): void {
+        this.filterForm.reset();
+        this.filters.set({});
+        this.currentPage.set(0);
+        this.loadUsers();
+    }
+
+    changePage(page: number): void {
+        if (page >= 0 && page < this.totalPages()) {
+            this.currentPage.set(page);
+            this.loadUsers();
+        }
+    }
+
+    nextPage(): void {
+        if (this.currentPage() < this.totalPages() - 1) {
+            this.changePage(this.currentPage() + 1);
+        }
+    }
+
+    previousPage(): void {
+        if (this.currentPage() > 0) {
+            this.changePage(this.currentPage() - 1);
+        }
+    }
+
+    changePageSize(size: number): void {
+        this.pageSize.set(size);
+        this.currentPage.set(0);
+        this.loadUsers();
+    }
+
+    sortBy(field: string): void {
+        if (this.sortField() === field) {
+            this.sortDirection.set(this.sortDirection() === 'ASC' ? 'DESC' : 'ASC');
+        } else {
+            this.sortField.set(field);
+            this.sortDirection.set('ASC');
+        }
+        this.loadUsers();
     }
 
     getRoleBadgeClass(role: string): string {
@@ -67,7 +176,7 @@ export class AdminUsersComponent implements OnInit {
         return enabled ? 'bg-success' : 'bg-secondary';
     }
 
-    getActiveUsersCount() : number {
+    getActiveUsersCount(): number {
         return this.users().filter(user => user.enabled).length;
     }
 

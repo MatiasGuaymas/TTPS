@@ -62,29 +62,29 @@ public class Specifications {
 
             if (user.getEmail() != null && !user.getEmail().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("email"), user.getEmail()));
+                        cb.like(cb.lower(root.get("email")), "%" + user.getEmail().toLowerCase() + "%"));
             }
             if (user.getName() != null && !user.getName().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("name"), user.getName()));
+                        cb.like(cb.lower(root.get("name")), "%" + user.getName().toLowerCase() + "%"));
             }
             if (user.getLastName() != null && !user.getLastName().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("lastName"), user.getLastName()));
+                        cb.like(cb.lower(root.get("lastName")), "%" + user.getLastName().toLowerCase() + "%"));
             }
             if (user.getCity() != null && !user.getCity().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("city"), user.getCity()));
+                        cb.like(cb.lower(root.get("city")), "%" + user.getCity().toLowerCase() + "%"));
             }
             if (user.getNeighborhood() != null && !user.getNeighborhood().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("neighborhood"), user.getNeighborhood()));
+                        cb.like(cb.lower(root.get("neighborhood")), "%" + user.getNeighborhood().toLowerCase() + "%"));
             }
-            if (user.getMinPoints() > 0) {
+            if (user.getMinPoints() != null && user.getMinPoints() > 0) {
                 predicates = cb.and(predicates,
                         cb.greaterThanOrEqualTo(root.get("points"), user.getMinPoints()));
             }
-            if (user.getMaxPoints() > 0) {
+            if (user.getMaxPoints() != null && user.getMaxPoints() > 0) {
                 predicates = cb.and(predicates,
                         cb.lessThanOrEqualTo(root.get("points"), user.getMaxPoints()));
             }

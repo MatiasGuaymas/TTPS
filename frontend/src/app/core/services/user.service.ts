@@ -75,6 +75,26 @@ export class UserService {
     return this.http.get<UserProfile[]>(this.apiUrl);
   }
 
+  getAllUsersFiltered(filters: UserFilter = {}, page: number = 0, size: number = 10, sort: string = 'name', direction: 'ASC' | 'DESC' = 'DESC'): Observable<UserProfile[]> {
+    const params: any = {
+      page: page.toString(),
+      size: size.toString(),
+      sort: `${sort},${direction}`
+    };
+
+    // Filtros
+    if (filters.email?.trim()) params.email = filters.email.trim();
+    if (filters.name?.trim()) params.name = filters.name.trim();
+    if (filters.lastName?.trim()) params.lastName = filters.lastName.trim();
+    if (filters.city?.trim()) params.city = filters.city.trim();
+    if (filters.neighborhood?.trim()) params.neighborhood = filters.neighborhood.trim();
+    if (filters.minPoints !== undefined && filters.minPoints !== null) params.minPoints = filters.minPoints.toString();
+    if (filters.maxPoints !== undefined && filters.maxPoints !== null) params.maxPoints = filters.maxPoints.toString();
+    if (filters.role?.trim()) params.role = filters.role.trim();
+
+    return this.http.get<UserProfile[]>(this.apiUrl, { params });
+  }
+
   updateUserStatus(userId: number, enabled: boolean): Observable<UserProfile> {
     return this.http.put<UserProfile>(`${this.apiUrl}/admin/${userId}/status?enabled=${enabled}`, {});
   }
