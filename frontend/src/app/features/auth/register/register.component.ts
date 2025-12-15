@@ -6,7 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AlertService } from '../../../core/services/alert.service';
 
 type RegisterFormContent = {
-  [K in keyof RegisterRequest]: FormControl<RegisterRequest[K]>;
+    [K in keyof RegisterRequest]: FormControl<RegisterRequest[K]>;
 };
 
 @Component({
@@ -40,10 +40,25 @@ export class RegisterComponent {
     onSubmit() {
         if (this.registerForm.valid) {
             console.log('Formulario válido:', this.registerForm.value);
-            this.authService.register(this.registerForm.getRawValue()).subscribe({
+            const registerData = this.registerForm.getRawValue();
+
+            this.authService.register(registerData).subscribe({
                 next: (response) => {
-                    this.alerts.success('¡Cuenta creada!', 'Te has registrado exitosamente').then(() => {
-                        this.router.navigate(['/login']);
+                    this.authService.login({
+                        email: registerData.email,
+                        password: registerData.password
+                    }).subscribe({
+                        next: () => {
+                            this.alerts.success('¡Bienvenido!', 'Tu cuenta ha sido creada e iniciaste sesión correctamente').then(() => {
+                                this.router.navigate(['/home']);
+                            });
+                        },
+                        error: (loginError) => {
+                            console.error('Error al iniciar sesión después del registro:', loginError);
+                            this.alerts.success('¡Cuenta creada!', 'Te registraste exitosamente. Por favor inicia sesión').then(() => {
+                                this.router.navigate(['/login']);
+                            });
+                        }
                     });
                 },
                 error: (error) => {
