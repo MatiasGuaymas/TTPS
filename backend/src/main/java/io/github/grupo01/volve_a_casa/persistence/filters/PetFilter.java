@@ -1,11 +1,10 @@
 package io.github.grupo01.volve_a_casa.persistence.filters;
 
+import java.time.LocalDate;
+
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor(force = true)
@@ -20,4 +19,12 @@ public class PetFilter {
     private final float weightMax;
     private final LocalDate initialLostDate;
     private final LocalDate finalLostDate;
+
+    //agrego atributos para filtrar por barrio
+    private final Float userLatitude;
+    private final Float userLongitude;
+    private final Float maxDistanceInKm;
+
+
+
 }
