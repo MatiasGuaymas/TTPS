@@ -1,10 +1,12 @@
 package io.github.grupo01.volve_a_casa.persistence;
 
+import org.springframework.data.jpa.domain.Specification;
+
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
 import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
-import org.springframework.data.jpa.domain.Specification;
+import jakarta.el.Expression;
 
 public class Specifications {
     public static Specification<Pet> getPetSpecification(PetFilter filter) {
@@ -50,6 +52,33 @@ public class Specifications {
             if (filter.getWeightMax() > 0) {
                 predicates = cb.and(predicates,
                         cb.lessThanOrEqualTo(root.get("weight"), filter.getWeightMax()));
+            }
+
+            //agrego filtros para busqueda por barrio
+            if (filter.getUserLatitude() != null && 
+            filter.getUserLongitude() != null && 
+            filter.getMaxDistanceInKm() != null &&
+            filter.getMaxDistanceInKm() > 0) {
+                double lat = filter.getUserLatitude();
+                double lon = filter.getUserLongitude();
+                double maxDistanceInKm = filter.getMaxDistanceInKm();
+
+                @Embedded 'coordinates'
+                var petLat= root.get("coordinates").get("latitude");
+                var petLon= root.get("coordinates").get("longitude");
+
+                jakarta.persistence.criteria.Expression<Double> distanceExpression = cb.function(
+                        "calculate_distance", 
+                        Double.class,
+                        cb.literal(lat),
+                        cb.literal(lon),
+                        petLat,
+                        petLon
+                );
+
+                Predicate distancePredicate = cb.lessThanOrEqualTo(distanceExpression, maxDistanceInKm);
+
+                predicates=cb.and(predicates, distancePredicate);
             }
 
             return predicates;
