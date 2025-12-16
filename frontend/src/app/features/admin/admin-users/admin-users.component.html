@@ -1,0 +1,577 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+
+    <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                    Gestión de Usuarios
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Administra los usuarios del sistema
+                </p>
+            </div>
+            <button (click)="openCreateModal()"
+                class="px-4 py-2.5 bg-[#37B47D] text-white font-medium rounded-lg hover:bg-[#2a8f63] transition-colors duration-200 flex items-center justify-center gap-2 whitespace-nowrap w-full md:w-auto">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span class="hidden sm:inline">Agregar Administrador</span>
+                <span class="sm:hidden">Nuevo Admin</span>
+            </button>
+        </div>
+        <!-- Filtros -->
+        <div *ngIf="!loading()" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Filtros de Búsqueda</h2>
+                </div>
+                <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                        <input type="text" formControlName="email"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="email@ejemplo.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
+                        <input type="text" formControlName="name"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="Juan">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Apellido</label>
+                        <input type="text" formControlName="lastName"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="Pérez">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ciudad</label>
+                        <input type="text" formControlName="city"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="Buenos Aires">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Barrio</label>
+                        <input type="text" formControlName="neighborhood"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="Palermo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rol</label>
+                        <select formControlName="role"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm">
+                            <option value="">Todos</option>
+                            <option value="USER">Usuario</option>
+                            <option value="ADMIN">Administrador</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Puntos
+                            Mínimos</label>
+                        <input type="number" formControlName="minPoints"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Puntos
+                            Máximos</label>
+                        <input type="number" formControlName="maxPoints"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="1000">
+                    </div>
+                </form>
+                <div class="flex gap-3 mt-4">
+                    <button (click)="applyFilters()"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                            </path>
+                        </svg>
+                        Aplicar Filtros
+                    </button>
+                    <button (click)="clearFilters()"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Loading -->
+        <div *ngIf="loading()" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#37B47D]"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading() && users().length === 0"
+            class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-blue-800 dark:text-blue-300">
+                    No se encontraron usuarios con los criterios de búsqueda proporcionados.
+                </p>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div *ngIf="!loading() && users().length > 0"
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                (click)="sortBy('name')">
+                                <div class="flex items-center gap-2">
+                                    Nombre
+                                    <svg *ngIf="sortField() === 'name'" class="w-4 h-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path *ngIf="sortDirection() === 'ASC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        <path *ngIf="sortDirection() === 'DESC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                (click)="sortBy('email')">
+                                <div class="flex items-center gap-2">
+                                    Email
+                                    <svg *ngIf="sortField() === 'email'" class="w-4 h-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path *ngIf="sortDirection() === 'ASC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        <path *ngIf="sortDirection() === 'DESC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                Teléfono
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                (click)="sortBy('city')">
+                                <div class="flex items-center gap-2">
+                                    Ciudad
+                                    <svg *ngIf="sortField() === 'city'" class="w-4 h-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path *ngIf="sortDirection() === 'ASC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        <path *ngIf="sortDirection() === 'DESC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                (click)="sortBy('points')">
+                                <div class="flex items-center gap-2">
+                                    Puntos
+                                    <svg *ngIf="sortField() === 'points'" class="w-4 h-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path *ngIf="sortDirection() === 'ASC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        <path *ngIf="sortDirection() === 'DESC'" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                Rol
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                Estado
+                            </th>
+                            <th
+                                class="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tr *ngFor="let user of users()"
+                            class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ user.name }} {{ user.lastName }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                                {{ user.email }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                                {{ user.phone }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                                {{ user.city }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                    {{ user.points }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                    [ngClass]="user.role === 'ADMIN' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'">
+                                    {{ user.role }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                    [ngClass]="user.enabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'">
+                                    {{ user.enabled ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="flex justify-center gap-2">
+                                    <!-- Botón Editar -->
+                                    <button (click)="openEditModal(user)"
+                                        class="inline-flex items-center px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        title="Editar usuario">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                            </path>
+                                        </svg>
+                                        Editar
+                                    </button>
+
+                                    <!-- Botón Habilitar/Deshabilitar -->
+                                    <button (click)="toggleUserStatus(user)"
+                                        [ngClass]="user.enabled ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'"
+                                        class="inline-flex items-center px-3 py-2 text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                        [title]="user.enabled ? 'Deshabilitar usuario' : 'Habilitar usuario'">
+                                        <svg *ngIf="user.enabled" class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                            </path>
+                                        </svg>
+                                        <svg *ngIf="!user.enabled" class="w-4 h-4 mr-1" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{ user.enabled ? 'Deshabilitar' : 'Habilitar' }}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <!-- Selector de tamaño de página -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-700 dark:text-gray-300">Mostrar:</label>
+                        <select (change)="changePageSize(+$any($event.target).value)" [value]="pageSize()"
+                            class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white text-sm">
+                            <option [value]="5">5</option>
+                            <option [value]="10">10</option>
+                            <option [value]="25">25</option>
+                            <option [value]="50">50</option>
+                        </select>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">por página</span>
+                    </div>
+
+                    <!-- Controles de navegación -->
+                    <div class="flex items-center gap-2">
+                        <button (click)="previousPage()" [disabled]="currentPage() === 0"
+                            class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Anterior
+                        </button>
+
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                            Página {{ currentPage() + 1 }}
+                        </span>
+
+                        <button (click)="nextPage()" [disabled]="users().length < pageSize()"
+                            class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Siguiente
+                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Stats -->
+            <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div class="flex items-center gap-4">
+                        <span>Total de usuarios: <strong class="text-gray-900 dark:text-white">{{ users().length
+                                }}</strong></span>
+                        <span class="text-gray-400 dark:text-gray-600">|</span>
+                        <span>Activos: <strong class="text-green-600 dark:text-green-400">{{ getActiveUsersCount()
+                                }}</strong></span>
+                        <span class="text-gray-400 dark:text-gray-600">|</span>
+                        <span>Inactivos: <strong class="text-gray-500 dark:text-gray-400">{{ getInactiveUsersCount()
+                                }}</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear administrador -->
+    <div *ngIf="showCreateModal()"
+        class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-4"
+        (click)="closeCreateModal()">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            (click)="$event.stopPropagation()">
+            <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                        Crear Nuevo Administrador
+                    </h2>
+                    <button (click)="closeCreateModal()"
+                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <form [formGroup]="createForm" (ngSubmit)="saveNewAdmin()" class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Nombre -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Nombre *
+                        </label>
+                        <input type="text" formControlName="name"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-[#37B47D] focus:border-transparent"
+                            placeholder="Juan">
+                    </div>
+
+                    <!-- Apellido -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Apellido *
+                        </label>
+                        <input type="text" formControlName="lastName"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-[#37B47D] focus:border-transparent"
+                            placeholder="Pérez">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Email *
+                        </label>
+                        <input type="email" formControlName="email"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-[#37B47D] focus:border-transparent"
+                            placeholder="admin@volveacasa.com">
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Contraseña *
+                        </label>
+                        <input type="password" formControlName="password"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-[#37B47D] focus:border-transparent"
+                            placeholder="Mínimo 6 caracteres">
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Teléfono *
+                        </label>
+                        <input type="text" formControlName="phoneNumber"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-[#37B47D] focus:border-transparent"
+                            placeholder="+54 9 11 1234-5678">
+                    </div>
+
+                    <!-- Latitud -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Latitud *
+                        </label>
+                        <input type="number" formControlName="latitude" step="any"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-[#37B47D] focus:border-transparent"
+                            placeholder="-34.6037">
+                    </div>
+
+                    <!-- Longitud -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Longitud *
+                        </label>
+                        <input type="number" formControlName="longitude" step="any"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-[#37B47D] focus:border-transparent"
+                            placeholder="-58.3816">
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 mt-6">
+                    <button type="submit"
+                        class="flex-1 bg-[#37B47D] hover:bg-[#2a8f63] text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:ring-offset-2">
+                        Crear Administrador
+                    </button>
+                    <button type="button" (click)="closeCreateModal()"
+                        class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de edición -->
+    <div *ngIf="showEditModal()"
+        class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-4"
+        (click)="closeEditModal()">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            (click)="$event.stopPropagation()">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Editar Usuario
+                </h2>
+                <button (click)="closeEditModal()"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form [formGroup]="editForm" (ngSubmit)="saveUserEdit()" class="p-6">
+                <div class="space-y-4">
+                    <!-- Nombre y Apellido -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nombre *
+                            </label>
+                            <input type="text" formControlName="name"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched"
+                                class="text-red-500 text-sm mt-1">
+                                El nombre es requerido (mínimo 2 caracteres)
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Apellido *
+                            </label>
+                            <input type="text" formControlName="lastName"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p *ngIf="editForm.get('lastName')?.invalid && editForm.get('lastName')?.touched"
+                                class="text-red-500 text-sm mt-1">
+                                El apellido es requerido (mínimo 2 caracteres)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Teléfono *
+                        </label>
+                        <input type="tel" formControlName="phoneNumber"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="+54 11 1234-5678">
+                        <p *ngIf="editForm.get('phoneNumber')?.invalid && editForm.get('phoneNumber')?.touched"
+                            class="text-red-500 text-sm mt-1">
+                            Formato de teléfono inválido
+                        </p>
+                    </div>
+
+                    <!-- Ciudad y Barrio -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Ciudad *
+                            </label>
+                            <input type="text" formControlName="city"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Barrio *
+                            </label>
+                            <input type="text" formControlName="neighborhood"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <!-- Latitud y Longitud -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Latitud *
+                            </label>
+                            <input type="number" step="any" formControlName="latitude"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Longitud *
+                            </label>
+                            <input type="number" step="any" formControlName="longitude"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <!-- Rol -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Rol *
+                        </label>
+                        <select formControlName="role"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="USER">Usuario</option>
+                            <option value="ADMIN">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 mt-6">
+                    <button type="submit"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Guardar Cambios
+                    </button>
+                    <button type="button" (click)="closeEditModal()"
+                        class="flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

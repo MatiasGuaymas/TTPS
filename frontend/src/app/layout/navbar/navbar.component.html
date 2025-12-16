@@ -3,9 +3,9 @@
 
   <!-- Logo -->
   <a routerLink="/home" class="flex-shrink-0 flex items-center h-full group">
-    <<img src="assets/logo_volve.png" 
-    class="h-22 w-auto object-contain transform transition-all duration-300 group-hover:scale-105">
-    <span class="ml-3 text-white font-bold text-xl hidden lg:block">Volvé a Casa</span>
+    <img src="assets/logo_volve.png"
+      class="h-22 w-auto object-contain transform transition-all duration-300 group-hover:scale-105">
+      <span class="ml-3 text-white font-bold text-xl hidden lg:block">Volvé a Casa</span>
   </a>
 
   <!-- Links de navegación -->
@@ -40,56 +40,67 @@
 
   <!-- Perfil dropdown -->
   @if (isLoggedIn()) {
-    <div class="relative hidden md:block profile-menu-container">
-      <button (click)="toggleProfileMenu()"
-        class="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-all duration-200 group">
-        <div class="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-white shadow-md">
+  <div class="relative hidden md:block profile-menu-container">
+    <button (click)="toggleProfileMenu()"
+      class="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-all duration-200 group">
+      <div
+        class="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold border-2 border-white shadow-md">
         {{ userInitials() }}
-        </div>
-        <svg class="w-4 h-4 text-white transition-transform duration-200" [class.rotate-180]="profileMenuOpen" fill="none"
-          stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-        </svg>
-      </button>
-
-      <!-- Dropdown menu -->
-      <div *ngIf="profileMenuOpen"
-        class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700 animate-slideDown">
-        <a routerLink="/profile" (click)="closeProfileMenu()"
-          class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-[#37B47D]/10 dark:hover:bg-[#205D6F]/30 transition-colors">
-          <svg class="w-4 h-4 mr-3 text-[#37B47D] dark:text-[#009F87]" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-          </svg>
-          Mi Perfil
-        </a>
-        <a routerLink="/my-pets" (click)="closeProfileMenu()"
-          class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-[#37B47D]/10 dark:hover:bg-[#205D6F]/30 transition-colors">
-          <svg class="w-4 h-4 mr-3 text-[#37B47D] dark:text-[#009F87]" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-            </path>
-          </svg>
-          Mis Mascotas
-        </a>
-        <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-        <a href="#" (click)="logout(); $event.preventDefault()"
-          class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-          <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-          Cerrar Sesión
-        </a>
       </div>
+      <svg class="w-4 h-4 text-white transition-transform duration-200" [class.rotate-180]="profileMenuOpen" fill="none"
+        stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+      </svg>
+    </button>
+
+    <!-- Dropdown menu -->
+    <div *ngIf="profileMenuOpen"
+      class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700 animate-slideDown">
+      <a routerLink="/profile" (click)="closeProfileMenu()"
+        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-[#37B47D]/10 dark:hover:bg-[#205D6F]/30 transition-colors">
+        <svg class="w-4 h-4 mr-3 text-[#37B47D] dark:text-[#009F87]" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        Mi Perfil
+      </a>
+      <a *ngIf="!isAdmin()" routerLink="/my-pets" (click)="closeProfileMenu()"
+        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-[#37B47D]/10 dark:hover:bg-[#205D6F]/30 transition-colors">
+        <svg class="w-4 h-4 mr-3 text-[#37B47D] dark:text-[#009F87]" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+          </path>
+        </svg>
+        Mis Mascotas
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/users" (click)="closeProfileMenu()"
+        class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-[#37B47D]/10 dark:hover:bg-[#205D6F]/30 transition-colors">
+        <svg class="w-4 h-4 mr-3 text-[#37B47D] dark:text-[#009F87]" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+          </path>
+        </svg>
+        Gestión de Usuarios
+      </a>
+      <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+      <a href="#" (click)="logout(); $event.preventDefault()"
+        class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+        <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        Cerrar Sesión
+      </a>
     </div>
+  </div>
   } @else {
-    <a routerLink="/login"
-      class="hidden md:block px-4 py-2 text-white font-medium text-sm lg:text-base rounded-lg hover:bg-white/10 transition-all duration-200 whitespace-nowrap">
-      Iniciar Sesión
-    </a>
+  <a routerLink="/login"
+    class="hidden md:block px-4 py-2 text-white font-medium text-sm lg:text-base rounded-lg hover:bg-white/10 transition-all duration-200 whitespace-nowrap">
+    Iniciar Sesión
+  </a>
   }
 </nav>
 
@@ -115,37 +126,56 @@
     </a>
     <div class="border-t border-white/20 pt-2 mt-2">
       @if (isLoggedIn()) {
-        <div class="flex items-center px-4 py-3 text-white">
-          <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 border-2 border-white">
-            {{ userInitials() }}
-          </div>
-          <div>
-            <p class="font-semibold">{{ userData()?.name }} {{ userData()?.lastName }}</p>
-            <p class="text-xs text-white/70">{{ userData()?.email }}</p>
-          </div>
+      <div class="flex items-center px-4 py-3 text-white">
+        <div
+          class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 border-2 border-white">
+          {{ userInitials() }}
         </div>
+        <div>
+          <p class="font-semibold">{{ userData()?.name }} {{ userData()?.lastName }}</p>
+          <p class="text-xs text-white/70">{{ userData()?.email }}</p>
+        </div>
+      </div>
 
-        <a routerLink="/profile" (click)="closeMobileMenu()"
-          class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-          </svg>
-          Mi Perfil
-        </a>
-        <a href="#" (click)="logout(); closeMobileMenu(); $event.preventDefault()"
-          class="flex items-center px-4 py-3 text-red-200 hover:bg-white/10 rounded-lg transition-colors">
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-          Cerrar Sesión
-        </a>
+      <a routerLink="/profile" (click)="closeMobileMenu()"
+        class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        Mi Perfil
+      </a>
+      <a *ngIf="!isAdmin()" routerLink="/my-pets" (click)="closeMobileMenu()"
+        class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+          </path>
+        </svg>
+        Mis Mascotas
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/users" (click)="closeMobileMenu()"
+        class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+          </path>
+        </svg>
+        Gestión de Usuarios
+      </a>
+      <a href="#" (click)="logout(); closeMobileMenu(); $event.preventDefault()"
+        class="flex items-center px-4 py-3 text-red-200 hover:bg-white/10 rounded-lg transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        Cerrar Sesión
+      </a>
       } @else {
-        <a routerLink="/login" (click)="closeMobileMenu()"
-          class="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
-          Iniciar Sesión
-        </a>
+      <a routerLink="/login" (click)="closeMobileMenu()"
+        class="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
+        Iniciar Sesión
+      </a>
       }
     </div>
   </div>
