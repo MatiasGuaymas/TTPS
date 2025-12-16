@@ -65,12 +65,10 @@ public class UserController implements IUserController {
     // Admin endpoints
     @PutMapping("/admin/{id}/status")
     public ResponseEntity<?> updateUserStatus(
-            Authentication authentication,
+            @AuthenticationPrincipal User requester,
             @PathVariable("id") Long userId,
             @RequestParam("enabled") Boolean enabled
     ) {
-        User requester = (User) authentication.getPrincipal();
-        
         if (requester.getRole() != User.Role.ADMIN) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can update user status");
         }
@@ -81,12 +79,10 @@ public class UserController implements IUserController {
 
     @PutMapping("/admin/{id}")
     public ResponseEntity<?> adminUpdateUser(
-            Authentication authentication,
+            @AuthenticationPrincipal User requester,
             @PathVariable("id") Long userId,
             @Valid @RequestBody AdminUserUpdateDTO updatedData
     ) {
-        User requester = (User) authentication.getPrincipal();
-        
         if (requester.getRole() != User.Role.ADMIN) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can update users");
         }
@@ -97,11 +93,9 @@ public class UserController implements IUserController {
 
     @PostMapping("/admin")
     public ResponseEntity<?> createAdmin(
-            Authentication authentication,
+            @AuthenticationPrincipal User requester,
             @Valid @RequestBody UserCreateDTO userData
     ) {
-        User requester = (User) authentication.getPrincipal();
-        
         if (requester.getRole() != User.Role.ADMIN) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can create admin users");
         }
