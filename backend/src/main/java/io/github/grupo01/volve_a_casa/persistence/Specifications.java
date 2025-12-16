@@ -13,11 +13,15 @@ public class Specifications {
 
             if (filter.getName() != null && !filter.getName().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("name"), filter.getName()));
+                        cb.like(cb.lower(root.get("name")), "%" + filter.getName() + "%"));
             }
             if (filter.getColor() != null && !filter.getColor().isEmpty()) {
                 predicates = cb.and(predicates,
-                        cb.like(root.get("color"), filter.getColor()));
+                        cb.like(cb.lower(root.get("color")), "%" + filter.getColor() + "%"));
+            }
+            if (filter.getRace() != null && !filter.getRace().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("race")), "%" + filter.getRace() + "%"));
             }
             if (filter.getState() != null) {
                 predicates = cb.and(predicates,
@@ -30,10 +34,6 @@ public class Specifications {
             if (filter.getSize() != null) {
                 predicates = cb.and(predicates,
                         cb.equal(root.get("size"), filter.getSize()));
-            }
-            if (filter.getRace() != null && !filter.getRace().isEmpty()) {
-                predicates = cb.and(predicates,
-                        cb.like(root.get("race"), filter.getRace()));
             }
             if (filter.getFinalLostDate() != null) {
                 predicates = cb.and(predicates,
