@@ -50,7 +50,7 @@ public class UserController implements IUserController {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@AuthenticationPrincipal User requester, @PathVariable("id") Long id) {
+    public ResponseEntity<?> getUserById(@AuthenticationPrincipal User requester, @PathVariable Long id) {
         User user = userService.findById(id);
         return ResponseEntity.ok(UserResponseDTO.fromUser(user));
     }
