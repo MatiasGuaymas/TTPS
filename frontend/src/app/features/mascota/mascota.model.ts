@@ -49,15 +49,20 @@ export interface PetResponse{
     creatorId:number
 }
 
-export interface filters{
-    name:string,
-    state:State,
-    type:TipoMascota;
-    size:Size;
-    color:string;
-    race:String;
-    weightMin:number;
-    weightMax: number;
-    initialLostDate:Date;
+export interface PetFilter{
+    name?:string,
+    state?:State,
+    type?:TipoMascota;
+    size?:Size;
+    color?:string;
+    race?:string;
+    weightMin?:number; 
+    weightMax?: number;
+    initialLostDate?:string;
     finalLostDate:Date;
+
+    page?:number;
+    perPage?:number;
+    sort?:string;
+    filterByNeighbordhood?:boolean;
 }

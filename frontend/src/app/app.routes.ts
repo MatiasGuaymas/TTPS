@@ -6,6 +6,7 @@ import { HomeComponent } from './features/home/home.component';
 import { AltaMascota } from './features/mascota/pages/alta/alta.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { ListadoMascotas } from './features/mascota/pages/listado/listado';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -21,6 +22,10 @@ export const routes: Routes = [
         component: LoginComponent,
         canActivate: [guestGuard]
     },
+    { 
+        path: 'listado-mascotas', 
+        component: ListadoMascotas 
+    },
     // Rutas para usuarios autenticados
     { 
         path: 'profile', 
@@ -32,4 +37,5 @@ export const routes: Routes = [
         component: AltaMascota,
         canActivate: [authGuard]
     },
+    
 ];

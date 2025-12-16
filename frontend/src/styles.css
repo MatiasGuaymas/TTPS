@@ -22,3 +22,10 @@
 body {
     font-family: 'Poppins', sans-serif;
 }
+
+.textos{
+    --color-background: oklch(98.7% 0.026 102.212);
+    --color-text: #000000;
+    --color-text-dark: oklch(96.7% 0.003 264.542);
+    --color-background-dark: oklch(21% 0.034 264.665);
+}

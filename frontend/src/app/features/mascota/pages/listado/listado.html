@@ -1,0 +1,71 @@
+<main>
+<div class="min-h-screen w-full bg-background dark:bg-background-dark flex flex-col items-center justify-center px-6 py-12 ">
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-4 text-center" >Filtrar mascotas por:</h1>
+    <form [formGroup]="filterForm" class="textos">
+        <label for="name">Nombre</label>
+        <input id="name" type="text" formControlName="name" />
+
+        <label for="state">Estado</label>
+        <select id="state" formControlName="state">
+            <option value="perdido_propio">Perdido propio</option>
+            <option value="perdido_ajeno">Perdido ajeno</option>
+            <option value="recuperado">Recuperado</option>
+            <option value="adoptado">Adoptado</option>
+        </select>
+
+        <label for="type">Tipo</label>
+        <select id="type" formControlName="type">
+            <option value="">Todos</option>
+            <option value="Perro">Perro</option>
+            <option value="Gato">Gato</option>
+            <option value="Cobaya">Cobaya</option>
+            <option value="Loro">Loro</option>
+            <option value="Conejo">Conejo</option>
+            <option value="Caballo">Caballo</option>
+            <option value="Tortuga">Tortuga</option>
+        </select>
+
+        <label for="size">Tamaño</label>
+        <select id="size" formControlName="size">
+            <option value="">Todos</option>
+            <option value="Pequeño">Pequeño</option>
+            <option value="Mediano">Mediano</option>
+            <option value="Grande">Grande</option>
+        </select>
+
+        <label for="color">Color</label>
+        <input id="color" type="text" formControlName="color" />
+
+        <label for="race">Raza</label>
+        <input id="race" type="text" formControlName="race" />
+
+        <label for="weightmin">Peso mínimo (kg)</label>
+        <input id="weightmin" type="number" formControlName="weightMin" />
+
+        <label for="weightmax">Peso máximo (kg)</label>
+        <input id="weightmax" type="number" formControlName="weightMax" />
+
+        <label for="initialLostDate">Fecha inicial de pérdida</label>
+        <input id="initialLostDate" type="date" formControlName="initialLostDate" />
+
+        <label for="finalLostDate">Fecha final de pérdida</label>
+        <input id="finalLostDate" type="date" formControlName="finalLostDate" />
+
+        <label for="sort">Ordenar por</label>
+        <select id="sort" formControlName="sort">
+            @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">
+                    {{ option.label }}
+                </option>
+            }
+
+        </select>
+
+        <label>
+        <input type="checkbox" [formControl]="userCurrentLocation">
+             Buscar mascotas cerca de mi ubicación
+        </label>
+        </form>
+</div>
+</main>
