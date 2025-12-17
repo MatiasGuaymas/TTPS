@@ -32,7 +32,7 @@ export class MascotaService {
         return this.http.get<PetResponse[]>("http://localhost:8080/api/pets", { params });
     }
 
-    getPetById(id: number): Observable<Pet> {
-        return this.http.get<Pet>(`${this.apiUrl}/${id}`);
+    getPetById(id: number): Observable<PetResponse> {
+        return this.http.get<PetResponse>(`${this.apiUrl}/${id}`);
     }
 }

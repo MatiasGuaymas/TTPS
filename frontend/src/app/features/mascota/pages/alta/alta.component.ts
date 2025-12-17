@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { PetCreate, Size, State, TipoMascota } from "../../mascota.model";
 import { MascotaService } from "../../mascota.service";
 import { AlertService } from '../../../../core/services/alert.service';
-import { Map } from "../../../../map/map";
+import { Map } from "../../../../shared/components/map/map";
 
 @Component({
     selector: "app-alta-mascota",
@@ -18,7 +18,7 @@ export class AltaMascota implements OnInit {
     formMascota!: FormGroup;
 
     tiposMascota = Object.values(TipoMascota);
-    
+
     tamanosMascota = Object.values(Size);
 
     estados = Object.values(State);
@@ -64,7 +64,7 @@ export class AltaMascota implements OnInit {
         this.formMascota.get('latitude')?.markAsTouched();
         this.formMascota.get('longitude')?.markAsTouched();
     }
-    
+
     seleccionarEstado(estado: String): void{
         this.formMascota.get('estado')?.setValue(estado);
     }
@@ -78,7 +78,7 @@ export class AltaMascota implements OnInit {
             const reader = new FileReader();
             reader.onload = e => {
                 this.imagenPreVisualizacion = reader.result;
-                this.cdRef.detectChanges(); 
+                this.cdRef.detectChanges();
             };
             reader.readAsDataURL(file);
 

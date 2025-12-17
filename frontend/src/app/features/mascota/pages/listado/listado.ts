@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
 import { combineLatest, debounceTime, distinctUntilChanged, Observable, race, startWith, Subject, switchMap } from 'rxjs';
-import { GeolocationService } from '../../../../services/geolocation.service';
+import { GeolocationService } from '../../../../core/services/geolocation.service';
 import { AlertService } from '../../../../core/services/alert.service';
 import { PetFilter, PetResponse } from '../../mascota.model';
 import { HttpParams } from '@angular/common/http';
@@ -53,7 +53,7 @@ export class ListadoMascotas implements OnInit{
       userLongitude:new FormControl<number|null>(null),
       maxDistanceInKm: new FormControl(10),
     });
-    
+
     this.userCurrentLocation.valueChanges.subscribe(
       (useLocation) => {
         if(useLocation) {
@@ -83,38 +83,38 @@ export class ListadoMascotas implements OnInit{
   pets:PetResponse[] = [];
 
   buscarMascotas(): void {
-    this.searchTrigger$.next(); 
+    this.searchTrigger$.next();
   }
   ngOnInit(): void {
-    
+
     if (this.userCurrentLocation.value) {
         this.loadUserLocation();
     }
-    
-   
+
+
     const searchEvents$ = this.searchTrigger$.asObservable().pipe(
-        startWith(null) 
+        startWith(null)
     );
-    
+
     const loadingChange$ = this.cargandoUbicacion.valueChanges.pipe(startWith(this.cargandoUbicacion.value));
 
 
     combineLatest([searchEvents$, loadingChange$]).pipe(
-        
+
         switchMap(([_, loading]) => {
-            
+
             const formValues = this.filterForm.value;
             const useLocation = this.userCurrentLocation.value;
             const lat = formValues.userLatitude;
             const lon = formValues.userLongitude;
-            
+
             if (loading || (useLocation && (lat === null || lon === null))) {
                 return new Observable<PetResponse[]>(observer => {
-                    observer.next([]); 
+                    observer.next([]);
                     observer.complete();
                 });
             }
-            
+
             const filters: any = { ...formValues };
 
             if (!useLocation) {
@@ -122,12 +122,12 @@ export class ListadoMascotas implements OnInit{
                 delete filters.userLongitude;
                 delete filters.maxDistanceInKm;
             }
-            
+
             const finalFilters: Record<string, any> = {};
 
             Object.keys(filters).forEach(key => {
                 let value = filters[key];
-                
+
                 if (value !== undefined && value !== null && value !== '') {
                     finalFilters[key] = value;
                 }

@@ -47,6 +47,7 @@ export interface PetResponse{
     lostDate:Date,
     state:State,
     type:TipoMascota,
+    photosBase64: string[],
     creatorId:number
 }
 
