@@ -173,11 +173,12 @@ public class SightingControllerTest {
                 id,
                 petId,
                 reporterId,
+                "Juan",
+                "Pérez",
                 -54f,
                 -21f,
-                "foto",
                 LocalDate.now(),
-                "foto"
+                "comentario"
         );
     }
 }

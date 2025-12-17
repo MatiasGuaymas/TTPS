@@ -312,7 +312,8 @@ public class PetControllerTest {
                 LocalDate.now(),
                 Pet.State.PERDIDO_PROPIO,
                 Pet.Type.PERRO,
-                creatorId
+                creatorId,
+                List.of("photo_url")
         );
     }
 
@@ -321,11 +322,12 @@ public class PetControllerTest {
                 id,
                 petId,
                 reporterId,
+                "Juan",
+                "Pérez",
                 -54f,
                 -21f,
-                "foto",
                 LocalDate.now(),
-                "foto"
+                "comentario"
         );
     }
 }

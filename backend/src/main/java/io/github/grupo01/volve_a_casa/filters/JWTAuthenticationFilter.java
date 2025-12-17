@@ -25,7 +25,8 @@ import lombok.RequiredArgsConstructor;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String[] EXCLUDED_URLS = {
-            "/api/auth"
+            "/api/auth",
+            "/api/pets"
     };
 
     private final TokenService tokenService;
