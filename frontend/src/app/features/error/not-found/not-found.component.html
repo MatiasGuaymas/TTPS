@@ -1,0 +1,74 @@
+<div
+    class="min-h-screen bg-gradient-to-br from-[#37B47D]/10 via-white to-[#009F87]/10 flex items-center justify-center px-4 py-8">
+    <div class="max-w-4xl w-full">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="grid md:grid-cols-2 gap-8 p-8 md:p-12">
+                <!-- Contenido del error -->
+                <div class="flex flex-col justify-center space-y-8">
+
+                    <!-- Mensaje -->
+                    <div class="space-y-3">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-800">
+                            ¡Ups! Página no encontrada
+                        </h2>
+                        <p class="text-lg text-gray-600">
+                            Parece que esta página se perdió, ¡como una mascota! 🐕
+                        </p>
+                        <p class="text-base text-gray-500">
+                            La página que buscás no existe o fue movida a otra ubicación.
+                        </p>
+                    </div>
+
+                    <!-- Botón de regreso -->
+                    <div class="pt-4">
+                        <button (click)="goHome()"
+                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#37B47D] to-[#009F87] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Volver al inicio
+                        </button>
+                    </div>
+
+                    <!-- Enlaces útiles -->
+                    <div class="pt-6 border-t border-gray-200">
+                        <p class="text-sm text-gray-600 mb-3">También podés:</p>
+                        <div class="space-y-2">
+                            <a href="/mascota-perdida"
+                                class="block text-[#37B47D] hover:text-[#009F87] font-medium text-sm transition-colors">
+                                → Reportar una mascota perdida
+                            </a>
+                            <a href="/home"
+                                class="block text-[#37B47D] hover:text-[#009F87] font-medium text-sm transition-colors">
+                                → Ver mascotas perdidas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center">
+                    <div class="relative">
+                        <!-- Imagen -->
+                        <img src="assets/error_404.jpg"
+                            alt="Perrito triste - Página no encontrada"
+                            class="w-full h-80 md:h-96 object-cover rounded-2xl shadow-xl">
+
+                        <!-- Decoración -->
+                        <div class="absolute -top-4 -right-4 w-24 h-24 bg-[#37B47D]/10 rounded-full blur-2xl"></div>
+                        <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-[#009F87]/10 rounded-full blur-2xl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje adicional -->
+        <div class="text-center mt-8">
+            <p class="text-gray-500 text-sm">
+                Si creés que esto es un error, por favor
+                <a href="/home" class="text-[#37B47D] hover:text-[#009F87] font-medium underline">contactá al
+                    soporte</a>
+            </p>
+        </div>
+    </div>
+</div>

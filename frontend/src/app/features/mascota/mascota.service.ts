@@ -4,14 +4,13 @@ import { Observable } from "rxjs";
 import { PetCreate, PetFilter, PetResponse } from "./mascota.model";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class MascotaService {
     private http = inject(HttpClient);
     private apiUrl = '/api/pets';
 
     constructor() { }
-
 
     crearMascota(petDto: PetCreate, token: string): Observable<any> {
         const headers = new HttpHeaders({
@@ -31,5 +30,9 @@ export class MascotaService {
             }
         });
         return this.http.get<PetResponse[]>("http://localhost:8080/api/pets", { params });
+    }
+
+    getPetById(id: number): Observable<PetResponse> {
+        return this.http.get<PetResponse>(`${this.apiUrl}/${id}`);
     }
 }

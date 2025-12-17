@@ -2,7 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
 import { combineLatest, debounceTime, distinctUntilChanged, EMPTY, filter, Observable, race, startWith, Subject, switchMap } from 'rxjs';
-import { GeolocationService } from '../../../../services/geolocation.service';
+
+import { GeolocationService } from '../../../../core/services/geolocation.service';
 import { AlertService } from '../../../../core/services/alert.service';
 import { PetFilter, PetResponse } from '../../mascota.model';
 
@@ -58,6 +59,8 @@ export class ListadoMascotas implements OnInit{
         this.loadUserLocation();
       } else {
         this.filterForm.patchValue({ userLatitude: null, userLongitude: null });
+
+   
       }
     });
   }
@@ -109,6 +112,7 @@ export class ListadoMascotas implements OnInit{
           this.alerts.error('Ubicación no disponible aún.');
           return EMPTY; 
         }
+
             const filters: any = { ...formValues };
 
             if (!useLocation) {
@@ -116,12 +120,12 @@ export class ListadoMascotas implements OnInit{
                 delete filters.userLongitude;
                 delete filters.maxDistanceInKm;
             }
-            
+
             const finalFilters: Record<string, any> = {};
 
             Object.keys(filters).forEach(key => {
                 let value = filters[key];
-                
+
                 if (value !== undefined && value !== null && value !== '') {
                     finalFilters[key] = value;
                 }

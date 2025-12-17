@@ -1,23 +1,23 @@
 <div class="min-h-screen flex items-center justify-center p-6 bg-background dark:bg-background-dark textos">
     <div class="max-w-6xl w-full bg-white dark:bg-primary-dark textos shadow-2xl rounded-lg overflow-hidden md:flex">
-        
-       <div class="md:w-1/2 p-4 hidden md:block bg-cover bg-center" 
-           style="background-image: url('/assets/alta.jpg'); min-height: 700px;"> 
+
+       <div class="md:w-1/2 p-4 hidden md:block bg-cover bg-center"
+           style="background-image: url('/assets/alta.jpg'); min-height: 700px;">
         </div>
         <div class="md:w-1/2 p-10 w-full"> <h2 class="text-3xl font-bold text-center mb-8 text-text dark:text-text-dark">Ayudanos A Encontrar A Tu Mascota!</h2>
 
             <form [formGroup]="formMascota" (ngSubmit)="onSubmit()">
-                
-                <div class="mb-6 flex flex-col items-center">
-                    
-                    <input type="file" 
-                           #fileInput 
-                           (change)="onFileSelected($event)" 
-                           accept="image/*" 
-                           class="hidden"
-                           formControlName="photoFile"> 
 
-                    <div (click)="fileInput.click()" 
+                <div class="mb-6 flex flex-col items-center">
+
+                    <input type="file"
+                           #fileInput
+                           (change)="onFileSelected($event)"
+                           accept="image/*"
+                           class="hidden"
+                           formControlName="photoFile">
+
+                    <div (click)="fileInput.click()"
                          class="flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors w-full max-w-xs"
                          [ngClass]="{
                             'border-blue-500 bg-blue-50': imagenPreVisualizacion,
@@ -25,8 +25,8 @@
                          }">
 
                         @if (imagenPreVisualizacion) {
-                            <img [src]="imagenPreVisualizacion" 
-                                 alt="Previsualización de Mascota" 
+                            <img [src]="imagenPreVisualizacion"
+                                 alt="Previsualización de Mascota"
                                  class="max-h-40 max-w-full object-contain rounded-md shadow-md mb-2">
                             <p class="text-xs text-text dark:text-text-dark font-medium">Click para cambiar foto</p>
                         } @else {
@@ -44,7 +44,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
+
                     <div class="space-y-4">
                         <label class="block text-sm font-medium text-text dark:text-text-dark">Nombre De Tu Mascota</label>
                         <input type="text" formControlName="name" placeholder="Toby" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
@@ -70,7 +70,7 @@
                                 <option [value]="tipo">{{ tipo }}</option>
                             }
                         </select>
-                        
+
                         <label class="block text-sm font-medium text-text dark:text-text-dark">Peso (kg)</label>
                         <input type="number" formControlName="weight" placeholder="5.5" step="0.1" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
                         @if (formMascota.get('weight')?.hasError('min')) {
@@ -79,29 +79,29 @@
                             </div>
                         }
                     </div>
-                    
+
                     <div class="space-y-4">
                         <label class="block text-sm font-medium text-text dark:text-text-dark">Tu Nombre</label>
                         <input type="text" formControlName="ownerName" placeholder="Jose Benito" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
-                        
+
                         <label class="block text-sm font-medium text-text dark:text-text-dark">Estado</label>
-                        <div class="grid grid-cols-2 gap-2"> 
+                        <div class="grid grid-cols-2 gap-2">
                             @for (estado of estados; track estado) {
-                                <button type="button" 
+                                <button type="button"
                                         (click)="seleccionarEstado(estado)"
                                         [ngClass]="{
                                             'bg-navbar dark:bg-navbar-dark text-white': formMascota.get('estado')?.value === estado,
                                             'bg-primary dark:bg-primary-dark text-text dark:text-text-dark hover:opacity-80': formMascota.get('estado')?.value !== estado
                                         }"
                                         class="px-2 py-2 rounded-md font-semibold transition-colors text-xs text-center">
-                                    {{ estado }} 
+                                    {{ estado.replace('_', ' ') }}
                                 </button>
                             }
                         </div>
-                        
+
                         <label class="block text-sm font-medium text-text dark:text-text-dark">COLOR</label>
                         <input type="text" formControlName="color" placeholder="Marron" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
-                        
+
                         <label class="block text-sm font-medium text-text dark:text-text-dark">Raza</label>
                         <input type="text" formControlName="race" placeholder="Border Collie" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
                     </div>
@@ -110,7 +110,7 @@
                 <div style="margin-top:20px">
                     <label class="block text-sm font-medium text-text dark:text-text-dark mb-2">Ubicación donde se perdió la mascota (Arrastra el marcador)</label>
                     <app-map (coordinatesChanged)="onCoordinatesChange($event)"></app-map>
-                    
+
                     <div class="mt-2 text-sm text-text dark:text-text-dark" style="opacity: 0.7;">
                         Latitud: {{ formMascota.get('latitude')?.value | number:'1.6-6' }}, Longitud: {{ formMascota.get('longitude')?.value | number:'1.6-6' }}
                     </div>
@@ -130,15 +130,15 @@
                         </div>
                     }
                 </div>
-                
+
                 <div class="mt-8 flex justify-end">
-                    <button type="submit" 
+                    <button type="submit"
                             [disabled]="formMascota.invalid || !imagenBase64"
                             class="px-8 py-3 bg-navbar dark:bg-navbar-dark text-white font-bold rounded-md shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                         Subir
                     </button>
                 </div>
-                
+
             </form>
         </div>
     </div>
