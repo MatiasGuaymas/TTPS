@@ -4,21 +4,23 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { HomeComponent } from './features/home/home.component';
 import { AltaMascota } from './features/mascota/pages/alta/alta.component';
+import { AdminUsersComponent } from './features/admin/admin-users/admin-users.component';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { adminGuard } from './core/guards/admin.guard';
 import { ListadoMascotas } from './features/mascota/pages/listado/listado';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: 'home', component: HomeComponent },
     // Rutas para usuarios NO autenticados
-    { 
-        path: 'register', 
+    {
+        path: 'register',
         component: RegisterComponent,
         canActivate: [guestGuard]
     },
-    { 
-        path: 'login', 
+    {
+        path: 'login',
         component: LoginComponent,
         canActivate: [guestGuard]
     },
@@ -28,15 +30,21 @@ export const routes: Routes = [
         canActivate: [guestGuard]
     },
     // Rutas para usuarios autenticados
-    { 
-        path: 'profile', 
+    {
+        path: 'profile',
         component: ProfileComponent,
         canActivate: [authGuard]
     },
-    { 
-        path: 'mascota-perdida', 
+    {
+        path: 'mascota-perdida',
         component: AltaMascota,
         canActivate: [authGuard]
     },
-    
+
+    // Rutas para administradores
+    {
+        path: 'admin/users',
+        component: AdminUsersComponent,
+        canActivate: [adminGuard]
+    },
 ];
