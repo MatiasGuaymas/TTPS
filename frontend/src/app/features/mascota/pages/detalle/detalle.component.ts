@@ -48,8 +48,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     loadingSightings = signal(false);
 
     sightingForm!: FormGroup;
-    private map: L.Map | null = null;
-    private sightingMap: L.Map | null = null;
     selectedSightingLocation = signal<{ latitude: number, longitude: number } | null>(null);
 
     ngOnInit(): void {
@@ -93,8 +91,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             next: (pet) => {
                 this.pet.set(pet);
                 this.loading.set(false);
-                // Inicializar mapa después de cargar los datos
-                setTimeout(() => this.initMap(), 100);
                 // Cargar avistamientos de esta mascota
                 this.loadSightings(id);
             },
@@ -113,8 +109,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             next: (sightings) => {
                 this.sightings.set(sightings);
                 this.loadingSightings.set(false);
-                // Inicializar mapas de avistamientos después de que se rendericen
-                setTimeout(() => this.initSightingMaps(), 200);
             },
             error: (error) => {
                 if (error.status === 204) {
@@ -123,51 +117,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
                     console.error('Error al cargar avistamientos:', error);
                 }
                 this.loadingSightings.set(false);
-            }
-        });
-    }
-
-    initMap(): void {
-        const pet = this.pet();
-        if (!pet || this.map) return;
-
-        // Crear el mapa centrado en la ubicación de pérdida
-        this.map = L.map('map').setView([pet.latitude, pet.longitude], 15);
-
-        // Agregar capa de tiles de OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(this.map);
-
-        // Agregar marcador en la ubicación de pérdida
-        const marker = L.marker([pet.latitude, pet.longitude]).addTo(this.map);
-        marker.bindPopup(`<b>${pet.name}</b><br>Último lugar visto`).openPopup();
-    }
-
-    initSightingMaps(): void {
-        const sightingsList = this.sightings();
-        if (!sightingsList || sightingsList.length === 0) return;
-
-        sightingsList.forEach(sighting => {
-            const mapId = `map-sighting-${sighting.id}`;
-            const mapElement = document.getElementById(mapId);
-
-            if (mapElement && !mapElement.classList.contains('leaflet-container')) {
-                const map = L.map(mapId, {
-                    zoomControl: true,
-                    scrollWheelZoom: true,
-                    doubleClickZoom: true
-                }).setView([sighting.latitude, sighting.longitude], 15);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(map);
-
-                // Agregar marcador en la ubicación del avistamiento
-                const marker = L.marker([sighting.latitude, sighting.longitude]).addTo(map);
-                marker.bindPopup(`Avistamiento: ${new Date(sighting.date).toLocaleDateString()}`);
             }
         });
     }
@@ -329,9 +278,5 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.map) {
-            this.map.remove();
-            this.map = null;
-        }
     }
 }

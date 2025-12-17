@@ -126,7 +126,10 @@
                             </svg>
                             Ubicación de Pérdida
                         </h3>
-                        <div id="map" class="w-full"></div>
+                        <app-map *ngIf="pet()" [initialLatitude]="pet()!.latitude" [initialLongitude]="pet()!.longitude"
+                            [readonly]="true" [popupText]="'<b>' + pet()!.name + '</b><br>Último lugar visto'"
+                            [zoom]="15">
+                        </app-map>
                     </div>
 
                     <!-- Botones de acción -->
@@ -181,8 +184,11 @@
                         <div class="flex flex-col lg:flex-row gap-4">
                             <!-- Mapa del avistamiento -->
                             <div class="lg:w-48 flex-shrink-0">
-                                <div [id]="'map-sighting-' + sighting.id"
-                                    class="w-full h-48 rounded-lg border-2 border-gray-200 dark:border-gray-600"></div>
+                                <app-map [initialLatitude]="sighting.latitude" [initialLongitude]="sighting.longitude"
+                                    [readonly]="true"
+                                    [popupText]="'Avistamiento: ' + (sighting.date | date:'dd/MM/yyyy')" [zoom]="15"
+                                    class="w-full h-48 rounded-lg border-2 border-gray-200 dark:border-gray-600 block">
+                                </app-map>
                             </div>
 
                             <!-- Información del avistamiento -->
