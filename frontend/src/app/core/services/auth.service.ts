@@ -53,4 +53,5 @@ export class AuthService {
     this.currentUserSig.set(null);
     this.router.navigate(['/home']);
   }
+  
 }
