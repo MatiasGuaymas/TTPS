@@ -20,7 +20,7 @@
                     Volver
                 </button>
                 <h1 class="text-2xl font-bold text-white">Detalle de Mascota</h1>
-                <div class="w-24"></div> <!-- Spacer para centrar el título -->
+                <div class="w-24"></div> 
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
@@ -179,10 +179,10 @@
                     <div *ngFor="let sighting of sightings()"
                         class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                         <div class="flex flex-col lg:flex-row gap-4">
-                            <!-- Foto del avistamiento -->
+                            <!-- Mapa del avistamiento -->
                             <div class="lg:w-48 flex-shrink-0">
-                                <img [src]="sighting.photoBase64" alt="Avistamiento"
-                                    class="w-full h-48 object-cover rounded-lg">
+                                <div [id]="'map-sighting-' + sighting.id"
+                                    class="w-full h-48 rounded-lg border-2 border-gray-200 dark:border-gray-600"></div>
                             </div>
 
                             <!-- Información del avistamiento -->
@@ -261,27 +261,13 @@
                             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#37B47D] focus:border-transparent dark:bg-gray-700 dark:text-white">
                     </div>
 
-                    <!-- Foto -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Foto del Avistamiento <span class="text-red-500">*</span>
-                        </label>
-                        <input type="file" accept="image/*" (change)="onPhotoSelected($event)"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#37B47D] dark:bg-gray-700 dark:text-white">
-
-                        <!-- Vista previa de la foto -->
-                        <div *ngIf="photoPreview()" class="mt-4">
-                            <img [src]="photoPreview()" alt="Preview" class="w-full h-48 object-cover rounded-lg">
-                        </div>
-                    </div>
-
                     <!-- Mapa para ubicación -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Ubicación del Avistamiento <span class="text-red-500">*</span>
                         </label>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                            Arrastra el marcador a la ubicación donde viste la mascota
+                            Haz clic en el mapa para seleccionar la ubicación donde viste la mascota
                         </p>
                         <div id="sightingMap" class="w-full h-64 rounded-lg"></div>
                     </div>

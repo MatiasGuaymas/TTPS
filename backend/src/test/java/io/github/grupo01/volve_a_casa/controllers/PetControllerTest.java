@@ -324,9 +324,8 @@ public class PetControllerTest {
                 reporterId,
                 -54f,
                 -21f,
-                "foto",
                 LocalDate.now(),
-                "foto"
+                "comentario"
         );
     }
 }

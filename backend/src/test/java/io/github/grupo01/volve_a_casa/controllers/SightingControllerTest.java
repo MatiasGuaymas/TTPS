@@ -175,9 +175,8 @@ public class SightingControllerTest {
                 reporterId,
                 -54f,
                 -21f,
-                "foto",
                 LocalDate.now(),
-                "foto"
+                "comentario"
         );
     }
 }

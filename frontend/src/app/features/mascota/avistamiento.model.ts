@@ -2,7 +2,7 @@ interface SightingCreate {
     petId: number;
     latitude: number;
     longitude: number;
-    photoBase64: string;
+    photoBase64?: string;
     date: string; // formato ISO: YYYY-MM-DD
     comment?: string;
 }
@@ -13,7 +13,6 @@ interface SightingResponse {
     reporterId: number;
     latitude: number;
     longitude: number;
-    photoBase64: string;
     date: string;
     comment?: string;
 }

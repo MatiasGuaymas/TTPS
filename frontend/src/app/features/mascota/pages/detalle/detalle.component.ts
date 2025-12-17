@@ -10,6 +10,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
 
+// TODO: Agregar foto a avistamiento -> no funciono :(
+
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,
@@ -52,8 +54,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         // Inicializar formulario de avistamiento
         this.sightingForm = this.fb.group({
             date: [new Date().toISOString().split('T')[0], [Validators.required]],
-            comment: ['', [Validators.maxLength(200)]],
-            photo: [null, [Validators.required]]
+            comment: ['', [Validators.maxLength(200)]]
         });
 
         const iconRetinaUrl = 'assets/leaflet/marker-icon-2x.png';
@@ -110,6 +111,8 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             next: (sightings) => {
                 this.sightings.set(sightings);
                 this.loadingSightings.set(false);
+                // Inicializar mapas de avistamientos después de que se rendericen
+                setTimeout(() => this.initSightingMaps(), 200);
             },
             error: (error) => {
                 if (error.status === 204) {
@@ -138,6 +141,33 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         // Agregar marcador en la ubicación de pérdida
         const marker = L.marker([pet.latitude, pet.longitude]).addTo(this.map);
         marker.bindPopup(`<b>${pet.name}</b><br>Último lugar visto`).openPopup();
+    }
+
+    initSightingMaps(): void {
+        const sightingsList = this.sightings();
+        if (!sightingsList || sightingsList.length === 0) return;
+
+        sightingsList.forEach(sighting => {
+            const mapId = `map-sighting-${sighting.id}`;
+            const mapElement = document.getElementById(mapId);
+
+            if (mapElement && !mapElement.classList.contains('leaflet-container')) {
+                const map = L.map(mapId, {
+                    zoomControl: true,
+                    scrollWheelZoom: true,
+                    doubleClickZoom: true
+                }).setView([sighting.latitude, sighting.longitude], 15);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                // Agregar marcador en la ubicación del avistamiento
+                const marker = L.marker([sighting.latitude, sighting.longitude]).addTo(map);
+                marker.bindPopup(`Avistamiento: ${new Date(sighting.date).toLocaleDateString()}`);
+            }
+        });
     }
 
     nextPhoto(): void {
@@ -314,7 +344,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             petId: pet.id,
             latitude: markerPosition.lat,
             longitude: markerPosition.lng,
-            photoBase64: this.sightingForm.value.photo,
             date: this.sightingForm.value.date,
             comment: this.sightingForm.value.comment || ''
         };
