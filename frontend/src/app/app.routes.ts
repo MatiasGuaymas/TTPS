@@ -24,10 +24,9 @@ export const routes: Routes = [
         component: LoginComponent,
         canActivate: [guestGuard]
     },
-    { 
-        path: 'listado-mascotas', 
-        component: ListadoMascotas,
-        canActivate: [guestGuard]
+    {
+        path: 'listado-mascotas',
+        component: ListadoMascotas
     },
     // Rutas para usuarios autenticados
     {
