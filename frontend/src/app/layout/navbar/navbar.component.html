@@ -2,7 +2,7 @@
   class="w-full bg-gradient-to-r from-[#37B47D] via-[#009F87] to-[#008A88] dark:from-[#205D6F] dark:via-[#2F4858] dark:to-[#2F4858] shadow-lg h-20 px-4 md:px-8 relative">
 
   <div class="h-full grid grid-cols-3 items-center gap-2">
-    <!-- Columna 1: Logo -->
+    <!-- Logo -->
     <div class="col-span-3 md:col-span-1 flex justify-start">
       <a routerLink="/home" class="flex-shrink-0 flex items-center h-full group">
         <img src="assets/logo_volve.png"
@@ -22,7 +22,7 @@
       </button>
     </div>
 
-    <!-- Columna 2: Links de navegación (centrados) -->
+    <!-- Links de navegación -->
     <div class="hidden md:flex items-center justify-center space-x-1 lg:space-x-2">
       <a routerLink="/mascota-perdida" routerLinkActive="bg-white/20"
         class="px-4 py-2 text-white font-medium text-sm lg:text-base rounded-lg hover:bg-white/10 transition-all duration-200 whitespace-nowrap">
@@ -38,7 +38,7 @@
       </a>
     </div>
 
-    <!-- Columna 3: Perfil/Login (derecha) -->
+    <!-- Perfil/Login -->
     <div class="hidden md:flex justify-end">
       @if (isLoggedIn()) {
       <div class="relative profile-menu-container flex-shrink-0">
