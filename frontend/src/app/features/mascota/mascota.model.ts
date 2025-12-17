@@ -36,7 +36,7 @@ export interface PetCreate {
 
 export interface PetResponse{
     id:number,
-    name:number,
+    name:string,
     size: Size,
     description: string;
     color: string;
@@ -47,7 +47,8 @@ export interface PetResponse{
     lostDate:Date,
     state:State,
     type:TipoMascota,
-    creatorId:number
+    creatorId:number,
+    photosBase64: string[];
 }
 
 export interface PetFilter{
