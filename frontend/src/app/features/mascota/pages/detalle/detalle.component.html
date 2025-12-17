@@ -282,7 +282,7 @@
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
                             Haz clic en el mapa para seleccionar la ubicación donde viste la mascota
                         </p>
-                        <div id="sightingMap" class="w-full h-64 rounded-lg"></div>
+                        <app-map (coordinatesChanged)="onSightingLocationChanged($event)"></app-map>
                     </div>
 
                     <!-- Comentario -->
