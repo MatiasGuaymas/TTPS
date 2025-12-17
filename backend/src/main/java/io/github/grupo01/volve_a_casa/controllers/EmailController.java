@@ -1,6 +1,7 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
 import io.github.grupo01.volve_a_casa.services.EmailService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,12 +17,12 @@ public class EmailController {
     }
 
     @PostMapping("/send")
-    public String sendEmail(
+    public ResponseEntity<?> sendEmail(
             @RequestParam String to,
             @RequestParam String subject,
             @RequestParam String body
     ) {
         this.emailService.sendEmail(to, subject, body);
-        return "Email sent to " + to;
+        return ResponseEntity.ok().build();
     }
 }
