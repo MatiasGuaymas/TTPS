@@ -322,6 +322,8 @@ public class PetControllerTest {
                 id,
                 petId,
                 reporterId,
+                "Juan",
+                "Pérez",
                 -54f,
                 -21f,
                 LocalDate.now(),

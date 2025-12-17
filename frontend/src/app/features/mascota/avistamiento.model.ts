@@ -10,8 +10,8 @@ interface SightingCreate {
 interface SightingResponse {
     id: number;
     petId: number;
-    reporterId: number;
-    latitude: number;
+    reporterId: number; reporterName: string;
+    reporterLastName: string; latitude: number;
     longitude: number;
     date: string;
     comment?: string;
