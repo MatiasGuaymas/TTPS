@@ -1,9 +1,9 @@
 package io.github.grupo01.volve_a_casa.controllers.dto.pet;
 
-import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 
 public record PetResponseDTO(
         Long id,
@@ -22,6 +22,12 @@ public record PetResponseDTO(
         List<String> photosBase64
 ) {
     public static PetResponseDTO fromPet(Pet pet) {
+        List<String> allPhotos = pet.getPhotosBase64();
+        
+        List<String> limitedPhotos = (allPhotos != null && !allPhotos.isEmpty()) 
+                ? List.of(allPhotos.get(0)) 
+                : List.of();
+
         return new PetResponseDTO(
                 pet.getId(),
                 pet.getName(),
@@ -36,7 +42,7 @@ public record PetResponseDTO(
                 pet.getState(),
                 pet.getType(),
                 pet.getCreator().getId(),
-                pet.getPhotosBase64()
+                limitedPhotos 
         );
     }
 }
