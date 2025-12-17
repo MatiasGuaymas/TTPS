@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
 import { AvistamientoService } from '../../avistamiento.service';
-import { Pet, EstadoMascota, TamanoMascota, TipoMascota } from '../../mascota.model';
+import { PetResponse, State, Size, TipoMascota } from '../../mascota.model';
 import { AlertService } from '../../../../core/services/alert.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import * as L from 'leaflet';
@@ -36,7 +36,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     private alertService = inject(AlertService);
     private authService = inject(AuthService);
 
-    pet = signal<Pet | null>(null);
+    pet = signal<PetResponse | null>(null);
     loading = signal(true);
     currentPhotoIndex = signal(0);
     showSightingModal = signal(false);
@@ -185,21 +185,21 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    getEstadoLabel(estado: EstadoMascota): string {
+    getEstadoLabel(estado: State): string {
         const labels = {
-            [EstadoMascota.PERDIDO_PROPIO]: 'Perdido (Propio)',
-            [EstadoMascota.PERDIDO_AJENO]: 'Perdido (Ajeno)',
-            [EstadoMascota.RECUPERADO]: 'Recuperado',
-            [EstadoMascota.ADOPTADO]: 'Adoptado'
+            [State.PERDIDO_PROPIO]: 'Perdido (Propio)',
+            [State.PERDIDO_AJENO]: 'Perdido (Ajeno)',
+            [State.RECUPERADO]: 'Recuperado',
+            [State.ADOPTADO]: 'Adoptado'
         };
         return labels[estado] || estado;
     }
 
-    getTamanoLabel(tamano: TamanoMascota): string {
+    getTamanoLabel(tamano: Size): string {
         const labels = {
-            [TamanoMascota.PEQUENO]: 'Pequeño',
-            [TamanoMascota.MEDIANO]: 'Mediano',
-            [TamanoMascota.GRANDE]: 'Grande'
+            [Size.PEQUENO]: 'Pequeño',
+            [Size.MEDIANO]: 'Mediano',
+            [Size.GRANDE]: 'Grande'
         };
         return labels[tamano] || tamano;
     }
@@ -217,12 +217,12 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         return labels[tipo] || tipo;
     }
 
-    getEstadoBadgeClass(estado: EstadoMascota): string {
+    getEstadoBadgeClass(estado: State): string {
         const classes = {
-            [EstadoMascota.PERDIDO_PROPIO]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-            [EstadoMascota.PERDIDO_AJENO]: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-            [EstadoMascota.RECUPERADO]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-            [EstadoMascota.ADOPTADO]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+            [State.PERDIDO_PROPIO]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+            [State.PERDIDO_AJENO]: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+            [State.RECUPERADO]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+            [State.ADOPTADO]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
         };
         return classes[estado] || 'bg-gray-100 text-gray-800';
     }

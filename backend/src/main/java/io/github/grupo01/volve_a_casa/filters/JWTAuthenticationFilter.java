@@ -1,5 +1,14 @@
 package io.github.grupo01.volve_a_casa.filters;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.github.grupo01.volve_a_casa.services.TokenService;
@@ -10,14 +19,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -56,6 +57,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+       
         try {
             Long userId = tokenService.getUserIdFromToken(token);
             User user = userService.findById(userId);
