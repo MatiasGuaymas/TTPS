@@ -1,13 +1,13 @@
 <main >
     <div class="w-full bg-background dark:bg-background-dark flex flex-col items-center justify-start px-6 py-6 ">
         <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8 text-center" >Filtrar mascotas por:</h1>
-        
-        <form [formGroup]="filterForm" class="textos w-full max-w-6xl p-6 rounded-lg shadow-2xl bg-white dark:bg-primary-dark border dark:border-border-dark" >            
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> 
+
+        <form [formGroup]="filterForm" class="textos w-full max-w-6xl p-6 rounded-lg shadow-2xl bg-white dark:bg-primary-dark border dark:border-border-dark" >
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="name" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Nombre</label>
-                    <input id="name" type="text" formControlName="name" 
+                    <input id="name" type="text" formControlName="name"
                            class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
                 </div>
                 <div>
@@ -69,7 +69,7 @@
                            class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
                 </div>
             </div>
-            
+
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="initialLostDate" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Fecha inicial de pérdida</label>
@@ -101,7 +101,7 @@
                            class="form-checkbox h-5 w-5 text-primary rounded border-gray-300 dark:border-border-dark dark:bg-background-dark">
                     <span class="text-text dark:text-text-dark font-semibold">Buscar mascotas cerca de mi ubicación</span>
                 </label>
-                
+
                 @if (userCurrentLocation.value) {
                     <div class="mt-3">
                         <label for="maxDistanceInKm" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Radio de búsqueda (Km)</label>
@@ -115,15 +115,15 @@
                         Cargando ubicación...
                     </div>
                 }
-                
+
                 <input type="hidden" formControlName="userLatitude">
                 <input type="hidden" formControlName="userLongitude">
 
             </div>
             </form>
-        
+
         <div class="w-full mt-6 flex justify-center">
-             <button 
+             <button
                 (click)="buscarMascotas()"
                 [disabled]="cargandoUbicacion.value"
                 class="w-full max-w-6xl py-3 px-6 bg-navbar dark:bg-navbar-dark text-white font-bold rounded-lg shadow-lg hover:bg-primary transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -131,18 +131,18 @@
                 {{ cargandoUbicacion.value ? 'Cargando Ubicación...' : 'Buscar Mascotas' }}
             </button>
         </div>
-        
+
         <div class="listado-mascotas mt-10 w-full max-w-7xl">
             <h2 class="text-3xl font-bold mb-6 text-text dark:text-text-dark border-b pb-2 dark:border-border-dark">
-                Resultados ({{ pets?.length || 0 }})
+                Resultados ({{ pets.length || 0 }})
             </h2>
-            
+
             @if (!pets || pets.length === 0) {
                 <div class="p-4 rounded-lg bg-backgrounddark:bg-primary-dark/50 text-text dark:text-text-dark border-l-4 border-primary">
                     No se encontraron mascotas que coincidan con los filtros o la búsqueda.
                 </div>
             } @else {
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> 
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @for (pet of pets; track pet.id) {
                         <div class="bg-background dark:bg-background-dark p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border dark:border-border-dark">
                             <h3 class="text-xl font-semibold text-navbar dark:text-navbar-dark truncate">{{ pet.name }}</h3>

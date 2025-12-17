@@ -9,8 +9,8 @@ export enum TipoMascota {
 }
 
 export enum State {
-    PERDIDO_PROPIO='PERDIDO PROPIO',
-    PERDIDO_AJENO='PERDIDO AJENO',
+    PERDIDO_PROPIO='PERDIDO_PROPIO',
+    PERDIDO_AJENO='PERDIDO_AJENO',
     RECUPERADO='RECUPERADO',
     ADOPTADO='ADOPTADO',
 }
@@ -57,7 +57,7 @@ export interface PetFilter{
     size?:Size;
     color?:string;
     race?:string;
-    weightMin?:number; 
+    weightMin?:number;
     weightMax?: number;
     initialLostDate?:string;
     finalLostDate:Date;
