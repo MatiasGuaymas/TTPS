@@ -12,9 +12,9 @@ public record UserResponseDTO(
         String neighborhood,
         Float latitude,
         Float longitude,
-        Integer points
-        // Boolean enabled,
-        // User.Role role
+        Integer points,
+        Boolean enabled,
+        User.Role role
 ) {
     public static UserResponseDTO fromUser(User user) {
         return new UserResponseDTO(
@@ -27,9 +27,9 @@ public record UserResponseDTO(
                 user.getNeighborhood(),
                 user.getCoordinates().getLatitude(),
                 user.getCoordinates().getLongitude(),
-                user.getPoints()
-                // user.isEnabled(),
-                // user.getRole()
+                user.getPoints(),
+                user.isEnabled(),
+                user.getRole()
         );
     }
 }

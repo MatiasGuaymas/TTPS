@@ -1,10 +1,9 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from "@angular/core";
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { PetCreate, Size, State, TipoMascota } from "../../mascota.model";
 import { MascotaService } from "../../mascota.service";
 import { AlertService } from '../../../../core/services/alert.service';
-import * as L from 'leaflet';
 import { Map } from "../../../../map/map";
 
 @Component({
@@ -32,7 +31,8 @@ export class AltaMascota implements OnInit {
     constructor(
         private fb: FormBuilder,
         private mascotaService: MascotaService,
-        private alert: AlertService
+        private alert: AlertService,
+        private cdRef: ChangeDetectorRef
     ) {}
 
 
@@ -42,15 +42,14 @@ export class AltaMascota implements OnInit {
             name: ['', Validators.required],
             size: [Size.MEDIANO, Validators.required],
             type: [TipoMascota.PERRO, Validators.required],
-            color: ['#000000', Validators.required],
+            color: ['', Validators.required],
             race: ['', Validators.required],
             weight: [null, [Validators.required, Validators.min(0.1)]],
             description: ['', [Validators.required, Validators.maxLength(500)]],
 
 
-            latitude: [ -34.6037, [Validators.required, Validators.min(-90), Validators.max(90)]],
-            longitude: [ -58.3816, [Validators.required, Validators.min(-180), Validators.max(180)]],
-
+            latitude: [ null, [Validators.required, Validators.min(-90), Validators.max(90)]],
+            longitude: [ null, [Validators.required, Validators.min(-180), Validators.max(180)]],
             ownerName: [''],
             fechaDesaparicion: [''],
             estado: [State.PERDIDO_PROPIO],
@@ -77,7 +76,10 @@ export class AltaMascota implements OnInit {
             const file = input.files[0];
 
             const reader = new FileReader();
-            reader.onload = e => this.imagenPreVisualizacion = reader.result;
+            reader.onload = e => {
+                this.imagenPreVisualizacion = reader.result;
+                this.cdRef.detectChanges(); 
+            };
             reader.readAsDataURL(file);
 
             this.convertToBase64(file);

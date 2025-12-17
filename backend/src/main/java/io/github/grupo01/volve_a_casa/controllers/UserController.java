@@ -1,6 +1,7 @@
 package io.github.grupo01.volve_a_casa.controllers;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.AdminUserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
@@ -17,6 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +50,7 @@ public class UserController implements IUserController {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@AuthenticationPrincipal User requester, @PathVariable("id") Long id) {
+    public ResponseEntity<?> getUserById(@AuthenticationPrincipal User requester, @PathVariable Long id) {
         User user = userService.findById(id);
         return ResponseEntity.ok(UserResponseDTO.fromUser(user));
     }
@@ -58,6 +60,48 @@ public class UserController implements IUserController {
     public ResponseEntity<?> updateUser(@AuthenticationPrincipal User requester, @Valid @RequestBody UserUpdateDTO updatedData) {
         UserResponseDTO user = userService.updateUser(requester, updatedData);
         return ResponseEntity.ok(user);
+    }
+
+    // Admin endpoints
+    @PutMapping("/admin/{id}/status")
+    public ResponseEntity<?> updateUserStatus(
+            @AuthenticationPrincipal User requester,
+            @PathVariable("id") Long userId,
+            @RequestParam("enabled") Boolean enabled
+    ) {
+        if (requester.getRole() != User.Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can update user status");
+        }
+
+        UserResponseDTO updatedUser = userService.updateUserStatus(userId, enabled);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PutMapping("/admin/{id}")
+    public ResponseEntity<?> adminUpdateUser(
+            @AuthenticationPrincipal User requester,
+            @PathVariable("id") Long userId,
+            @Valid @RequestBody AdminUserUpdateDTO updatedData
+    ) {
+        if (requester.getRole() != User.Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can update users");
+        }
+
+        UserResponseDTO updatedUser = userService.adminUpdateUser(userId, updatedData);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<?> createAdmin(
+            @AuthenticationPrincipal User requester,
+            @Valid @RequestBody UserCreateDTO userData
+    ) {
+        if (requester.getRole() != User.Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only admins can create admin users");
+        }
+
+        UserResponseDTO createdAdmin = userService.createAdminUser(userData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAdmin);
     }
 
 }
