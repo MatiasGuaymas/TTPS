@@ -36,7 +36,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private User initializeAdminUser() {
-        String adminEmail = "matiasguaymas2005@gmail.com";
+        String adminEmail = "admin@volveacasa.com";
         
         if (userRepository.existsByEmail(adminEmail)) {
             logger.info("Usuario administrador ya existe: {}", adminEmail);
