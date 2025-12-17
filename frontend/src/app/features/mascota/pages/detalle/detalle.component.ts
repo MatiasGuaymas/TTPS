@@ -239,9 +239,25 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             attribution: '© OpenStreetMap contributors'
         }).addTo(this.sightingMap);
 
-        // Agregar marcador arrastrable
-        const marker = L.marker([pet.latitude, pet.longitude], { draggable: true }).addTo(this.sightingMap);
-        marker.bindPopup('Arrastra el marcador a la ubicación del avistamiento').openPopup();
+        // Agregar marcador inicial
+        const marker = L.marker([pet.latitude, pet.longitude]).addTo(this.sightingMap);
+        marker.bindPopup('Haz clic en el mapa para seleccionar la ubicación del avistamiento').openPopup();
+
+        // Variable para almacenar la ubicación seleccionada
+        let selectedLocation = { lat: pet.latitude, lng: pet.longitude };
+
+        // Manejar clics en el mapa
+        this.sightingMap.on('click', (e: L.LeafletMouseEvent) => {
+            selectedLocation = e.latlng;
+            marker.setLatLng(e.latlng);
+            marker.bindPopup(`Ubicación seleccionada: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`).openPopup();
+
+            // Actualizar el formulario con las nuevas coordenadas
+            this.sightingForm.patchValue({
+                latitude: e.latlng.lat,
+                longitude: e.latlng.lng
+            });
+        });
     }
 
     onPhotoSelected(event: Event): void {
