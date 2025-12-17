@@ -22,6 +22,8 @@ public class Sighting {
     @Embedded
     private Coordinates coordinates;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String photoBase64;
 
     @Setter

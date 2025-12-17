@@ -8,9 +8,10 @@ public record SightingResponseDTO(
         Long id,
         Long petId,
         Long reporterId,
+        String reporterName,
+        String reporterLastName,
         Float latitude,
         Float longitude,
-        String photoBase64,
         LocalDate date,
         String comment
 ) {
@@ -19,9 +20,10 @@ public record SightingResponseDTO(
                 sighting.getId(),
                 sighting.getPet().getId(),
                 sighting.getReporter().getId(),
+                sighting.getReporter().getName(),
+                sighting.getReporter().getLastName(),
                 sighting.getCoordinates().getLatitude(),
                 sighting.getCoordinates().getLongitude(),
-                sighting.getPhotoBase64(),
                 sighting.getDate(),
                 sighting.getComment()
         );

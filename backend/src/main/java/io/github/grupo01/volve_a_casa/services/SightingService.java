@@ -40,6 +40,12 @@ public class SightingService {
                 .toList();
     }
 
+    public List<SightingResponseDTO> findByPetId(Long petId) {
+        return sightingRepository.findByPetIdOrderByDateDesc(petId).stream()
+                .map(SightingResponseDTO::fromSighting)
+                .toList();
+    }
+
     public SightingResponseDTO createSighting(User creator, SightingCreateDTO dto) {
         Pet pet = petService.findById(dto.petId());
 

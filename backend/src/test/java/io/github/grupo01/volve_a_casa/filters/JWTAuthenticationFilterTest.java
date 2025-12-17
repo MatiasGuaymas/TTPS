@@ -77,7 +77,7 @@ public class JWTAuthenticationFilterTest {
 
     @Test
     void shouldFilter_whenPathIsProtectedEndpoint() throws ServletException {
-        when(request.getRequestURI()).thenReturn("/api/pets");
+        when(request.getRequestURI()).thenReturn("/api/users");
         when(request.getMethod()).thenReturn("GET");
 
         boolean result = jwtAuthenticationFilter.shouldNotFilter(request);

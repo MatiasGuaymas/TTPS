@@ -53,4 +53,16 @@ public class SightingController implements ISightingController {
         Sighting sighting = sightingService.findById(id);
         return ResponseEntity.ok(SightingResponseDTO.fromSighting(sighting));
     }
+
+    @Override
+    @GetMapping("/pet/{petId}")
+    public ResponseEntity<?> getSightingsByPetId(@PathVariable("petId") Long petId) {
+        List<SightingResponseDTO> sightings = sightingService.findByPetId(petId);
+        
+        if (sightings.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        
+        return new ResponseEntity<>(sightings, HttpStatus.OK);
+    }
 }
