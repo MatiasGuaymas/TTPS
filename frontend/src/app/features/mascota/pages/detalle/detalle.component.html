@@ -131,7 +131,7 @@
 
                     <!-- Botones de acción -->
                     <div class="flex gap-3 pt-4">
-                        <button
+                        <button (click)="openSightingModal()"
                             class="flex-1 bg-[#37B47D] hover:bg-[#2a8f63] text-white font-medium py-3 px-6 rounded-lg transition">
                             <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -144,6 +144,183 @@
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Sección de Avistamientos -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mt-8">
+                <div class="bg-[#37B47D] px-6 py-4">
+                    <h2 class="text-2xl font-bold text-white">Avistamientos Reportados</h2>
+                    <p class="text-white/80 text-sm mt-1">Historial de avistamientos de esta mascota</p>
+                </div>
+
+                <!-- Loading de avistamientos -->
+                <div *ngIf="loadingSightings()" class="flex justify-center items-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#37B47D]"></div>
+                </div>
+
+                <!-- Sin avistamientos -->
+                <div *ngIf="!loadingSightings() && (!sightings() || sightings().length === 0)" class="p-8 text-center">
+                    <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                        </path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">No hay avistamientos</h3>
+                    <p class="text-gray-600 dark:text-gray-400">Aún no se han reportado avistamientos de esta mascota.
+                    </p>
+                </div>
+
+                <!-- Lista de avistamientos -->
+                <div *ngIf="!loadingSightings() && sightings() && sightings().length > 0"
+                    class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <div *ngFor="let sighting of sightings()"
+                        class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                        <div class="flex flex-col lg:flex-row gap-4">
+                            <!-- Foto del avistamiento -->
+                            <div class="lg:w-48 flex-shrink-0">
+                                <img [src]="sighting.photoBase64" alt="Avistamiento"
+                                    class="w-full h-48 object-cover rounded-lg">
+                            </div>
+
+                            <!-- Información del avistamiento -->
+                            <div class="flex-1 space-y-3">
+                                <!-- Fecha -->
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-[#37B47D]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <span class="text-gray-900 dark:text-white font-medium">
+                                        {{ sighting.date | date:'dd/MM/yyyy' }}
+                                    </span>
+                                </div>
+
+                                <!-- Ubicación -->
+                                <div class="flex items-start gap-2">
+                                    <svg class="w-5 h-5 text-[#37B47D] mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    <div class="text-sm text-gray-700 dark:text-gray-300">
+                                        <span class="font-medium">Ubicación:</span><br>
+                                        Lat: {{ sighting.latitude }}, Lng: {{ sighting.longitude }}
+                                    </div>
+                                </div>
+
+                                <!-- Comentario -->
+                                <div *ngIf="sighting.comment" class="flex items-start gap-2">
+                                    <svg class="w-5 h-5 text-[#37B47D] mt-0.5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z">
+                                        </path>
+                                    </svg>
+                                    <p class="text-gray-700 dark:text-gray-300">{{ sighting.comment }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Avistamiento -->
+        <div *ngIf="showSightingModal()"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]"
+            (click)="closeSightingModal()">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                (click)="$event.stopPropagation();">
+
+                <!-- Header del Modal -->
+                <div class="bg-[#37B47D] px-6 py-4 flex items-center justify-between rounded-t-xl">
+                    <h2 class="text-xl font-bold text-white">Reportar Avistamiento</h2>
+                    <button (click)="closeSightingModal()"
+                        class="text-white hover:bg-[#2a8f63] p-2 rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Formulario -->
+                <form [formGroup]="sightingForm" (ngSubmit)="submitSighting()" class="p-6 space-y-6">
+
+                    <!-- Fecha -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Fecha del Avistamiento <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" formControlName="date" [max]="maxDate"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#37B47D] focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    </div>
+
+                    <!-- Foto -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Foto del Avistamiento <span class="text-red-500">*</span>
+                        </label>
+                        <input type="file" accept="image/*" (change)="onPhotoSelected($event)"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#37B47D] dark:bg-gray-700 dark:text-white">
+
+                        <!-- Vista previa de la foto -->
+                        <div *ngIf="photoPreview()" class="mt-4">
+                            <img [src]="photoPreview()" alt="Preview" class="w-full h-48 object-cover rounded-lg">
+                        </div>
+                    </div>
+
+                    <!-- Mapa para ubicación -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Ubicación del Avistamiento <span class="text-red-500">*</span>
+                        </label>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            Arrastra el marcador a la ubicación donde viste la mascota
+                        </p>
+                        <div id="sightingMap" class="w-full h-64 rounded-lg"></div>
+                    </div>
+
+                    <!-- Comentario -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Comentario Adicional
+                        </label>
+                        <textarea formControlName="comment" rows="3" maxlength="200"
+                            placeholder="Describe cualquier detalle adicional sobre el avistamiento..."
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#37B47D] focus:border-transparent dark:bg-gray-700 dark:text-white"></textarea>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {{ sightingForm.get('comment')?.value?.length || 0 }}/200 caracteres
+                        </p>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" (click)="closeSightingModal()"
+                            class="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" [disabled]="sightingForm.invalid || submittingSighting()"
+                            class="flex-1 bg-[#37B47D] hover:bg-[#2a8f63] text-white font-medium py-3 px-6 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span *ngIf="!submittingSighting()">Reportar</span>
+                            <span *ngIf="submittingSighting()" class="flex items-center justify-center gap-2">
+                                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                Enviando...
+                            </span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

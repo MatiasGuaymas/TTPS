@@ -1,35 +1,61 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
+import { AvistamientoService } from '../../avistamiento.service';
 import { Pet, EstadoMascota, TamanoMascota, TipoMascota } from '../../mascota.model';
 import { AlertService } from '../../../../core/services/alert.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import * as L from 'leaflet';
+import { initFlowbite } from 'flowbite';
 
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule],
     templateUrl: './detalle.component.html',
     styles: [`
-        #map {
+        #map, #sightingMap {
             height: 400px;
             border-radius: 0.5rem;
+        }
+        #sightingMap {
+            height: 16rem;
         }
     `]
 })
 export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
+    private fb = inject(FormBuilder);
     private mascotaService = inject(MascotaService);
+    private avistamientoService = inject(AvistamientoService);
     private alertService = inject(AlertService);
+    private authService = inject(AuthService);
 
     pet = signal<Pet | null>(null);
     loading = signal(true);
     currentPhotoIndex = signal(0);
+    showSightingModal = signal(false);
+    submittingSighting = signal(false);
+    photoPreview = signal<string | null>(null);
+    maxDate = new Date().toISOString().split('T')[0];
+    sightings = signal<SightingResponse[]>([]);
+    loadingSightings = signal(false);
+
+    sightingForm!: FormGroup;
     private map: L.Map | null = null;
+    private sightingMap: L.Map | null = null;
 
     ngOnInit(): void {
+        // Inicializar formulario de avistamiento
+        this.sightingForm = this.fb.group({
+            date: [new Date().toISOString().split('T')[0], [Validators.required]],
+            comment: ['', [Validators.maxLength(200)]],
+            photo: [null, [Validators.required]]
+        });
+
         const iconRetinaUrl = 'assets/leaflet/marker-icon-2x.png';
         const iconUrl = 'assets/leaflet/marker-icon.png';
         const shadowUrl = 'assets/leaflet/marker-shadow.png';
@@ -55,6 +81,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
+        initFlowbite();
     }
 
     loadPetDetails(id: number): void {
@@ -65,12 +92,32 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.loading.set(false);
                 // Inicializar mapa después de cargar los datos
                 setTimeout(() => this.initMap(), 100);
+                // Cargar avistamientos de esta mascota
+                this.loadSightings(id);
             },
             error: (error) => {
                 console.error('Error al cargar mascota:', error);
                 this.alertService.error('Error', 'No se pudo cargar la información de la mascota');
                 this.loading.set(false);
                 this.router.navigate(['/home']);
+            }
+        });
+    }
+
+    loadSightings(petId: number): void {
+        this.loadingSightings.set(true);
+        this.avistamientoService.getSightingsByPetId(petId).subscribe({
+            next: (sightings) => {
+                this.sightings.set(sightings);
+                this.loadingSightings.set(false);
+            },
+            error: (error) => {
+                if (error.status === 204) {
+                    this.sightings.set([]);
+                } else {
+                    console.error('Error al cargar avistamientos:', error);
+                }
+                this.loadingSightings.set(false);
             }
         });
     }
@@ -150,10 +197,136 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         return classes[estado] || 'bg-gray-100 text-gray-800';
     }
 
+    openSightingModal(): void {
+        // Verificar si el usuario está autenticado
+        if (!this.authService.isLoggedIn()) {
+            this.alertService.error('Autenticación requerida', 'Debes iniciar sesión para reportar un avistamiento');
+            this.router.navigate(['/login']);
+            return;
+        }
+
+        this.showSightingModal.set(true);
+        this.sightingForm.reset({
+            date: new Date().toISOString().split('T')[0],
+            comment: '',
+            photo: null
+        });
+        this.photoPreview.set(null);
+
+        // Inicializar mapa del modal después de que se muestre
+        setTimeout(() => this.initSightingMap(), 200);
+    }
+
+    closeSightingModal(): void {
+        this.showSightingModal.set(false);
+        if (this.sightingMap) {
+            this.sightingMap.remove();
+            this.sightingMap = null;
+        }
+        // Re-inicializar flowbite después de cerrar el modal
+        setTimeout(() => initFlowbite(), 100);
+    }
+
+    initSightingMap(): void {
+        const pet = this.pet();
+        if (!pet || this.sightingMap) return;
+
+        // Crear el mapa para seleccionar ubicación del avistamiento
+        this.sightingMap = L.map('sightingMap').setView([pet.latitude, pet.longitude], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(this.sightingMap);
+
+        // Agregar marcador arrastrable
+        const marker = L.marker([pet.latitude, pet.longitude], { draggable: true }).addTo(this.sightingMap);
+        marker.bindPopup('Arrastra el marcador a la ubicación del avistamiento').openPopup();
+    }
+
+    onPhotoSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Validar tipo de archivo
+            if (!file.type.startsWith('image/')) {
+                this.alertService.error('Error', 'Solo se permiten archivos de imagen');
+                return;
+            }
+
+            // Validar tamaño (máx 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                this.alertService.error('Error', 'La imagen no puede superar los 5MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target?.result as string;
+                this.photoPreview.set(base64);
+                this.sightingForm.patchValue({ photo: base64 });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    submitSighting(): void {
+        if (this.sightingForm.invalid) {
+            this.alertService.error('Error', 'Por favor completa todos los campos requeridos');
+            return;
+        }
+
+        const pet = this.pet();
+        if (!pet || !this.sightingMap) return;
+
+        // Obtener la posición del marcador
+        const layers = (this.sightingMap as any)._layers;
+        let markerPosition = { lat: pet.latitude, lng: pet.longitude };
+
+        for (const key in layers) {
+            const layer = layers[key];
+            if (layer instanceof L.Marker) {
+                markerPosition = layer.getLatLng();
+                break;
+            }
+        }
+
+        this.submittingSighting.set(true);
+
+        const sightingData = {
+            petId: pet.id,
+            latitude: markerPosition.lat,
+            longitude: markerPosition.lng,
+            photoBase64: this.sightingForm.value.photo,
+            date: this.sightingForm.value.date,
+            comment: this.sightingForm.value.comment || ''
+        };
+
+        this.avistamientoService.createSighting(sightingData).subscribe({
+            next: () => {
+                this.submittingSighting.set(false);
+                this.alertService.success('Éxito', 'Avistamiento reportado correctamente');
+                this.closeSightingModal();
+                // Recargar avistamientos
+                this.loadSightings(pet.id);
+            },
+            error: (error) => {
+                this.submittingSighting.set(false);
+                console.error('Error al reportar avistamiento:', error);
+                this.alertService.error('Error', 'No se pudo reportar el avistamiento');
+            }
+        });
+    }
+
     ngOnDestroy(): void {
         if (this.map) {
             this.map.remove();
             this.map = null;
+        }
+        if (this.sightingMap) {
+            this.sightingMap.remove();
+            this.sightingMap = null;
         }
     }
 }

@@ -57,4 +57,13 @@ public interface ISightingController {
     ResponseEntity<?> getSightingById(
             @Parameter(description = "ID del avistamiento", required = true, example = "1") Long id
     );
+
+    @Operation(summary = "Obtener avistamientos por mascota", description = "Obtiene todos los avistamientos de una mascota específica ordenados por fecha descendente.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de avistamientos obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SightingResponseDTO.class))),
+            @ApiResponse(responseCode = "204", description = "No hay avistamientos para esta mascota")
+    })
+    ResponseEntity<?> getSightingsByPetId(
+            @Parameter(description = "ID de la mascota", required = true, example = "1") Long petId
+    );
 }
