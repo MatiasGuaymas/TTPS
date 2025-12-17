@@ -88,7 +88,6 @@ public class PetController implements IPetController {
             @PageableDefault(sort = "lostDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         List<PetResponseDTO> pets = petService.findAll(filter, pageable);
-
         if (pets.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

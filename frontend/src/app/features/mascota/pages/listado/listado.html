@@ -1,71 +1,164 @@
-<main>
-<div class="min-h-screen w-full bg-background dark:bg-background-dark flex flex-col items-center justify-center px-6 py-12 ">
+<main >
+    <div class="w-full bg-background dark:bg-background-dark flex flex-col items-center justify-start px-6 py-6 ">
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8 text-center" >Filtrar mascotas por:</h1>
+        
+        <form [formGroup]="filterForm" class="textos w-full max-w-6xl p-6 rounded-lg shadow-2xl bg-white dark:bg-primary-dark border dark:border-border-dark" >            
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> 
+                <div>
+                    <label for="name" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Nombre</label>
+                    <input id="name" type="text" formControlName="name" 
+                           class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
+                </div>
+                <div>
+                    <label for="State" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Estado</label>
+                    <select id="State" formControlName="state"
+                            class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white">
+                        <option [ngValue]="null">Todos</option>
+                        <option value="perdido_propio">Perdido propio</option>
+                        <option value="perdido_ajeno">Perdido ajeno</option>
+                        <option value="recuperado">Recuperado</option>
+                        <option value="adoptado">Adoptado</option>
+                    </select>
+                </div>
 
-    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-4 text-center" >Filtrar mascotas por:</h1>
-    <form [formGroup]="filterForm" class="textos">
-        <label for="name">Nombre</label>
-        <input id="name" type="text" formControlName="name" />
+                <div>
+                    <label for="Type" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Tipo</label>
+                    <select id="Type" formControlName="type"
+                            class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white">
+                        <option [ngValue]="null">Todos</option>
+                        <option value="Perro">Perro</option>
+                        <option value="Gato">Gato</option>
+                        <option value="Cobaya">Cobaya</option>
+                        <option value="Loro">Loro</option>
+                        <option value="Conejo">Conejo</option>
+                        <option value="Caballo">Caballo</option>
+                        <option value="Tortuga">Tortuga</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="Size" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Tamaño</label>
+                    <select id="Size" formControlName="size"
+                            class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white">
+                        <option [ngValue]="null">Todos</option>
+                        <option value="Pequeño">Pequeño</option>
+                        <option value="Mediano">Mediano</option>
+                        <option value="Grande">Grande</option>
+                    </select>
+                </div>
 
-        <label for="state">Estado</label>
-        <select id="state" formControlName="state">
-            <option value="perdido_propio">Perdido propio</option>
-            <option value="perdido_ajeno">Perdido ajeno</option>
-            <option value="recuperado">Recuperado</option>
-            <option value="adoptado">Adoptado</option>
-        </select>
+                <div>
+                    <label for="color" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Color</label>
+                    <input id="color" type="text" formControlName="color"
+                           class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
+                </div>
+                <div>
+                    <label for="race" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Raza</label>
+                    <input id="race" type="text" formControlName="race"
+                           class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
+                </div>
 
-        <label for="type">Tipo</label>
-        <select id="type" formControlName="type">
-            <option value="">Todos</option>
-            <option value="Perro">Perro</option>
-            <option value="Gato">Gato</option>
-            <option value="Cobaya">Cobaya</option>
-            <option value="Loro">Loro</option>
-            <option value="Conejo">Conejo</option>
-            <option value="Caballo">Caballo</option>
-            <option value="Tortuga">Tortuga</option>
-        </select>
+                <div>
+                    <label for="weightmin" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Peso mínimo (kg)</label>
+                    <input id="weightmin" type="number" formControlName="weightMin" min="0"
+                           class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
+                </div>
+                <div>
+                    <label for="weightmax" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Peso máximo (kg)</label>
+                    <input id="weightmax" type="number" formControlName="weightMax" min="0"
+                           class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
+                </div>
+            </div>
+            
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="initialLostDate" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Fecha inicial de pérdida</label>
+                    <input id="initialLostDate" type="date" formControlName="initialLostDate"
+                           class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
+                </div>
+                <div>
+                    <label for="finalLostDate" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Fecha final de pérdida</label>
+                    <input id="finalLostDate" type="date" formControlName="finalLostDate"
+                           class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white" />
+                </div>
+            </div>
 
-        <label for="size">Tamaño</label>
-        <select id="size" formControlName="size">
-            <option value="">Todos</option>
-            <option value="Pequeño">Pequeño</option>
-            <option value="Mediano">Mediano</option>
-            <option value="Grande">Grande</option>
-        </select>
+            <div class="mt-4">
+                <label for="sort" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Ordenar por</label>
+                <select id="sort" formControlName="sort"
+                        class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-background-dark dark:text-text-dark">
+                    @for (option of sortOptions; track option.value) {
+                        <option [value]="option.value">
+                            {{ option.label }}
+                        </option>
+                    }
+                </select>
+            </div>
 
-        <label for="color">Color</label>
-        <input id="color" type="text" formControlName="color" />
+            <div class="mt-6 p-4 border rounded-md dark:border-border-dark bg-background dark:bg-background-dark">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" [formControl]="userCurrentLocation"
+                           class="form-checkbox h-5 w-5 text-primary rounded border-gray-300 dark:border-border-dark dark:bg-background-dark">
+                    <span class="text-text dark:text-text-dark font-semibold">Buscar mascotas cerca de mi ubicación</span>
+                </label>
+                
+                @if (userCurrentLocation.value) {
+                    <div class="mt-3">
+                        <label for="maxDistanceInKm" class="block text-sm font-medium text-text dark:text-text-dark mb-1">Radio de búsqueda (Km)</label>
+                        <input id="maxDistanceInKm" type="number" formControlName="maxDistanceInKm" min="1"
+                               class="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:text-white" />
+                    </div>
+                }
 
-        <label for="race">Raza</label>
-        <input id="race" type="text" formControlName="race" />
+                @if (cargandoUbicacion.value) {
+                    <div class="text-sm text-text dark:text-text mt-2">
+                        Cargando ubicación...
+                    </div>
+                }
+                
+                <input type="hidden" formControlName="userLatitude">
+                <input type="hidden" formControlName="userLongitude">
 
-        <label for="weightmin">Peso mínimo (kg)</label>
-        <input id="weightmin" type="number" formControlName="weightMin" />
-
-        <label for="weightmax">Peso máximo (kg)</label>
-        <input id="weightmax" type="number" formControlName="weightMax" />
-
-        <label for="initialLostDate">Fecha inicial de pérdida</label>
-        <input id="initialLostDate" type="date" formControlName="initialLostDate" />
-
-        <label for="finalLostDate">Fecha final de pérdida</label>
-        <input id="finalLostDate" type="date" formControlName="finalLostDate" />
-
-        <label for="sort">Ordenar por</label>
-        <select id="sort" formControlName="sort">
-            @for (option of sortOptions; track option.value) {
-                <option [value]="option.value">
-                    {{ option.label }}
-                </option>
+            </div>
+            </form>
+        
+        <div class="w-full mt-6 flex justify-center">
+             <button 
+                (click)="buscarMascotas()"
+                [disabled]="cargandoUbicacion.value"
+                class="w-full max-w-6xl py-3 px-6 bg-navbar dark:bg-navbar-dark text-white font-bold rounded-lg shadow-lg hover:bg-primary transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {{ cargandoUbicacion.value ? 'Cargando Ubicación...' : 'Buscar Mascotas' }}
+            </button>
+        </div>
+        
+        <div class="listado-mascotas mt-10 w-full max-w-7xl">
+            <h2 class="text-3xl font-bold mb-6 text-text dark:text-text-dark border-b pb-2 dark:border-border-dark">
+                Resultados ({{ pets?.length || 0 }})
+            </h2>
+            
+            @if (!pets || pets.length === 0) {
+                <div class="p-4 rounded-lg bg-backgrounddark:bg-primary-dark/50 text-text dark:text-text-dark border-l-4 border-primary">
+                    No se encontraron mascotas que coincidan con los filtros o la búsqueda.
+                </div>
+            } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> 
+                    @for (pet of pets; track pet.id) {
+                        <div class="bg-background dark:bg-background-dark p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 border dark:border-border-dark">
+                            <h3 class="text-xl font-semibold text-navbar dark:text-navbar-dark truncate">{{ pet.name }}</h3>
+                            <p class="text-xs text-text dark:text-text-dark mt-2">
+                                Tipo: <strong>{{ pet.type}}</strong>
+                            </p>
+                            <p class="text-xs text-text dark:text-text-dark mt-2">
+                                Estado: <strong>{{ pet.state}}</strong>
+                            </p>
+                            <p class="text-xs text-text dark:text-text-dark mt-2">
+                                Perdido: {{ pet.lostDate}}
+                            </p>
+                            </div>
+                    }
+                </div>
             }
-
-        </select>
-
-        <label>
-        <input type="checkbox" [formControl]="userCurrentLocation">
-             Buscar mascotas cerca de mi ubicación
-        </label>
-        </form>
-</div>
+        </div>
+        </div>
 </main>

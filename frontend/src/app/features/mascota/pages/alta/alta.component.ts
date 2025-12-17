@@ -1,36 +1,33 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
-import { PetCreate, TipoMascota } from "../../mascota.model";
+import { PetCreate, Size, State, TipoMascota } from "../../mascota.model";
 import { MascotaService } from "../../mascota.service";
 import { AlertService } from '../../../../core/services/alert.service';
 import * as L from 'leaflet';
+import { Map } from "../../../../map/map";
 
 @Component({
     selector: "app-alta-mascota",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, Map],
     templateUrl: "./alta.component.html",
     styleUrls: ['./alta.component.css']
 })
 export class AltaMascota implements OnInit {
 
-    @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef<HTMLDivElement>;
-
-    private map!: L.Map;
-    private marker!: L.Marker;
-
     formMascota!: FormGroup;
 
     tiposMascota = Object.values(TipoMascota);
+    
+    tamanosMascota = Object.values(Size);
 
-    estados = ['Perdido Propio', 'Perdido Ajeno', 'Recuperado', 'Adoptado'];
+    estados = Object.values(State);
 
     imagenPreVisualizacion: string | ArrayBuffer | null = null;
 
     imagenBase64: string | null = null;
 
-    private dumbtoken = "FAKE";
 
     constructor(
         private fb: FormBuilder,
@@ -43,7 +40,7 @@ export class AltaMascota implements OnInit {
     ngOnInit(): void {
         this.formMascota = this.fb.group({
             name: ['', Validators.required],
-            size: ['', Validators.required],
+            size: [Size.MEDIANO, Validators.required],
             type: [TipoMascota.PERRO, Validators.required],
             color: ['#000000', Validators.required],
             race: ['', Validators.required],
@@ -56,54 +53,19 @@ export class AltaMascota implements OnInit {
 
             ownerName: [''],
             fechaDesaparicion: [''],
-            estado: ['Perdido Propio'],
-
+            estado: [State.PERDIDO_PROPIO],
             photoFile: [null, Validators.required]
 
         });
     }
 
-    ngAfterViewInit(): void {
-        try {
-            const lat = this.formMascota.get('latitude')?.value ?? -34.6037;
-            const lng = this.formMascota.get('longitude')?.value ?? -58.3816;
-
-
-            delete (L.Icon.Default.prototype as any)._getIconUrl;
-            L.Icon.Default.mergeOptions({
-                iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
-                iconUrl: 'assets/leaflet/marker-icon.png',
-                shadowUrl: 'assets/leaflet/marker-shadow.png',
-            });
-
-            this.map = L.map(this.mapContainer.nativeElement).setView([lat, lng], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(this.map);
-
-            this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
-
-            this.marker.on('dragend', () => {
-                const pos = this.marker.getLatLng();
-                this.formMascota.patchValue({ latitude: pos.lat, longitude: pos.lng });
-            });
-
-            this.map.on('click', (e: L.LeafletMouseEvent) => {
-                this.marker.setLatLng(e.latlng);
-                this.formMascota.patchValue({ latitude: e.latlng.lat, longitude: e.latlng.lng });
-            });
-        } catch (err) {
-            console.error('Error inicializando el mapa:', err);
-        }
+    onCoordinatesChange(coords: { latitude: number, longitude: number }): void {
+        this.formMascota.get('latitude')?.setValue(coords.latitude);
+        this.formMascota.get('longitude')?.setValue(coords.longitude);
+        this.formMascota.get('latitude')?.markAsTouched();
+        this.formMascota.get('longitude')?.markAsTouched();
     }
-
-    ngOnDestroy(): void {
-        if (this.map) {
-            this.map.remove();
-        }
-    }
-
+    
     seleccionarEstado(estado: String): void{
         this.formMascota.get('estado')?.setValue(estado);
     }
@@ -152,12 +114,13 @@ export class AltaMascota implements OnInit {
                 weight: formValue.weight,
                 latitude: formValue.latitude,
                 longitude: formValue.longitude,
+                state: formValue.estado,
                 type: formValue.type,
                 photoBase64: this.imagenBase64!,
             };
 
 
-            this.mascotaService.crearMascota(petCreateDto, this.dumbtoken).subscribe({
+            this.mascotaService.crearMascota(petCreateDto, localStorage.getItem("token") ?? "").subscribe({
                 next: (response) => {
                     this.alert.success('Éxito', 'Mascota registrada con éxito!');
                     this.formMascota.reset();

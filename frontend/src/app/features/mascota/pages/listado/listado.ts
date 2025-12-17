@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
-import { combineLatest, debounceTime, distinctUntilChanged, Observable, race, startWith, switchMap } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, Observable, race, startWith, Subject, switchMap } from 'rxjs';
 import { GeolocationService } from '../../../../services/geolocation.service';
 import { AlertService } from '../../../../core/services/alert.service';
 import { PetFilter, PetResponse } from '../../mascota.model';
@@ -31,8 +31,7 @@ export class ListadoMascotas implements OnInit{
   userCurrentLocation=new FormControl(false);
   cargandoUbicacion=new FormControl(false);
 
-  userLatitude=new FormControl<number|null>(null);
-  userLongitude=new FormControl<number|null>(null);
+  private searchTrigger$ = new Subject<void>();
 
   constructor(private fb:FormBuilder, private petService: MascotaService, private alert: AlertService) {
     this.filterForm = new FormGroup({
@@ -49,22 +48,30 @@ export class ListadoMascotas implements OnInit{
       page: new FormControl(0),
       perPage: new FormControl(10),
       sort: new FormControl('lostDate,desc'),
+
+      userLatitude:new FormControl<number|null>(null),
+      userLongitude:new FormControl<number|null>(null),
+      maxDistanceInKm: new FormControl(10),
     });
     
     this.userCurrentLocation.valueChanges.subscribe(
-      () => {
-        this.loadUserLocation();
+      (useLocation) => {
+        if(useLocation) {
+             this.loadUserLocation();
+        } else {
+             this.filterForm.get('userLatitude')?.setValue(null);
+             this.filterForm.get('userLongitude')?.setValue(null);
+        }
       }
-
     )
   }
 
-  async loadUserLocation(){
+  async loadUserLocation(): Promise<void>{
     this.cargandoUbicacion.setValue(true);
     try {
       const coords = await this.geolocationService.getLocation();
-      this.userLatitude.setValue(coords.latitude);
-      this.userLongitude.setValue(coords.longitude);
+      this.filterForm.get('userLatitude')?.setValue(coords.latitude);
+      this.filterForm.get('userLongitude')?.setValue(coords.longitude);
     } catch (error) {
       this.alerts.error('No pudimos obtener tu ubicación. Por favor permite el acceso.');
       this.userCurrentLocation.setValue(false);
@@ -73,9 +80,71 @@ export class ListadoMascotas implements OnInit{
     }
   }
 
-  pets: PetResponse[];
+  pets:PetResponse[] = [];
+
+  buscarMascotas(): void {
+    this.searchTrigger$.next(); 
+  }
   ngOnInit(): void {
     
+    if (this.userCurrentLocation.value) {
+        this.loadUserLocation();
+    }
+    
+   
+    const searchEvents$ = this.searchTrigger$.asObservable().pipe(
+        startWith(null) 
+    );
+    
+    const loadingChange$ = this.cargandoUbicacion.valueChanges.pipe(startWith(this.cargandoUbicacion.value));
+
+
+    combineLatest([searchEvents$, loadingChange$]).pipe(
+        
+        switchMap(([_, loading]) => {
+            
+            const formValues = this.filterForm.value;
+            const useLocation = this.userCurrentLocation.value;
+            const lat = formValues.userLatitude;
+            const lon = formValues.userLongitude;
+            
+            if (loading || (useLocation && (lat === null || lon === null))) {
+                return new Observable<PetResponse[]>(observer => {
+                    observer.next([]); 
+                    observer.complete();
+                });
+            }
+            
+            const filters: any = { ...formValues };
+
+            if (!useLocation) {
+                delete filters.userLatitude;
+                delete filters.userLongitude;
+                delete filters.maxDistanceInKm;
+            }
+            
+            const finalFilters: Record<string, any> = {};
+
+            Object.keys(filters).forEach(key => {
+                let value = filters[key];
+                
+                if (value !== undefined && value !== null && value !== '') {
+                    finalFilters[key] = value;
+                }
+            });
+
+            return this.petService.listAllPets(finalFilters as PetFilter);
+        })
+    ).subscribe({
+        next: (pets) => {
+            this.pets = pets;
+        },
+        error: (err) => {
+             this.alerts.error('Error al cargar la lista de mascotas.');
+             console.error(err);
+             this.pets = [];
+        }
+    });
+
   }
 }
-

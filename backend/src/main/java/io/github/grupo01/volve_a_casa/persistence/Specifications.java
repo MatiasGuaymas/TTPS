@@ -6,7 +6,7 @@ import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
 import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
-import jakarta.el.Expression;
+import jakarta.persistence.criteria.Predicate;
 
 public class Specifications {
     public static Specification<Pet> getPetSpecification(PetFilter filter) {
@@ -63,7 +63,6 @@ public class Specifications {
                 double lon = filter.getUserLongitude();
                 double maxDistanceInKm = filter.getMaxDistanceInKm();
 
-                @Embedded 'coordinates'
                 var petLat= root.get("coordinates").get("latitude");
                 var petLon= root.get("coordinates").get("longitude");
 

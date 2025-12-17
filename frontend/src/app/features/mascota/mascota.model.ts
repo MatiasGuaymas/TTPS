@@ -29,6 +29,7 @@ export interface PetCreate {
     weight: number;
     latitude: number;
     longitude: number;
+    state: State;
     type: TipoMascota;
     photoBase64: string;
 }
