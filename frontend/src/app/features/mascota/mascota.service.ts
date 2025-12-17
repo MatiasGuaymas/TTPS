@@ -1,16 +1,15 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { PetCreate } from "./mascota.model";
+import { Pet, PetCreate } from "./mascota.model";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class MascotaService {
     private apiUrl = '/api/pets';
 
     constructor(private http: HttpClient) { }
-
 
     crearMascota(petDto: PetCreate, token: string): Observable<any> {
         const headers = new HttpHeaders({
@@ -19,5 +18,9 @@ export class MascotaService {
         });
 
         return this.http.post(this.apiUrl, petDto, { headers });
+    }
+
+    getPetById(id: number): Observable<Pet> {
+        return this.http.get<Pet>(`${this.apiUrl}/${id}`);
     }
 }

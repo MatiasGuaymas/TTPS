@@ -1,0 +1,156 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Loading -->
+        <div *ngIf="loading()" class="flex justify-center items-center py-20">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#37B47D]"></div>
+        </div>
+
+        <!-- Contenido del detalle -->
+        <div *ngIf="!loading() && pet()" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+
+            <!-- Header con botón volver -->
+            <div class="bg-[#37B47D] px-6 py-4 flex items-center justify-between">
+                <button routerLink="/home"
+                    class="flex items-center gap-2 text-white hover:bg-[#2a8f63] px-3 py-2 rounded-lg transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Volver
+                </button>
+                <h1 class="text-2xl font-bold text-white">Detalle de Mascota</h1>
+                <div class="w-24"></div> <!-- Spacer para centrar el título -->
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
+
+                <!-- Galería de fotos -->
+                <div class="space-y-4">
+                    <div class="relative rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 aspect-square">
+                        <img *ngIf="pet()?.photosBase64 && pet()!.photosBase64.length > 0"
+                            [src]="pet()!.photosBase64[currentPhotoIndex()]" [alt]="pet()!.name"
+                            class="w-full h-full object-cover">
+
+                        <!-- Controles de navegación de fotos -->
+                        <div *ngIf="pet()?.photosBase64 && pet()!.photosBase64.length > 1"
+                            class="absolute inset-0 flex items-center justify-between px-4">
+                            <button (click)="prevPhoto()"
+                                class="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <button (click)="nextPhoto()"
+                                class="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Indicador de foto actual -->
+                        <div *ngIf="pet()?.photosBase64 && pet()!.photosBase64.length > 1"
+                            class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                            <div *ngFor="let photo of pet()!.photosBase64; let i = index"
+                                [class.bg-white]="i === currentPhotoIndex()"
+                                [class.bg-white/50]="i !== currentPhotoIndex()" class="w-2 h-2 rounded-full transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Miniaturas -->
+                    <div *ngIf="pet()?.photosBase64 && pet()!.photosBase64.length > 1" class="grid grid-cols-4 gap-2">
+                        <button *ngFor="let photo of pet()!.photosBase64; let i = index"
+                            (click)="currentPhotoIndex.set(i)" [class.ring-2]="i === currentPhotoIndex()"
+                            [class.ring-[#37B47D]]="i === currentPhotoIndex()"
+                            class="aspect-square rounded-lg overflow-hidden hover:opacity-75 transition">
+                            <img [src]="photo" [alt]="'Foto ' + (i + 1)" class="w-full h-full object-cover">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Información de la mascota -->
+                <div class="space-y-6">
+
+                    <!-- Nombre y estado -->
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ pet()!.name }}</h2>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                                [ngClass]="getEstadoBadgeClass(pet()!.state)">
+                                {{ getEstadoLabel(pet()!.state) }}
+                            </span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-lg">{{ getTipoLabel(pet()!.type) }} · {{
+                            pet()!.race }}</p>
+                    </div>
+
+                    <!-- Detalles básicos -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Tamaño</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{
+                                getTamanoLabel(pet()!.size) }}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Peso</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pet()!.weight }} kg</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Color</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pet()!.color }}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Fecha de Pérdida</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pet()!.lostDate | date:
+                                'dd/MM/yyyy' }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Descripción</h3>
+                        <p class="text-gray-700 dark:text-gray-300">{{ pet()!.description }}</p>
+                    </div>
+
+                    <!-- Ubicación -->
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Ubicación de Pérdida</h3>
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-[#37B47D] mt-0.5 flex-shrink-0" fill="currentColor"
+                                viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <div>
+                                <p class="text-gray-700 dark:text-gray-300">
+                                    Latitud: {{ pet()!.latitude }}<br>
+                                    Longitud: {{ pet()!.longitude }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="flex gap-3 pt-4">
+                        <button
+                            class="flex-1 bg-[#37B47D] hover:bg-[#2a8f63] text-white font-medium py-3 px-6 rounded-lg transition">
+                            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                </path>
+                            </svg>
+                            Reportar Avistamiento
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
