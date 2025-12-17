@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.services;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -19,11 +21,16 @@ public class SightingService {
     private final SightingRepository sightingRepository;
     private final UserService userService;
     private final PetService petService;
+    private final EmailService emailService;
+    private final GeorefService georefService;
 
-    public SightingService(SightingRepository sightingRepository, UserService userService, PetService petService) {
+    public SightingService(SightingRepository sightingRepository, UserService userService, PetService petService, 
+                           EmailService emailService, GeorefService georefService) {
         this.sightingRepository = sightingRepository;
         this.userService = userService;
         this.petService = petService;
+        this.emailService = emailService;
+        this.georefService = georefService;
     }
 
     // TODO: Test de integracion
@@ -58,6 +65,69 @@ public class SightingService {
                 dto.comment(),
                 dto.date()
         );
-        return SightingResponseDTO.fromSighting(sightingRepository.save(newSighting));
+        Sighting savedSighting = sightingRepository.save(newSighting);
+        
+        // Enviar email al dueño de la mascota
+        sendSightingNotificationEmail(savedSighting, creator);
+        
+        return SightingResponseDTO.fromSighting(savedSighting);
+    }
+    
+    private void sendSightingNotificationEmail(Sighting sighting, User reporter) {
+        User owner = sighting.getPet().getCreator();
+        
+        // Obtener ubicación legible
+        GeorefResponse georef = georefService.getUbication(
+                sighting.getCoordinates().getLatitude(),
+                sighting.getCoordinates().getLongitude()
+        );
+        
+        String city = georef != null && georef.ubicacion() != null && georef.ubicacion().municipio() != null
+                ? georef.ubicacion().municipio().nombre()
+                : "Desconocida";
+        
+        String neighborhood = georef != null && georef.ubicacion() != null && georef.ubicacion().departamento() != null
+                ? georef.ubicacion().departamento().nombre()
+                : "Desconocido";
+        
+        // Construir el email
+        String subject = "¡Avistamiento de " + sighting.getPet().getName() + "!";
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String formattedDate = sighting.getDate().format(formatter);
+        
+        String body = String.format(
+                "Hola %s,\n\n" +
+                "Te informamos que %s %s ha reportado un avistamiento de tu mascota %s.\n\n" +
+                "Detalles del avistamiento:\n" +
+                "- Fecha: %s\n" +
+                "- Ubicación: %s, %s\n" +
+                "- Coordenadas: %.6f, %.6f\n" +
+                "- Comentario: %s\n\n" +
+                "Contacto del reportero:\n" +
+                "- Teléfono: %s\n" +
+                "- Email: %s\n\n" +
+                "¡Esperamos que puedas encontrar a tu mascota pronto!\n\n" +
+                "Saludos,\n" +
+                "Equipo Volvé a Casa",
+                owner.getName(),
+                reporter.getName(),
+                reporter.getLastName(),
+                sighting.getPet().getName(),
+                formattedDate,
+                city,
+                neighborhood,
+                sighting.getCoordinates().getLatitude(),
+                sighting.getCoordinates().getLongitude(),
+                sighting.getComment() != null ? sighting.getComment() : "Sin comentarios",
+                reporter.getPhone(),
+                reporter.getEmail()
+        );
+        
+        try {
+            emailService.sendEmail(owner.getEmail(), subject, body);
+        } catch (Exception e) {
+            System.err.println("Error enviando email de notificación: " + e.getMessage());
+        }
     }
 }

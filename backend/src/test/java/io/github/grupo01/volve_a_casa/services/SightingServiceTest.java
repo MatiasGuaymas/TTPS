@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.services;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
@@ -29,6 +30,12 @@ class SightingServiceTest {
     @Mock
     PetService petService;
 
+    @Mock
+    GeorefService georefService;
+
+    @Mock
+    EmailService emailService;
+
     @InjectMocks
     SightingService sightingService;
 
@@ -37,11 +44,34 @@ class SightingServiceTest {
         long userId = 1L;
         User user = mock(User.class);
         when(user.getId()).thenReturn(userId);
+        when(user.getEmail()).thenReturn("test@gmail.com");
 
         long petId = 1L;
         Pet pet = mock(Pet.class);
         when(petService.findById(petId)).thenReturn(pet);
         when(pet.getId()).thenReturn(petId);
+        when(pet.getCreator()).thenReturn(user);
+
+        when(georefService.getUbication(-54f, -27f)).thenReturn(new GeorefResponse(
+                new GeorefResponse.Ubicacion(
+                        new GeorefResponse.Entidad(
+                                "1",
+                                "Partido de La Plata"
+                        ),
+                        new GeorefResponse.Entidad(
+                                "1",
+                                "Partido de La Plata"
+                        ),
+                        new GeorefResponse.Entidad(
+                                "2",
+                                "Buenos Aires"
+                        ),
+                        -54f,
+                        -27f
+                )
+        ));
+
+        doNothing().when(emailService).sendEmail(any(String.class), any(String.class), any(String.class));
 
         SightingCreateDTO dto = new SightingCreateDTO(
                 petId,
