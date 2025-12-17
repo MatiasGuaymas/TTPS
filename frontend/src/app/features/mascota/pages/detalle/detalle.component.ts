@@ -1,17 +1,24 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MascotaService } from '../../mascota.service';
 import { Pet, EstadoMascota, TamanoMascota, TipoMascota } from '../../mascota.model';
 import { AlertService } from '../../../../core/services/alert.service';
+import * as L from 'leaflet';
 
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,
     imports: [CommonModule, RouterLink],
-    templateUrl: './detalle.component.html'
+    templateUrl: './detalle.component.html',
+    styles: [`
+        #map {
+            height: 400px;
+            border-radius: 0.5rem;
+        }
+    `]
 })
-export class DetalleComponent implements OnInit {
+export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private mascotaService = inject(MascotaService);
@@ -20,8 +27,24 @@ export class DetalleComponent implements OnInit {
     pet = signal<Pet | null>(null);
     loading = signal(true);
     currentPhotoIndex = signal(0);
+    private map: L.Map | null = null;
 
     ngOnInit(): void {
+        const iconRetinaUrl = 'assets/leaflet/marker-icon-2x.png';
+        const iconUrl = 'assets/leaflet/marker-icon.png';
+        const shadowUrl = 'assets/leaflet/marker-shadow.png';
+        const iconDefault = L.icon({
+            iconRetinaUrl,
+            iconUrl,
+            shadowUrl,
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            tooltipAnchor: [16, -28],
+            shadowSize: [41, 41]
+        });
+        L.Marker.prototype.options.icon = iconDefault;
+
         const petId = this.route.snapshot.paramMap.get('id');
         if (petId) {
             this.loadPetDetails(+petId);
@@ -31,12 +54,17 @@ export class DetalleComponent implements OnInit {
         }
     }
 
+    ngAfterViewInit(): void {
+    }
+
     loadPetDetails(id: number): void {
         this.loading.set(true);
         this.mascotaService.getPetById(id).subscribe({
             next: (pet) => {
                 this.pet.set(pet);
                 this.loading.set(false);
+                // Inicializar mapa después de cargar los datos
+                setTimeout(() => this.initMap(), 100);
             },
             error: (error) => {
                 console.error('Error al cargar mascota:', error);
@@ -45,6 +73,24 @@ export class DetalleComponent implements OnInit {
                 this.router.navigate(['/home']);
             }
         });
+    }
+
+    initMap(): void {
+        const pet = this.pet();
+        if (!pet || this.map) return;
+
+        // Crear el mapa centrado en la ubicación de pérdida
+        this.map = L.map('map').setView([pet.latitude, pet.longitude], 15);
+
+        // Agregar capa de tiles de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(this.map);
+
+        // Agregar marcador en la ubicación de pérdida
+        const marker = L.marker([pet.latitude, pet.longitude]).addTo(this.map);
+        marker.bindPopup(`<b>${pet.name}</b><br>Último lugar visto`).openPopup();
     }
 
     nextPhoto(): void {
@@ -102,5 +148,12 @@ export class DetalleComponent implements OnInit {
             [EstadoMascota.ADOPTADO]: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
         };
         return classes[estado] || 'bg-gray-100 text-gray-800';
+    }
+
+    ngOnDestroy(): void {
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+        }
     }
 }
