@@ -14,5 +14,6 @@ interface SightingResponse {
     reporterLastName: string; latitude: number;
     longitude: number;
     date: string;
+    photoBase64: string;
     comment?: string;
 }
