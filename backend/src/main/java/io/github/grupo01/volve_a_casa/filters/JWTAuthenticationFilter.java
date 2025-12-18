@@ -55,7 +55,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
        
         try {
             Long userId = tokenService.getUserIdFromToken(token);
