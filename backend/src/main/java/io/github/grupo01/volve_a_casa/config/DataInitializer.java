@@ -86,7 +86,7 @@ public class DataInitializer implements CommandLineRunner {
             }
 
             // imagen del perro
-            File file = new File("src/main/resources/perro.jpg");
+            File file = new File("src/main/resources/static/perro.jpg");
             String photoBase64 = Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath()));
 
             Pet samplePet = new Pet(
