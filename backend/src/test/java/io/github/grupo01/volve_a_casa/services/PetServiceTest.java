@@ -1,23 +1,30 @@
 package io.github.grupo01.volve_a_casa.services;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
+
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.repositories.PetRepository;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PetServiceTest {
@@ -63,7 +70,7 @@ public class PetServiceTest {
         when(user.getId()).thenReturn(userId);
 
         Pet pet = createPet("NombreViejo", user);
-        PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null);
+        PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null, null);
 
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
         when(petRepository.save(pet)).thenReturn(pet);
@@ -80,7 +87,7 @@ public class PetServiceTest {
         when(petRepository.findById(10L)).thenReturn(Optional.empty());
         User user = mock(User.class);
 
-        PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null);
+        PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null, null);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
                 () -> petService.updatePet(10L, user, dto));
@@ -98,7 +105,7 @@ public class PetServiceTest {
 
         when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
 
-        PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null);
+        PetUpdateDTO dto = new PetUpdateDTO("NuevoNombre", null, null, null, null, null, null, null, null, null, null);
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
                 () -> petService.updatePet(10L, otherUser, dto));
