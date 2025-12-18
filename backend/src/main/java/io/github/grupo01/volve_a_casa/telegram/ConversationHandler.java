@@ -45,6 +45,9 @@ public class ConversationHandler {
     @Autowired
     private MessageSender messageSender;
 
+    @Autowired
+    private TelegramMessages messages;
+
     private final ConcurrentHashMap<Long, ConversationState> conversations = new ConcurrentHashMap<>();
 
     /**
@@ -55,10 +58,7 @@ public class ConversationHandler {
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_EMAIL);
         conversations.put(chatId, conversation);
 
-        messageSender.sendText(bot, chatId, "📝 *Registro de Mascota Perdida*\n\n" +
-                "Primero necesito autenticarte.\n" +
-                "Puedes cancelar en cualquier momento con /cancelar\n\n" +
-                "Por favor, ingresa tu *email* registrado en Volve a Casa:");
+        messageSender.sendText(bot, chatId, messages.get("register.start"));
     }
 
     /**
@@ -69,9 +69,9 @@ public class ConversationHandler {
         if (conversation != null && conversation.getCurrentStep() != ConversationState.ConversationStep.NONE) {
             conversation.reset();
             conversations.remove(chatId);
-            messageSender.sendText(bot, chatId, "❌ Registro cancelado. Puedes iniciar uno nuevo con /perdida");
+            messageSender.sendText(bot, chatId, messages.get("register.cancel.success"));
         } else {
-            messageSender.sendText(bot, chatId, "No hay ningún proceso activo para cancelar.");
+            messageSender.sendText(bot, chatId, messages.get("register.cancel.no_active"));
         }
     }
 
@@ -109,32 +109,30 @@ public class ConversationHandler {
 
     private void processEmail(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía tu email como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.email.text_required"));
             return;
         }
 
         String email = update.getMessage().getText().trim();
         if (email.isEmpty() || email.startsWith("/") || !email.contains("@")) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, ingresa un email válido.");
+            messageSender.sendText(bot, chatId, messages.get("register.email.invalid"));
             return;
         }
 
         conversation.put("email", email);
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_PASSWORD);
-        messageSender.sendText(bot, chatId, "✅ Email: " + email + "\n\n" +
-                "Ahora ingresa tu *contraseña*:\n" +
-                "⚠️ Por seguridad, elimina este mensaje después de enviarlo.");
+        messageSender.sendText(bot, chatId, messages.get("register.email.success", email));
     }
 
     private void processPassword(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía tu contraseña como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.password.text_required"));
             return;
         }
 
         String password = update.getMessage().getText().trim();
         if (password.isEmpty() || password.startsWith("/")) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, ingresa una contraseña válida.");
+            messageSender.sendText(bot, chatId, messages.get("register.password.invalid"));
             return;
         }
 
@@ -146,13 +144,9 @@ public class ConversationHandler {
             conversation.put("userName", authResponse.user().name());
             conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_NAME);
 
-            messageSender.sendText(bot, chatId, "✅ *¡Autenticación exitosa!*\n\n" +
-                    "Bienvenido/a " + authResponse.user().name() + "!\n\n" +
-                    "Ahora vamos a registrar tu mascota perdida.\n" +
-                    "Por favor, ingresa el *nombre de la mascota*:");
+            messageSender.sendText(bot, chatId, messages.get("register.password.auth.success", authResponse.user().name()));
         } catch (ResponseStatusException e) {
-            messageSender.sendText(bot, chatId, "❌ Credenciales inválidas. El email o contraseña son incorrectos.\n\n" +
-                    "Usa /perdida para intentar de nuevo o /cancelar para salir.");
+            messageSender.sendText(bot, chatId, messages.get("register.password.auth.error"));
             conversation.reset();
             conversations.remove(chatId);
         }
@@ -160,29 +154,24 @@ public class ConversationHandler {
 
     private void processName(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía el nombre de la mascota como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.name.text_required"));
             return;
         }
 
         String name = update.getMessage().getText().trim();
         if (name.isEmpty() || name.startsWith("/")) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, ingresa un nombre válido.");
+            messageSender.sendText(bot, chatId, messages.get("register.name.invalid"));
             return;
         }
 
         conversation.put("name", name);
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_SIZE);
-        messageSender.sendText(bot, chatId, "✅ Nombre registrado: " + name + "\n\n" +
-                "Selecciona el *tamaño* de la mascota:\n" +
-                "1️⃣ PEQUENO\n" +
-                "2️⃣ MEDIANO\n" +
-                "3️⃣ GRANDE\n\n" +
-                "Responde con el número (1, 2 o 3):");
+        messageSender.sendText(bot, chatId, messages.get("register.name.success", name));
     }
 
     private void processSize(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía el tamaño como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.size.text_required"));
             return;
         }
 
@@ -195,24 +184,18 @@ public class ConversationHandler {
         };
 
         if (size == null) {
-            messageSender.sendText(bot, chatId, "⚠️ Opción no válida. Por favor responde con 1, 2 o 3.");
+            messageSender.sendText(bot, chatId, messages.get("register.size.invalid"));
             return;
         }
 
         conversation.put("size", size);
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_STATE);
-        messageSender.sendText(bot, chatId, "✅ Tamaño registrado: " + size + "\n\n" +
-                "Selecciona el *estado* de la mascota:\n" +
-                "1️⃣ PERDIDO_PROPIO (es tu mascota)\n" +
-                "2️⃣ PERDIDO_AJENO (viste una mascota perdida)\n" +
-                "3️⃣ RECUPERADO\n" +
-                "4️⃣ ADOPTADO\n\n" +
-                "Responde con el número (1, 2, 3 o 4):");
+        messageSender.sendText(bot, chatId, messages.get("register.size.success", size));
     }
 
     private void processState(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía el estado como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.state.text_required"));
             return;
         }
 
@@ -226,20 +209,18 @@ public class ConversationHandler {
         };
 
         if (state == null) {
-            messageSender.sendText(bot, chatId, "⚠️ Opción no válida. Por favor responde con 1, 2, 3 o 4.");
+            messageSender.sendText(bot, chatId, messages.get("register.state.invalid"));
             return;
         }
 
         conversation.put("state", state);
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_DATE);
-        messageSender.sendText(bot, chatId, "✅ Estado registrado: " + state + "\n\n" +
-                "Ingresa la *fecha de desaparición* en formato DD/MM/AAAA\n" +
-                "Ejemplo: 15/12/2025");
+        messageSender.sendText(bot, chatId, messages.get("register.state.success", state));
     }
 
     private void processDate(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía la fecha como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.date.text_required"));
             return;
         }
 
@@ -249,49 +230,38 @@ public class ConversationHandler {
         try {
             LocalDate date = LocalDate.parse(text, formatter);
             if (date.isAfter(LocalDate.now())) {
-                messageSender.sendText(bot, chatId, "⚠️ La fecha no puede ser futura. Por favor ingresa una fecha válida.");
+                messageSender.sendText(bot, chatId, messages.get("register.date.future"));
                 return;
             }
 
             conversation.put("lostDate", date);
             conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_COLOR);
-            messageSender.sendText(bot, chatId, "✅ Fecha registrada: " + date.format(formatter) + "\n\n" +
-                    "Ingresa el *color* de la mascota:");
+            messageSender.sendText(bot, chatId, messages.get("register.date.success", date.format(formatter)));
         } catch (DateTimeParseException e) {
-            messageSender.sendText(bot, chatId, "⚠️ Formato de fecha inválido. Por favor usa el formato DD/MM/AAAA\n" +
-                    "Ejemplo: 15/12/2025");
+            messageSender.sendText(bot, chatId, messages.get("register.date.invalid"));
         }
     }
 
     private void processColor(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía el color como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.color.text_required"));
             return;
         }
 
         String color = update.getMessage().getText().trim();
         if (color.isEmpty() || color.startsWith("/")) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, ingresa un color válido.");
+            messageSender.sendText(bot, chatId, messages.get("register.color.invalid"));
             return;
         }
 
         conversation.put("color", color);
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_TYPE);
-        messageSender.sendText(bot, chatId, "✅ Color registrado: " + color + "\n\n" +
-                "Selecciona el *tipo* de mascota:\n" +
-                "1️⃣ PERRO\n" +
-                "2️⃣ GATO\n" +
-                "3️⃣ COBAYA\n" +
-                "4️⃣ LORO\n" +
-                "5️⃣ CONEJO\n" +
-                "6️⃣ CABALLO\n" +
-                "7️⃣ TORTUGA\n\n" +
-                "Responde con el número (1-7):");
+        messageSender.sendText(bot, chatId, messages.get("register.color.success", color));
     }
 
     private void processType(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía el tipo como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.type.text_required"));
             return;
         }
 
@@ -308,37 +278,35 @@ public class ConversationHandler {
         };
 
         if (type == null) {
-            messageSender.sendText(bot, chatId, "⚠️ Opción no válida. Por favor responde con un número del 1 al 7.");
+            messageSender.sendText(bot, chatId, messages.get("register.type.invalid"));
             return;
         }
 
         conversation.put("type", type);
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_RACE);
-        messageSender.sendText(bot, chatId, "✅ Tipo registrado: " + type + "\n\n" +
-                "Ingresa la *raza* de la mascota:");
+        messageSender.sendText(bot, chatId, messages.get("register.type.success", type));
     }
 
     private void processRace(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía la raza como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.race.text_required"));
             return;
         }
 
         String race = update.getMessage().getText().trim();
         if (race.isEmpty() || race.startsWith("/")) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, ingresa una raza válida.");
+            messageSender.sendText(bot, chatId, messages.get("register.race.invalid"));
             return;
         }
 
         conversation.put("race", race);
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_WEIGHT);
-        messageSender.sendText(bot, chatId, "✅ Raza registrada: " + race + "\n\n" +
-                "Ingresa el *peso* de la mascota en kilogramos (ejemplo: 5.5):");
+        messageSender.sendText(bot, chatId, messages.get("register.race.success", race));
     }
 
     private void processWeight(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía el peso como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.weight.text_required"));
             return;
         }
 
@@ -346,22 +314,21 @@ public class ConversationHandler {
         try {
             float weight = Float.parseFloat(text);
             if (weight <= 0) {
-                messageSender.sendText(bot, chatId, "⚠️ El peso debe ser un número positivo.");
+                messageSender.sendText(bot, chatId, messages.get("register.weight.positive"));
                 return;
             }
 
             conversation.put("weight", weight);
             conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_PHOTO);
-            messageSender.sendText(bot, chatId, "✅ Peso registrado: " + weight + " kg\n\n" +
-                    "Por favor, *envía una foto* de la mascota:");
+            messageSender.sendText(bot, chatId, messages.get("register.weight.success", weight));
         } catch (NumberFormatException e) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, ingresa un número válido (ejemplo: 5.5)");
+            messageSender.sendText(bot, chatId, messages.get("register.weight.invalid"));
         }
     }
 
     private void processPhoto(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasPhoto()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía una foto de la mascota.");
+            messageSender.sendText(bot, chatId, messages.get("register.photo.required"));
             return;
         }
 
@@ -390,18 +357,17 @@ public class ConversationHandler {
 
                 conversation.put("photoBase64", photoBase64);
                 conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_LOCATION);
-                messageSender.sendText(bot, chatId, "✅ Foto recibida correctamente\n\n" +
-                        "Por favor, *envía tu ubicación actual* usando el botón de adjuntar ubicación de Telegram 📍");
+                messageSender.sendText(bot, chatId, messages.get("register.photo.success"));
             }
         } catch (Exception e) {
             System.err.println("Error procesando foto: " + e.getMessage());
-            messageSender.sendText(bot, chatId, "❌ Hubo un error al procesar la foto. Por favor, inténtalo de nuevo.");
+            messageSender.sendText(bot, chatId, messages.get("register.photo.error"));
         }
     }
 
     private void processLocation(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasLocation()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía tu ubicación usando el botón de adjuntar ubicación 📍");
+            messageSender.sendText(bot, chatId, messages.get("register.location.required"));
             return;
         }
 
@@ -410,20 +376,18 @@ public class ConversationHandler {
         conversation.put("longitude", location.getLongitude().floatValue());
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_DESCRIPTION);
 
-        messageSender.sendText(bot, chatId, "✅ Ubicación registrada\n\n" +
-                "Por último, ingresa una *descripción adicional* de la mascota\n" +
-                "(características especiales, comportamiento, etc.):");
+        messageSender.sendText(bot, chatId, messages.get("register.location.success"));
     }
 
     private void processDescription(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, envía la descripción como texto.");
+            messageSender.sendText(bot, chatId, messages.get("register.description.text_required"));
             return;
         }
 
         String description = update.getMessage().getText().trim();
         if (description.isEmpty() || description.startsWith("/")) {
-            messageSender.sendText(bot, chatId, "⚠️ Por favor, ingresa una descripción válida.");
+            messageSender.sendText(bot, chatId, messages.get("register.description.invalid"));
             return;
         }
 
@@ -452,27 +416,7 @@ public class ConversationHandler {
 
             var petResponse = petService.createPet(creator, petCreateDTO);
 
-            String summary = String.format("""
-                    ✅ ¡Mascota registrada exitosamente!
-                    
-                    📋 Resumen:
-                    🆔 ID: %d
-                    🐾 Nombre: %s
-                    👤 Dueño: %s
-                    📏 Tamaño: %s
-                    📊 Estado: %s
-                    📅 Fecha: %s
-                    🎨 Color: %s
-                    🐕 Tipo: %s
-                    🏷️ Raza: %s
-                    ⚖️ Peso: %.1f kg
-                    📝 Descripción: %s
-                    
-                    Tu mascota ha sido registrada en el sistema.
-                    Puedes verla en la aplicación web de Volve a Casa.
-                    
-                    Usa /suscribir %d para recibir notificaciones de avistamientos.
-                    """,
+            String summary = messages.get("register.save.success",
                     petResponse.id(),
                     conversation.getString("name"),
                     conversation.getString("userName"),
@@ -500,7 +444,7 @@ public class ConversationHandler {
         } catch (Exception e) {
             System.err.println("Error guardando mascota: " + e.getMessage());
             e.printStackTrace();
-            messageSender.sendText(bot, chatId, "❌ Hubo un error al guardar la mascota. Por favor, inténtalo de nuevo más tarde.\n\nError: " + e.getMessage());
+            messageSender.sendText(bot, chatId, messages.get("register.save.error", e.getMessage()));
             conversation.reset();
             conversations.remove(chatId);
         }

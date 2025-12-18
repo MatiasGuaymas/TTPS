@@ -26,6 +26,9 @@ public class IATelegramBot extends TelegramLongPollingBot {
     @Autowired
     private ConversationHandler conversationHandler;
 
+    @Autowired
+    private TelegramMessages messages;
+
     private final IACliente iaCliente;
 
     @Autowired
@@ -56,7 +59,7 @@ public class IATelegramBot extends TelegramLongPollingBot {
 
         // Comando /start o saludos
         if (messageText.equals("/start") || messageText.equalsIgnoreCase("hola") || messageText.equalsIgnoreCase("hello")) {
-            messageSender.sendText(this, chatId, "¡Hola! 👋 Soy el bot de Volve a Casa.\n\nUsa /comandos para ver todas las funcionalidades disponibles.");
+            messageSender.sendText(this, chatId, messages.welcome());
             return;
         }
 
@@ -109,7 +112,7 @@ public class IATelegramBot extends TelegramLongPollingBot {
         }
 
         // Comando no reconocido
-        messageSender.sendText(this, chatId, "⚠️ Comando no reconocido. Usa /comandos para ver la lista de comandos disponibles.");
+        messageSender.sendText(this, chatId, messages.commandUnknown());
     }
 
     /**

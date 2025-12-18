@@ -36,44 +36,16 @@ public class CommandHandler {
     @Autowired
     private MessageSender messageSender;
 
+    @Autowired
+    private TelegramMessages messages;
+
     private final ConcurrentHashMap<Long, UserWindow> userWindows = new ConcurrentHashMap<>();
 
     /**
      * Maneja el comando /comandos - muestra la ayuda.
      */
     public void handleComandos(TelegramLongPollingBot bot, long chatId) {
-        String commandsHelp = """
-                📋 *Comandos disponibles:*
-                
-                🐾 /mascotas
-                Lista todas las mascotas perdidas con información resumida.
-                
-                🔍 /mascota <id>
-                Muestra información detallada de una mascota específica.
-                Ejemplo: /mascota 123
-                
-                📝 /perdida
-                Registra una nueva mascota perdida de forma interactiva.
-                
-                🤖 /preguntar <pregunta>
-                Realiza cualquier pregunta sobre mascotas perdidas o la aplicación.
-                Ejemplo: /preguntar ¿Cómo reportar una mascota?
-                
-                🔔 /suscribir <id_mascota>
-                Suscríbete para recibir notificaciones de avistamientos de una mascota específica.
-                Ejemplo: /suscribir 123
-                
-                🔕 /desuscribir <id_mascota>
-                Deja de recibir notificaciones de avistamientos de una mascota.
-                Ejemplo: /desuscribir 123
-                
-                ❌ /cancelar
-                Cancela el proceso de registro actual.
-                
-                📋 /comandos
-                Muestra este mensaje de ayuda.
-                """;
-        messageSender.sendMarkdownText(bot, chatId, commandsHelp);
+        messageSender.sendMarkdownText(bot, chatId, messages.help());
     }
 
     /**
@@ -84,19 +56,18 @@ public class CommandHandler {
             List<PetSummaryDTO> pets = petService.getAllLostPetsSummary();
 
             if (pets.isEmpty()) {
-                messageSender.sendText(bot, chatId, "✅ ¡Buenas noticias! No hay mascotas perdidas en este momento.");
+                messageSender.sendText(bot, chatId, messages.get("mascotas.empty"));
                 return;
             }
 
-            StringBuilder message = new StringBuilder();
-            message.append("🐾 *Mascotas Perdidas* (").append(pets.size()).append(" encontradas)\n\n");
+            String title = messages.get("mascotas.title", pets.size());
 
             // Enviar en lotes para evitar mensajes muy largos
             int batchSize = 5;
             for (int i = 0; i < pets.size(); i += batchSize) {
                 StringBuilder batch = new StringBuilder();
                 if (i == 0) {
-                    batch.append(message);
+                    batch.append(title);
                 }
 
                 int end = Math.min(i + batchSize, pets.size());
@@ -110,11 +81,11 @@ public class CommandHandler {
                 messageSender.sendMarkdownText(bot, chatId, batch.toString());
             }
 
-            messageSender.sendText(bot, chatId, "💡 Usa /mascota <id> para ver más detalles de una mascota específica.");
+            messageSender.sendText(bot, chatId, messages.get("mascotas.footer"));
 
         } catch (Exception e) {
             System.err.println("Error al obtener listado de mascotas: " + e.getMessage());
-            messageSender.sendText(bot, chatId, "❌ Lo siento, hubo un error al obtener el listado de mascotas. Intenta de nuevo más tarde.");
+            messageSender.sendText(bot, chatId, messages.get("mascotas.error"));
         }
     }
 
@@ -125,7 +96,7 @@ public class CommandHandler {
         String[] parts = messageText.split("\\s+");
 
         if (parts.length < 2) {
-            messageSender.sendText(bot, chatId, "⚠️ Formato incorrecto. Usa: /mascota <id>\n\nEjemplo: /mascota 123");
+            messageSender.sendText(bot, chatId, messages.get("mascota.format.error"));
             return;
         }
 
@@ -139,10 +110,10 @@ public class CommandHandler {
                 messageSender.sendMarkdownText(bot, chatId, pet.toTelegramFormat());
             }
         } catch (NumberFormatException e) {
-            messageSender.sendText(bot, chatId, "❌ El ID de mascota debe ser un número válido.\n\nEjemplo: /mascota 123");
+            messageSender.sendText(bot, chatId, messages.get("mascota.id.invalid"));
         } catch (Exception e) {
             System.err.println("Error al obtener detalle de mascota: " + e.getMessage());
-            messageSender.sendText(bot, chatId, "❌ No se encontró una mascota con ese ID o hubo un error al obtener la información.");
+            messageSender.sendText(bot, chatId, messages.get("mascota.not.found"));
         }
     }
 
@@ -153,7 +124,7 @@ public class CommandHandler {
         String[] parts = messageText.split("\\s+");
 
         if (parts.length < 2) {
-            messageSender.sendText(bot, chatId, "⚠️ Formato incorrecto. Usa: /suscribir <id_mascota>\n\nEjemplo: /suscribir 123");
+            messageSender.sendText(bot, chatId, messages.get("suscribir.format.error"));
             return;
         }
 
@@ -162,7 +133,7 @@ public class CommandHandler {
             String response = notificationService.suscribir(chatId, petId);
             messageSender.sendText(bot, chatId, response);
         } catch (NumberFormatException e) {
-            messageSender.sendText(bot, chatId, "❌ El ID de mascota debe ser un número válido.\n\nEjemplo: /suscribir 123");
+            messageSender.sendText(bot, chatId, messages.get("suscribir.id.invalid"));
         }
     }
 
@@ -173,7 +144,7 @@ public class CommandHandler {
         String[] parts = messageText.split("\\s+");
 
         if (parts.length < 2) {
-            messageSender.sendText(bot, chatId, "⚠️ Formato incorrecto. Usa: /desuscribir <id_mascota>\n\nEjemplo: /desuscribir 123");
+            messageSender.sendText(bot, chatId, messages.get("desuscribir.format.error"));
             return;
         }
 
@@ -182,7 +153,7 @@ public class CommandHandler {
             String response = notificationService.desuscribir(chatId, petId);
             messageSender.sendText(bot, chatId, response);
         } catch (NumberFormatException e) {
-            messageSender.sendText(bot, chatId, "❌ El ID de mascota debe ser un número válido.\n\nEjemplo: /desuscribir 123");
+            messageSender.sendText(bot, chatId, messages.get("desuscribir.id.invalid"));
         }
     }
 
@@ -191,13 +162,13 @@ public class CommandHandler {
      */
     public void handlePreguntar(TelegramLongPollingBot bot, long chatId, String messageText) {
         if (isRateLimited(chatId)) {
-            messageSender.sendText(bot, chatId, "⏱️ Has alcanzado el límite de preguntas. Por favor espera un minuto.");
+            messageSender.sendText(bot, chatId, messages.get("preguntar.rate.limit"));
             return;
         }
 
         String prompt = messageText.substring("/preguntar".length()).trim();
         if (prompt.isEmpty()) {
-            messageSender.sendText(bot, chatId, "Por favor escribe una pregunta después del comando.\n\nEjemplo: /preguntar ¿Qué es Volve a Casa?");
+            messageSender.sendText(bot, chatId, messages.get("preguntar.empty"));
             return;
         }
 
@@ -209,7 +180,7 @@ public class CommandHandler {
             messageSender.sendText(bot, chatId, answer);
         } catch (IOException e) {
             System.err.println("API callback failed: " + e.getMessage());
-            messageSender.sendText(bot, chatId, "❌ Lo siento, hubo un error al procesar tu pregunta. Intenta de nuevo más tarde.");
+            messageSender.sendText(bot, chatId, messages.get("preguntar.error"));
         }
     }
 
