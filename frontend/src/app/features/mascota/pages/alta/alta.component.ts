@@ -1,24 +1,19 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { PetCreate, TipoMascota } from "../../mascota.model";
 import { MascotaService } from "../../mascota.service";
 import { AlertService } from '../../../../core/services/alert.service';
-import * as L from 'leaflet';
+import { MapComponent } from "../../../../shared/components/map/map.component";
 
 @Component({
     selector: "app-alta-mascota",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, MapComponent],
     templateUrl: "./alta.component.html",
     styleUrls: ['./alta.component.css']
 })
 export class AltaMascota implements OnInit {
-
-    @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef<HTMLDivElement>;
-
-    private map!: L.Map;
-    private marker!: L.Marker;
 
     formMascota!: FormGroup;
 
@@ -38,7 +33,14 @@ export class AltaMascota implements OnInit {
         private alert: AlertService
     ) {}
 
-
+    actualizarUbicacionDesdeMapa(coords: {lat: number, lng: number}) {
+        this.formMascota.patchValue({
+            latitude: coords.lat,
+            longitude: coords.lng
+        });
+        // Opcional: Marcar como dirty si es necesario
+        this.formMascota.markAsDirty();
+    }
 
     ngOnInit(): void {
         this.formMascota = this.fb.group({
@@ -61,47 +63,6 @@ export class AltaMascota implements OnInit {
             photoFile: [null, Validators.required]
 
         });
-    }
-
-    ngAfterViewInit(): void {
-        try {
-            const lat = this.formMascota.get('latitude')?.value ?? -34.6037;
-            const lng = this.formMascota.get('longitude')?.value ?? -58.3816;
-
-
-            delete (L.Icon.Default.prototype as any)._getIconUrl;
-            L.Icon.Default.mergeOptions({
-                iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
-                iconUrl: 'assets/leaflet/marker-icon.png',
-                shadowUrl: 'assets/leaflet/marker-shadow.png',
-            });
-
-            this.map = L.map(this.mapContainer.nativeElement).setView([lat, lng], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(this.map);
-
-            this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
-
-            this.marker.on('dragend', () => {
-                const pos = this.marker.getLatLng();
-                this.formMascota.patchValue({ latitude: pos.lat, longitude: pos.lng });
-            });
-
-            this.map.on('click', (e: L.LeafletMouseEvent) => {
-                this.marker.setLatLng(e.latlng);
-                this.formMascota.patchValue({ latitude: e.latlng.lat, longitude: e.latlng.lng });
-            });
-        } catch (err) {
-            console.error('Error inicializando el mapa:', err);
-        }
-    }
-
-    ngOnDestroy(): void {
-        if (this.map) {
-            this.map.remove();
-        }
     }
 
     seleccionarEstado(estado: String): void{

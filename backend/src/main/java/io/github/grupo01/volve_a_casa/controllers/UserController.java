@@ -31,7 +31,8 @@ public class UserController implements IUserController {
 
     @Override
     @GetMapping
-    public ResponseEntity<?> listAllUsersOrderByName() {
+    //TODO:/api/users?name="test"&lastname="test"&pointsMin=10&pointsMax=100&orderBy="points"&direction="desc"
+    public ResponseEntity<?> listAllUsers() {
         List<UserResponseDTO> users = userService.findAll(Sort.by("name"));
         if (users.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -79,7 +79,7 @@ class UserControllerTest {
     // ========= LIST USERS =========
 
     @Test
-    void listAllUsersOrderByName_whenEmpty_returnsNoContent() throws Exception {
+    void listAllUsers_whenEmpty_returnsNoContent() throws Exception {
         when(userService.findAll(Sort.by("name"))).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/users").accept(MediaType.APPLICATION_JSON))

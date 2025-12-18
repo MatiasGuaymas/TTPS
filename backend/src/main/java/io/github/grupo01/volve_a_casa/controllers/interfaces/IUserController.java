@@ -1,11 +1,8 @@
 package io.github.grupo01.volve_a_casa.controllers.interfaces;
 
-import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
-import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
-import io.github.grupo01.volve_a_casa.security.UserAuthentication;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,7 +23,7 @@ public interface IUserController {
             @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
             @ApiResponse(responseCode = "204", description = "No hay usuarios registrados")
     })
-    ResponseEntity<?> listAllUsersOrderByName();
+    ResponseEntity<?> listAllUsers();
 
 //    @Operation(summary = "Crear usuario", description = "Registra un nuevo usuario en el sistema. El email debe ser único. "
 //            +
