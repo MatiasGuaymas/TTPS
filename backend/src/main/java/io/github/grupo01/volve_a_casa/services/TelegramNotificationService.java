@@ -106,8 +106,15 @@ public class TelegramNotificationService {
                 "💬 Comentario: " + (sighting.getComment() != null ? sighting.getComment() : "Sin comentarios") + "\n\n" +
                 "👉 Ver detalles en la app";
         
+        // Obtener la foto del avistamiento si existe
+        String photoBase64 = sighting.getPhotoBase64();
+        
         for (TelegramSubscription subscription : subscriptions) {
-            telegramBot.sendNotification(subscription.getChatId(), message);
+            if (photoBase64 != null && !photoBase64.isEmpty()) {
+                telegramBot.sendPhotoNotification(subscription.getChatId(), message, photoBase64);
+            } else {
+                telegramBot.sendNotification(subscription.getChatId(), message);
+            }
         }
     }
 

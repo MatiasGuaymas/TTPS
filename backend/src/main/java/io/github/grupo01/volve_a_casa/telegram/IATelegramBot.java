@@ -10,12 +10,16 @@ import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -162,6 +166,34 @@ public class IATelegramBot extends TelegramLongPollingBot {
 
     public void sendNotification(Long chatId, String message) {
         sendMarkdownText(chatId, message);
+    }
+
+    public void sendPhotoNotification(Long chatId, String message, String photoBase64) {
+        if (photoBase64 == null || photoBase64.isEmpty()) {
+            sendMarkdownText(chatId, message);
+            return;
+        }
+
+        try {
+            // Decodificar la imagen Base64
+            byte[] imageBytes = Base64.getDecoder().decode(photoBase64);
+            ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
+
+            SendPhoto sendPhoto = new SendPhoto();
+            sendPhoto.setChatId(chatId.toString());
+            sendPhoto.setPhoto(new InputFile(imageStream, "avistamiento.jpg"));
+            sendPhoto.setCaption(message);
+            sendPhoto.setParseMode(ParseMode.MARKDOWN);
+
+            execute(sendPhoto);
+        } catch (TelegramApiException e) {
+            System.err.println("Error enviando foto por Telegram: " + e.getMessage());
+            // Si falla el envío de la foto, enviar solo el mensaje
+            sendMarkdownText(chatId, message);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error decodificando imagen Base64: " + e.getMessage());
+            sendMarkdownText(chatId, message);
+        }
     }
 
     @Override
