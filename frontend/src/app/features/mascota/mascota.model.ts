@@ -67,3 +67,17 @@ export interface PetFilter{
     userLongitude?:number;
     maxDistanceKm?:number;
 }
+
+export interface PetUpdate{
+        name: string,
+        description:string,
+        color: string,
+        size:Size,
+        race:string,
+        weight: number,
+        type:TipoMascota,
+        state:State,
+        latitude:number,
+        longitude:number,
+        photoBase64:string
+}

@@ -13,6 +13,8 @@ import { adminGuard } from './core/guards/admin.guard';
 
 import { ListadoMascotas } from './features/mascota/pages/listado/listado.component';
 import { UserPublicProfileComponent } from './features/profile/user-public-profile/user-public-profile.component';
+import { Editar } from './features/mascota/pages/editar/editar';
+import { Eliminar } from './features/mascota/pages/eliminar/eliminar';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -56,9 +58,20 @@ export const routes: Routes = [
         component: AdminUsersComponent,
         canActivate: [adminGuard]
     },
+    {
+        path:'admin/edicion-mascota/:id',
+        component:Editar,
+        canActivate:[adminGuard]
+    },
+    {
+        path:'admin/eliminar-mascota/:id',
+        component:Eliminar,
+        canActivate:[adminGuard]
+    },
     // Ruta 404
     {
         path: '**',
         component: NotFoundComponent
     }
+    
 ];

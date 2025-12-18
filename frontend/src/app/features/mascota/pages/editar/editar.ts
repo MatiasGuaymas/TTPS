@@ -4,10 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MascotaService } from '../../mascota.service';
 import { AlertService } from '../../../../core/services/alert.service';
 import { PetUpdate, Size, State, TipoMascota } from '../../mascota.model';
+import { Map } from "../../../../shared/components/map/map";
 
 @Component({
   selector: 'app-editar',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Map],
   templateUrl: './editar.html',
   styleUrl: './editar.css',
 })
@@ -18,9 +19,9 @@ export class Editar implements OnInit{
     private petService = inject(MascotaService);
     private alerts = inject(AlertService);
 
-    tiposMascota = Object.values(TipoMascota);
-    estadosMascota = Object.values(State);
-    tamanosMascota = Object.values(Size);
+    tiposMascota = Object.values(TipoMascota) as string[];
+    estadosMascota = Object.values(State) as string[];
+    tamanosMascota = Object.values(Size) as string[];
 
     petForm: FormGroup;
     petId: number | null = null;
@@ -53,11 +54,18 @@ export class Editar implements OnInit{
     loadPetData(petId: number) {
         this.petService.getPetById(petId).subscribe({
             next: (pet) => {
+
+                let photo=pet.photosBase64?.[0]||'';
+
+                const displayPhoto = photo.startsWith('data:image') 
+                ? photo 
+                : `data:image/jpeg;base64,${photo}`;
+
                 this.petForm.patchValue({
                     ...pet,
-                    photoBase64: pet.photosBase64?.[0]||''
+                    photoBase64: photo
                 });
-                this.imagePreview.set(pet.photosBase64?.[0] || null);
+                this.imagePreview.set(photo ? displayPhoto : null);
                 this.loading.set(false);
             },
             error: () => {
@@ -105,5 +113,9 @@ export class Editar implements OnInit{
             else{
                 this.petForm.markAllAsTouched();
             }
+    }
+
+    goToPetDetail(petId: number) {
+        this.router.navigate(['/mascota/{}'.replace('{}', petId.toString())]);
     }
 }

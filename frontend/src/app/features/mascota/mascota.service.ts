@@ -51,4 +51,12 @@ export class MascotaService {
     getPetById(id: number): Observable<PetResponse> {
         return this.http.get<PetResponse>(`${this.apiUrl}/${id}`);
     }
+    updatePet(id: number, petDto: any, token: string): Observable<any> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'token': token
+        });
+
+        return this.http.put(`${this.apiUrl}/${id}`, petDto, { headers });
+    }
 }
