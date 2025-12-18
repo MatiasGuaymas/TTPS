@@ -59,4 +59,12 @@ export class MascotaService {
 
         return this.http.put(`${this.apiUrl}/${id}`, petDto, { headers });
     }
+
+    deletePet(id: number, token: string): Observable<any> {
+        const headers = new HttpHeaders({
+            'token': token
+        });
+        
+        return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+    }
 }

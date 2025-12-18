@@ -285,7 +285,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         });
     }
 
-    //edicion de mascota
+    //edicion y borraado de mascota
    
     goToPetUpdate(petId: number): void {
         this.router.navigate(['admin/edicion-mascota', petId]);
