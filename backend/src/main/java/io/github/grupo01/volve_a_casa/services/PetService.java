@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.services;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetDetailDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
@@ -24,9 +25,11 @@ import java.util.List;
 @Service
 public class PetService {
     private final PetRepository petRepository;
+    private final GeorefService georefService;
 
-    public PetService(PetRepository petRepository) {
+    public PetService(PetRepository petRepository, GeorefService georefService) {
         this.petRepository = petRepository;
+        this.georefService = georefService;
     }
 
     // TODO: Test de integracion
@@ -109,9 +112,6 @@ public class PetService {
                 .toList();
     }
 
-    /**
-     * Obtiene un listado resumido de todas las mascotas perdidas para el bot de Telegram
-     */
     public List<PetSummaryDTO> getAllLostPetsSummary() {
         return petRepository.findAllByStateInOrderByLostDate(Pet.State.PERDIDO_PROPIO, Pet.State.PERDIDO_AJENO)
                 .stream()
@@ -119,13 +119,39 @@ public class PetService {
                 .toList();
     }
 
-    /**
-     * Obtiene información detallada de una mascota por ID para el bot de Telegram
-     * Incluye la primera foto de la mascota
-     */
     @Transactional(readOnly = true)
     public PetDetailDTO getPetDetailForTelegram(Long petId) {
         Pet pet = this.findById(petId);
-        return PetDetailDTO.fromPet(pet);
+        
+        // Obtener descripción de ubicación usando GeorefService
+        String locationDescription = null;
+        try {
+            GeorefResponse georef = georefService.getUbication(
+                pet.getCoordinates().getLatitude(),
+                pet.getCoordinates().getLongitude()
+            );
+            
+            if (georef != null && georef.ubicacion() != null) {
+                var ubicacion = georef.ubicacion();
+                StringBuilder location = new StringBuilder();
+                
+                if (ubicacion.municipio() != null && ubicacion.municipio().nombre() != null) {
+                    location.append(ubicacion.municipio().nombre());
+                }
+                
+                if (ubicacion.provincia() != null && ubicacion.provincia().nombre() != null) {
+                    if (location.length() > 0) {
+                        location.append(", ");
+                    }
+                    location.append(ubicacion.provincia().nombre());
+                }
+                
+                locationDescription = location.toString();
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener ubicación para mascota " + petId + ": " + e.getMessage());
+        }
+        
+        return PetDetailDTO.fromPet(pet, locationDescription);
     }
 }

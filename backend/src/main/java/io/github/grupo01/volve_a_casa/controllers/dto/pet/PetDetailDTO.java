@@ -22,9 +22,10 @@ public record PetDetailDTO(
         Pet.State state,
         Pet.Type type,
         Long creatorId,
-        String photoBase64  // Primera foto de la mascota para Telegram
+        String photoBase64,  // Primera foto de la mascota para Telegram
+        String locationDescription  // Descripción de la ubicación (ciudad, provincia)
 ) {
-    public static PetDetailDTO fromPet(Pet pet) {
+    public static PetDetailDTO fromPet(Pet pet, String locationDescription) {
         // Obtener la primera foto si existe
         String firstPhoto = null;
         if (pet.getPhotosBase64() != null && !pet.getPhotosBase64().isEmpty()) {
@@ -45,7 +46,8 @@ public record PetDetailDTO(
                 pet.getState(),
                 pet.getType(),
                 pet.getCreator().getId(),
-                firstPhoto
+                firstPhoto,
+                locationDescription
         );
     }
 
@@ -69,9 +71,12 @@ public record PetDetailDTO(
             message.append("• Peso: ").append(String.format("%.1f kg", weight)).append("\n");
         }
         
-        message.append("\n📍 *Ubicación:*\n");
-        message.append("• Latitud: ").append(String.format("%.6f", latitude)).append("\n");
-        message.append("• Longitud: ").append(String.format("%.6f", longitude)).append("\n");
+        message.append("\n📍 *Ubicación del último avistamiento:*\n");
+        if (locationDescription != null && !locationDescription.isEmpty()) {
+            message.append("• ").append(locationDescription).append("\n");
+        } else {
+            message.append(String.format("• Coordenadas: %.6f, %.6f", latitude, longitude)).append("\n");
+        }
         
         message.append("\n📅 *Estado:*\n");
         message.append("• Estado actual: ").append(formatState(state)).append("\n");
