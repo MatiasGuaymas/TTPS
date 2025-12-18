@@ -1,4 +1,6 @@
-interface UserProfile {
+import { PetResponse } from "../../features/mascota/mascota.model";
+
+export interface UserProfile {
     id: number;
     name: string;
     lastName: string;
@@ -13,7 +15,7 @@ interface UserProfile {
     role: 'USER' | 'ADMIN';
 }
 
-interface UserUpdateRequest {
+export interface UserUpdateRequest {
     name?: string;
     lastName?: string;
     phoneNumber?: string;
@@ -23,11 +25,11 @@ interface UserUpdateRequest {
     longitude?: number;
 }
 
-interface AdminUserUpdateRequest extends UserUpdateRequest {
+export interface AdminUserUpdateRequest extends UserUpdateRequest {
     role?: 'USER' | 'ADMIN';
 }
 
-interface UserFilter {
+export interface UserFilter {
     email?: string;
     name?: string;
     lastName?: string;
@@ -36,4 +38,15 @@ interface UserFilter {
     minPoints?: number;
     maxPoints?: number;
     role?: 'USER' | 'ADMIN';
+}
+
+export interface UserPublicProfile {
+    id: number;
+    name: string;
+    lastName: string;
+    phone: string;
+    city: string;
+    neighborhood: string;
+    points: number;
+    pets: PetResponse[];
 }
