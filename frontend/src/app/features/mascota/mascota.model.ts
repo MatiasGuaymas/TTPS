@@ -61,11 +61,9 @@ export interface PetFilter{
     race?:string;
     weightMin?:number;
     weightMax?: number;
-    initialLostDate?:string;
-    finalLostDate:Date;
-
-    page?:number;
-    perPage?:number;
-    sort?:string;
-    filterByNeighbordhood?:boolean;
+    initialLostDate?:Date;
+    finalLostDate?:Date;
+    userLatitude?:number;
+    userLongitude?:number;
+    maxDistanceKm?:number;
 }

@@ -33,9 +33,9 @@ public class Specifications {
                 predicates = cb.and(predicates,
                         cb.equal(root.get("type"), filter.getType()));
             }
-            if (filter.getSize() != null) {
+            if (filter.getPetSize() != null) {
                 predicates = cb.and(predicates,
-                        cb.equal(root.get("size"), filter.getSize()));
+                        cb.equal(root.get("size"), filter.getPetSize()));
             }
             if (filter.getFinalLostDate() != null) {
                 predicates = cb.and(predicates,
@@ -45,11 +45,11 @@ public class Specifications {
                 predicates = cb.and(predicates,
                         cb.greaterThanOrEqualTo(root.get("lostDate"), filter.getInitialLostDate()));
             }
-            if (filter.getWeightMin() > 0) {
+            if (filter.getWeightMin() != null && filter.getWeightMin() > 0) {
                 predicates = cb.and(predicates,
                         cb.greaterThanOrEqualTo(root.get("weight"), filter.getWeightMin()));
             }
-            if (filter.getWeightMax() > 0) {
+            if (filter.getWeightMax() != null && filter.getWeightMax() > 0) {
                 predicates = cb.and(predicates,
                         cb.lessThanOrEqualTo(root.get("weight"), filter.getWeightMax()));
             }
