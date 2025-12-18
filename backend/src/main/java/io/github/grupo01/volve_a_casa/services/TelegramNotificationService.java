@@ -1,5 +1,6 @@
 package io.github.grupo01.volve_a_casa.services;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.Sighting;
 import io.github.grupo01.volve_a_casa.persistence.entities.TelegramSubscription;
@@ -26,6 +27,9 @@ public class TelegramNotificationService {
     @Autowired
     @Lazy
     private IATelegramBot telegramBot;
+
+    @Autowired
+    private GeorefService georefService;
 
     @Transactional
     public String suscribir(Long chatId, Long petId) {
@@ -72,9 +76,32 @@ public class TelegramNotificationService {
     public void notificarAvistamiento(Sighting sighting) {
         List<TelegramSubscription> subscriptions = subscriptionRepository.findByPetId(sighting.getPet().getId());
         
+        GeorefResponse georef = georefService.getUbication(
+                sighting.getCoordinates().getLatitude(),
+                sighting.getCoordinates().getLongitude()
+        );
+        
+        String ubicacion = "Sin información de ubicación";
+        if (georef != null && georef.ubicacion() != null) {
+            StringBuilder ubicacionStr = new StringBuilder();
+            if (georef.ubicacion().municipio() != null) {
+                ubicacionStr.append(georef.ubicacion().municipio().nombre()).append(", ");
+            }
+            if (georef.ubicacion().departamento() != null) {
+                ubicacionStr.append(georef.ubicacion().departamento().nombre()).append(", ");
+            }
+            if (georef.ubicacion().provincia() != null) {
+                ubicacionStr.append(georef.ubicacion().provincia().nombre());
+            }
+            ubicacion = ubicacionStr.toString();
+            if (ubicacion.endsWith(", ")) {
+                ubicacion = ubicacion.substring(0, ubicacion.length() - 2);
+            }
+        }
+        
         String message = "🔔 *Nueva notificación de avistamiento*\n\n" +
                 "🐾 Mascota: *" + sighting.getPet().getName() + "*\n" +
-                "📍 Ubicación reportada\n" +
+                "📍 Ubicación: " + ubicacion + "\n" +
                 "📅 Fecha: " + sighting.getDate() + "\n\n" +
                 "💬 Comentario: " + (sighting.getComment() != null ? sighting.getComment() : "Sin comentarios") + "\n\n" +
                 "👉 Ver detalles en la app";

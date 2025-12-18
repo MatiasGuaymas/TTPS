@@ -36,6 +36,9 @@ class SightingServiceTest {
     @Mock
     EmailService emailService;
 
+    @Mock
+    TelegramNotificationService telegramNotificationService;
+
     @InjectMocks
     SightingService sightingService;
 
@@ -72,6 +75,7 @@ class SightingServiceTest {
         ));
 
         doNothing().when(emailService).sendEmail(any(String.class), any(String.class), any(String.class));
+        doNothing().when(telegramNotificationService).notificarAvistamiento(any(Sighting.class));
 
         SightingCreateDTO dto = new SightingCreateDTO(
                 petId,
