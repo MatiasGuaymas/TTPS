@@ -121,21 +121,6 @@ export class DetalleComponent implements OnInit, AfterViewInit {
         });
     }
 
-    nextPhoto(): void {
-        const pet = this.pet();
-        if (pet && pet.photosBase64.length > 1) {
-            this.currentPhotoIndex.set((this.currentPhotoIndex() + 1) % pet.photosBase64.length);
-        }
-    }
-
-    prevPhoto(): void {
-        const pet = this.pet();
-        if (pet && pet.photosBase64.length > 1) {
-            const newIndex = this.currentPhotoIndex() - 1;
-            this.currentPhotoIndex.set(newIndex < 0 ? pet.photosBase64.length - 1 : newIndex);
-        }
-    }
-
     getEstadoLabel(estado: State): string {
         const labels = {
             [State.PERDIDO_PROPIO]: 'Perdido (Propio)',

@@ -71,7 +71,7 @@ public record PetDetailDTO(
             message.append("• Peso: ").append(String.format("%.1f kg", weight)).append("\n");
         }
         
-        message.append("\n📍 *Ubicación del último avistamiento:*\n");
+        message.append("\n📍 *Ubicación de Pérdida:*\n");
         if (locationDescription != null && !locationDescription.isEmpty()) {
             message.append("• ").append(locationDescription).append("\n");
         } else {
