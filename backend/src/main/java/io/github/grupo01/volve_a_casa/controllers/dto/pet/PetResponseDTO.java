@@ -22,12 +22,6 @@ public record PetResponseDTO(
         List<String> photosBase64
 ) {
     public static PetResponseDTO fromPet(Pet pet) {
-        List<String> allPhotos = pet.getPhotosBase64();
-        
-        List<String> limitedPhotos = (allPhotos != null && !allPhotos.isEmpty()) 
-                ? List.of(allPhotos.get(0)) 
-                : List.of();
-
         return new PetResponseDTO(
                 pet.getId(),
                 pet.getName(),
@@ -42,7 +36,7 @@ public record PetResponseDTO(
                 pet.getState(),
                 pet.getType(),
                 pet.getCreator().getId(),
-                limitedPhotos 
+                pet.getPhotosBase64()
         );
     }
 }
