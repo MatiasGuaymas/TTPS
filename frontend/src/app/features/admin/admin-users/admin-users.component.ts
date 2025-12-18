@@ -5,6 +5,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { UserService } from '../../../core/services/user.service';
 import { AlertService } from '../../../core/services/alert.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AdminUserUpdateRequest, UserFilter, UserProfile } from '../../../core/models/user.models';
 
 @Component({
     selector: 'app-admin-users',

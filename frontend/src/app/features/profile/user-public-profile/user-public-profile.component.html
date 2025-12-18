@@ -1,0 +1,201 @@
+<div class="min-h-screen bg-gray-50 dark:bg-background-dark py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Error -->
+        <div *ngIf="error" class="flex items-center justify-center min-h-[60vh] p-4">
+            <div class="bg-white dark:bg-primary-dark rounded-2xl p-8 sm:p-12 text-center max-w-md shadow-lg">
+                <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i>
+                <p class="text-lg mb-6 text-gray-900 dark:text-white">{{ error }}</p>
+                <button type="button" (click)="goBack()"
+                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] text-white rounded-xl hover:shadow-lg transition-all duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver
+                </button>
+            </div>
+        </div>
+
+        <!-- Perfil del Usuario -->
+        <div *ngIf="userProfile$ | async as userProfile; else loadingTpl" class="max-w-6xl mx-auto">
+            <!-- Back Button -->
+            <button type="button" (click)="goBack()"
+                class="inline-flex items-center mb-6 px-6 py-3 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] text-white rounded-xl hover:shadow-lg transition-all duration-300">
+                <i class="fas fa-arrow-left mr-2"></i>Volver
+            </button>
+
+            <!-- Header del Perfil -->
+            <div
+                class="bg-white dark:bg-primary-dark rounded-2xl shadow-lg p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-6">
+                <div class="flex-shrink-0">
+                    <div
+                        class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] rounded-full flex items-center justify-center text-white text-4xl sm:text-5xl">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                        {{ userProfile.name }} {{ userProfile.lastName }}
+                    </h1>
+                    <div class="flex items-center text-gray-600 dark:text-gray-400 text-base sm:text-lg">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span>{{ userProfile.city }}, {{ userProfile.neighborhood }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Contacto -->
+            <div class="bg-white dark:bg-primary-dark rounded-2xl shadow-lg p-6 sm:p-8 mb-6">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <i class="fas fa-info-circle mr-3 text-[#37B47D] dark:text-[#205D6F]"></i>
+                    Información de Contacto
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div
+                        class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl hover:shadow-md transition-all duration-300">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user text-white text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400 block">Nombre</span>
+                            <span class="text-base font-semibold text-gray-900 dark:text-white truncate block">{{
+                                userProfile.name }}</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl hover:shadow-md transition-all duration-300">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-tag text-white text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400 block">Apellido</span>
+                            <span class="text-base font-semibold text-gray-900 dark:text-white truncate block">{{
+                                userProfile.lastName }}</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl hover:shadow-md transition-all duration-300">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-phone text-white text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400 block">Teléfono</span>
+                            <span class="text-base font-semibold text-gray-900 dark:text-white truncate block">{{
+                                userProfile.phone || 'No especificado' }}</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl hover:shadow-md transition-all duration-300">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-city text-white text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400 block">Ciudad</span>
+                            <span class="text-base font-semibold text-gray-900 dark:text-white truncate block">{{
+                                userProfile.city }}</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl hover:shadow-md transition-all duration-300">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-map text-white text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400 block">Barrio</span>
+                            <span class="text-base font-semibold text-gray-900 dark:text-white truncate block">{{
+                                userProfile.neighborhood }}</span>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-background-dark rounded-xl hover:shadow-md transition-all duration-300">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-star text-white text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400 block">Puntos</span>
+                            <span class="text-base font-semibold text-gray-900 dark:text-white truncate block">{{
+                                userProfile.points }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mascotas del Usuario -->
+            <div class="bg-white dark:bg-primary-dark rounded-2xl shadow-lg p-6 sm:p-8">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <i class="fas fa-paw mr-3 text-[#37B47D] dark:text-[#205D6F]"></i>
+                    Sus Mascotas
+                    <span
+                        class="ml-3 inline-flex items-center justify-center min-w-[2rem] h-8 px-3 bg-gradient-to-r from-[#37B47D] to-[#008A88] dark:from-[#205D6F] dark:to-[#2F4858] text-white rounded-full text-sm font-semibold">
+                        {{ userProfile.pets.length }}
+                    </span>
+                </h2>
+
+                <div *ngIf="userProfile.pets.length === 0" class="text-center py-16">
+                    <i class="fas fa-inbox text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-lg text-gray-600 dark:text-gray-400">Este usuario no tiene mascotas registradas</p>
+                </div>
+
+                <div *ngIf="userProfile.pets.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div *ngFor="let pet of userProfile.pets" (click)="goToPetDetail(pet.id)"
+                        class="bg-gray-50 dark:bg-background-dark rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                        <div class="relative h-48 sm:h-56 overflow-hidden group">
+                            <img *ngIf="pet.photosBase64 && pet.photosBase64.length > 0"
+                                [src]="'data:image/jpeg;base64,' + pet.photosBase64[0]"
+                                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                [alt]="pet.name">
+                            <div *ngIf="!pet.photosBase64 || pet.photosBase64.length === 0"
+                                class="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                                <i class="fas fa-image text-6xl text-white opacity-70"></i>
+                            </div>
+                            <div
+                                class="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <span class="text-white font-semibold text-lg">Ver detalles</span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ pet.name }}</h3>
+                            <div class="flex gap-2 flex-wrap mb-4">
+                                <span class="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm font-semibold">{{
+                                    pet.type }}</span>
+                                <span class="px-3 py-1 bg-gray-500 text-white rounded-lg text-sm font-semibold">{{
+                                    pet.size }}</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="font-semibold text-gray-600 dark:text-gray-400">Raza:</span>
+                                    <span class="text-gray-900 dark:text-white">{{ pet.race || 'No especificada'
+                                        }}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="font-semibold text-gray-600 dark:text-gray-400">Color:</span>
+                                    <span class="text-gray-900 dark:text-white">{{ pet.color }}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="font-semibold text-gray-600 dark:text-gray-400">Estado:</span>
+                                    <span class="px-2 py-1 rounded text-xs font-semibold" [ngClass]="{
+                                        'bg-red-500 text-white': pet.state === 'PERDIDO_PROPIO' || pet.state === 'PERDIDO_AJENO',
+                                        'bg-green-500 text-white': pet.state === 'RECUPERADO',
+                                        'bg-yellow-500 text-white': pet.state === 'ADOPTADO'
+                                    }">
+                                        {{ pet.state }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Template -->
+        <ng-template #loadingTpl>
+            <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">Cargando perfil...</p>
+            </div>
+        </ng-template>
+    </div>
+</div>

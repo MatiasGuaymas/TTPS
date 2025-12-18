@@ -12,7 +12,7 @@
 
       <!-- Menú móvil -->
       <button (click)="toggleMobileMenu()"
-        class="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors ml-auto">
+        class="md:hidden text-white p-2 hover:bg-white/5 rounded-lg transition-colors ml-auto">
         <svg *ngIf="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
@@ -24,7 +24,7 @@
 
     <!-- Links de navegación -->
     <div class="hidden md:flex items-center justify-center space-x-1 lg:space-x-2">
-      <a routerLink="/mascota-perdida" routerLinkActive="bg-white/20"
+      <a routerLink="/listado-mascotas" routerLinkActive="bg-white/20"
         class="px-4 py-2 text-white font-medium text-sm lg:text-base rounded-lg hover:bg-white/10 transition-all duration-200 whitespace-nowrap">
         ¿Perdiste tu mascota?
       </a>
@@ -111,21 +111,17 @@
 <div *ngIf="mobileMenuOpen"
   class="md:hidden bg-gradient-to-r from-[#37B47D] via-[#009F87] to-[#008A88] dark:from-[#205D6F] dark:via-[#2F4858] dark:to-[#2F4858] border-t border-white/20 shadow-lg">
   <div class="px-4 py-3 space-y-2">
-    <a routerLink="/x" (click)="closeMobileMenu()"
+    <a routerLink="/listado-mascotas" (click)="closeMobileMenu()"
       class="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
       ¿Perdiste tu mascota?
     </a>
-    <a routerLink="/x" (click)="closeMobileMenu()"
+    <a routerLink="/mascota-perdida" (click)="closeMobileMenu()"
       class="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
       ¿Encontraste una mascota?
     </a>
     <a routerLink="/x" (click)="closeMobileMenu()"
       class="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
-      Ver mascotas perdidas
-    </a>
-    <a routerLink="/x" (click)="closeMobileMenu()"
-      class="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors">
-      Ranking rescatistas
+      Ranking
     </a>
     <div class="border-t border-white/20 pt-2 mt-2">
       @if (isLoggedIn()) {

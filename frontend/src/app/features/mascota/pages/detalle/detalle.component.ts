@@ -7,6 +7,7 @@ import { AvistamientoService } from '../../avistamiento.service';
 import { PetResponse, State, Size, TipoMascota } from '../../mascota.model';
 import { AlertService } from '../../../../core/services/alert.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Map } from '../../../../shared/components/map/map';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
 
@@ -15,7 +16,7 @@ import { initFlowbite } from 'flowbite';
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,
-    imports: [CommonModule, RouterLink, ReactiveFormsModule],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule, Map],
     templateUrl: './detalle.component.html',
     styles: [`
         #map, #sightingMap {
@@ -47,8 +48,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     loadingSightings = signal(false);
 
     sightingForm!: FormGroup;
-    private map: L.Map | null = null;
-    private sightingMap: L.Map | null = null;
+    selectedSightingLocation = signal<{ latitude: number, longitude: number } | null>(null);
 
     ngOnInit(): void {
         // Inicializar formulario de avistamiento
@@ -91,8 +91,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             next: (pet) => {
                 this.pet.set(pet);
                 this.loading.set(false);
-                // Inicializar mapa después de cargar los datos
-                setTimeout(() => this.initMap(), 100);
                 // Cargar avistamientos de esta mascota
                 this.loadSightings(id);
             },
@@ -111,8 +109,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             next: (sightings) => {
                 this.sightings.set(sightings);
                 this.loadingSightings.set(false);
-                // Inicializar mapas de avistamientos después de que se rendericen
-                setTimeout(() => this.initSightingMaps(), 200);
             },
             error: (error) => {
                 if (error.status === 204) {
@@ -121,51 +117,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
                     console.error('Error al cargar avistamientos:', error);
                 }
                 this.loadingSightings.set(false);
-            }
-        });
-    }
-
-    initMap(): void {
-        const pet = this.pet();
-        if (!pet || this.map) return;
-
-        // Crear el mapa centrado en la ubicación de pérdida
-        this.map = L.map('map').setView([pet.latitude, pet.longitude], 15);
-
-        // Agregar capa de tiles de OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(this.map);
-
-        // Agregar marcador en la ubicación de pérdida
-        const marker = L.marker([pet.latitude, pet.longitude]).addTo(this.map);
-        marker.bindPopup(`<b>${pet.name}</b><br>Último lugar visto`).openPopup();
-    }
-
-    initSightingMaps(): void {
-        const sightingsList = this.sightings();
-        if (!sightingsList || sightingsList.length === 0) return;
-
-        sightingsList.forEach(sighting => {
-            const mapId = `map-sighting-${sighting.id}`;
-            const mapElement = document.getElementById(mapId);
-
-            if (mapElement && !mapElement.classList.contains('leaflet-container')) {
-                const map = L.map(mapId, {
-                    zoomControl: true,
-                    scrollWheelZoom: true,
-                    doubleClickZoom: true
-                }).setView([sighting.latitude, sighting.longitude], 15);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(map);
-
-                // Agregar marcador en la ubicación del avistamiento
-                const marker = L.marker([sighting.latitude, sighting.longitude]).addTo(map);
-                marker.bindPopup(`Avistamiento: ${new Date(sighting.date).toLocaleDateString()}`);
             }
         });
     }
@@ -241,53 +192,21 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             comment: '',
             photo: null
         });
-        this.photoPreview.set(null);
+        this.selectedSightingLocation.set(null);
 
-        // Inicializar mapa del modal después de que se muestre
-        setTimeout(() => this.initSightingMap(), 200);
+        // Re-inicializar flowbite después de abrir el modal
+        setTimeout(() => initFlowbite(), 100);
     }
 
     closeSightingModal(): void {
         this.showSightingModal.set(false);
-        if (this.sightingMap) {
-            this.sightingMap.remove();
-            this.sightingMap = null;
-        }
+        this.selectedSightingLocation.set(null);
         // Re-inicializar flowbite después de cerrar el modal
         setTimeout(() => initFlowbite(), 100);
     }
 
-    initSightingMap(): void {
-        const pet = this.pet();
-        if (!pet || this.sightingMap) return;
-
-        // Crear el mapa para seleccionar ubicación del avistamiento
-        this.sightingMap = L.map('sightingMap').setView([pet.latitude, pet.longitude], 13);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(this.sightingMap);
-
-        // Agregar marcador inicial
-        const marker = L.marker([pet.latitude, pet.longitude]).addTo(this.sightingMap);
-        marker.bindPopup('Haz clic en el mapa para seleccionar la ubicación del avistamiento').openPopup();
-
-        // Variable para almacenar la ubicación seleccionada
-        let selectedLocation = { lat: pet.latitude, lng: pet.longitude };
-
-        // Manejar clics en el mapa
-        this.sightingMap.on('click', (e: L.LeafletMouseEvent) => {
-            selectedLocation = e.latlng;
-            marker.setLatLng(e.latlng);
-            marker.bindPopup(`Ubicación seleccionada: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`).openPopup();
-
-            // Actualizar el formulario con las nuevas coordenadas
-            this.sightingForm.patchValue({
-                latitude: e.latlng.lat,
-                longitude: e.latlng.lng
-            });
-        });
+    onSightingLocationChanged(coords: { latitude: number, longitude: number }): void {
+        this.selectedSightingLocation.set(coords);
     }
 
     onPhotoSelected(event: Event): void {
@@ -323,27 +242,21 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             return;
         }
 
-        const pet = this.pet();
-        if (!pet || !this.sightingMap) return;
-
-        // Obtener la posición del marcador
-        const layers = (this.sightingMap as any)._layers;
-        let markerPosition = { lat: pet.latitude, lng: pet.longitude };
-
-        for (const key in layers) {
-            const layer = layers[key];
-            if (layer instanceof L.Marker) {
-                markerPosition = layer.getLatLng();
-                break;
-            }
+        const location = this.selectedSightingLocation();
+        if (!location) {
+            this.alertService.error('Error', 'Por favor selecciona una ubicación en el mapa');
+            return;
         }
+
+        const pet = this.pet();
+        if (!pet) return;
 
         this.submittingSighting.set(true);
 
         const sightingData = {
             petId: pet.id,
-            latitude: markerPosition.lat,
-            longitude: markerPosition.lng,
+            latitude: location.latitude,
+            longitude: location.longitude,
             date: this.sightingForm.value.date,
             comment: this.sightingForm.value.comment || ''
         };
@@ -365,13 +278,5 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.map) {
-            this.map.remove();
-            this.map = null;
-        }
-        if (this.sightingMap) {
-            this.sightingMap.remove();
-            this.sightingMap = null;
-        }
     }
 }
