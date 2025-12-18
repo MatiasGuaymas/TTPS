@@ -37,3 +37,32 @@ interface UserFilter {
     maxPoints?: number;
     role?: 'USER' | 'ADMIN';
 }
+
+interface UserPublicProfile {
+    id: number;
+    name: string;
+    lastName: string;
+    phone: string;
+    city: string;
+    neighborhood: string;
+    pets: PetResponse[];
+}
+
+// TODO: PetResponse ya existe en otro lado, habria que cambiar esto.
+
+interface PetResponse {
+    id: number;
+    name: string;
+    size: string;
+    description: string;
+    color: string;
+    race: string;
+    weight: number;
+    latitude: number;
+    longitude: number;
+    lostDate: string;
+    state: string;
+    type: string;
+    creatorId: number;
+    photosBase64: string[];
+}

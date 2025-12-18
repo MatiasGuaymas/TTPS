@@ -10,6 +10,7 @@ import { NotFoundComponent } from './features/error/not-found/not-found.componen
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { UserPublicProfileComponent } from './features/profile/user-public-profile/user-public-profile.component';
 import { ListadoMascotas } from './features/mascota/pages/listado/listado';
 
 export const routes: Routes = [
@@ -42,7 +43,11 @@ export const routes: Routes = [
         component: AltaMascota,
         canActivate: [authGuard]
     },
-
+    {
+        path: 'user/:id',
+        component: UserPublicProfileComponent, 
+        canActivate: [authGuard]
+    },
     // Rutas para administradores
     {
         path: 'admin/users',

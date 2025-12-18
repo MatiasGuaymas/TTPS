@@ -107,4 +107,8 @@ export class UserService {
     return this.http.post<UserProfile>(`${this.apiUrl}/admin`, userData);
   }
 
+  getUserPublicProfile(userId: number): Observable<UserPublicProfile> {
+    return this.http.get<UserPublicProfile>(`${this.apiUrl}/${userId}/profile`);
+  }
+
 }

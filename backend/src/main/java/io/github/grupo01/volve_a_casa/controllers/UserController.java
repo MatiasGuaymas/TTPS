@@ -3,6 +3,7 @@ package io.github.grupo01.volve_a_casa.controllers;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.AdminUserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserPublicProfileDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.interfaces.IUserController;
@@ -53,6 +54,12 @@ public class UserController implements IUserController {
     public ResponseEntity<?> getUserById(@AuthenticationPrincipal User requester, @PathVariable Long id) {
         User user = userService.findById(id);
         return ResponseEntity.ok(UserResponseDTO.fromUser(user));
+    }
+
+    @GetMapping("/{id}/profile")
+    public ResponseEntity<UserPublicProfileDTO> getUserPublicProfile(@PathVariable Long id) {
+        UserPublicProfileDTO profile = userService.getUserPublicProfile(id);
+        return ResponseEntity.ok(profile);
     }
 
     @Override

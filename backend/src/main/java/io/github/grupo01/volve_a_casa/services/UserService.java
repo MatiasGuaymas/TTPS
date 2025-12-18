@@ -4,6 +4,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.AdminUserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserPublicProfileDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
@@ -168,5 +169,10 @@ public class UserService {
         user.setRole(User.Role.ADMIN);
 
         return UserResponseDTO.fromUser(userRepository.save(user));
+    }
+
+    public UserPublicProfileDTO getUserPublicProfile(Long userId) {
+        User user = findById(userId);
+        return UserPublicProfileDTO.fromUser(user);
     }
 }
