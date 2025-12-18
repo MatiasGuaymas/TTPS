@@ -1,11 +1,13 @@
 package io.github.grupo01.volve_a_casa.telegram;
 
 import io.github.grupo01.volve_a_casa.integrations.IACliente;
+import io.github.grupo01.volve_a_casa.services.TelegramNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -24,6 +26,9 @@ public class IATelegramBot extends TelegramLongPollingBot {
     private String botToken;
 
     private final IACliente iaCliente;
+    
+    @Autowired
+    private TelegramNotificationService notificationService;
 
     private final ConcurrentHashMap<Long, UserWindow> userWindows = new ConcurrentHashMap<>();
 
@@ -43,16 +48,91 @@ public class IATelegramBot extends TelegramLongPollingBot {
 
         // Manejar comando /start o saludos
         if(messageText.equals("/start") || messageText.equalsIgnoreCase("hola") || messageText.equalsIgnoreCase("hello")) {
-            sendText(chatId, "¡Hola! 👋 Soy el bot de Volve a Casa.\n\nEscribe /preguntar seguido de tu pregunta para que pueda ayudarte.\n\nEjemplo: /preguntar ¿Cómo reportar una mascota perdida?");
+            sendText(chatId, "¡Hola! 👋 Soy el bot de Volve a Casa.\n\nUsa /comandos para ver todas las funcionalidades disponibles.");
             return;
         }
 
-        // Verificar que empiece con /preguntar
-        if(!messageText.startsWith("/preguntar")) {
-            sendText(chatId, "Por favor usa el comando /preguntar seguido de tu pregunta.\n\nEjemplo: /preguntar ¿Cómo funciona la app?");
+        // Comando /comandos
+        if(messageText.equals("/comandos")) {
+            String commandsHelp = """
+                    📋 *Comandos disponibles:*
+                    
+                    🤖 /preguntar <pregunta>
+                    Realiza cualquier pregunta sobre mascotas perdidas o la aplicación.
+                    Ejemplo: /preguntar ¿Cómo reportar una mascota?
+                    
+                    🔔 /suscribir <id_mascota>
+                    Suscríbete para recibir notificaciones de avistamientos de una mascota específica.
+                    Ejemplo: /suscribir 123
+                    
+                    🔕 /desuscribir <id_mascota>
+                    Deja de recibir notificaciones de avistamientos de una mascota.
+                    Ejemplo: /desuscribir 123
+                    
+                    📋 /comandos
+                    Muestra este mensaje de ayuda.
+                    """;
+            sendMarkdownText(chatId, commandsHelp);
             return;
         }
 
+        // Comando /suscribir
+        if(messageText.startsWith("/suscribir")) {
+            handleSuscribir(chatId, messageText);
+            return;
+        }
+
+        // Comando /desuscribir
+        if(messageText.startsWith("/desuscribir")) {
+            handleDesuscribir(chatId, messageText);
+            return;
+        }
+
+        // Comando /preguntar
+        if(messageText.startsWith("/preguntar")) {
+            handlePreguntar(chatId, messageText);
+            return;
+        }
+
+        // Comando no reconocido
+        sendText(chatId, "⚠️ Comando no reconocido. Usa /comandos para ver la lista de comandos disponibles.");
+    }
+
+    private void handleSuscribir(long chatId, String messageText) {
+        String[] parts = messageText.split("\\s+");
+        
+        if(parts.length < 2) {
+            sendText(chatId, "⚠️ Formato incorrecto. Usa: /suscribir <id_mascota>\n\nEjemplo: /suscribir 123");
+            return;
+        }
+
+        try {
+            Long petId = Long.parseLong(parts[1]);
+            String response = notificationService.suscribir(chatId, petId);
+            sendText(chatId, response);
+        } catch (NumberFormatException e) {
+            sendText(chatId, "❌ El ID de mascota debe ser un número válido.\n\nEjemplo: /suscribir 123");
+        }
+    }
+
+    private void handleDesuscribir(long chatId, String messageText) {
+        String[] parts = messageText.split("\\s+");
+        
+        if(parts.length < 2) {
+            sendText(chatId, "⚠️ Formato incorrecto. Usa: /desuscribir <id_mascota>\n\nEjemplo: /desuscribir 123");
+            return;
+        }
+
+        try {
+            Long petId = Long.parseLong(parts[1]);
+            String response = notificationService.desuscribir(chatId, petId);
+            sendText(chatId, response);
+        } catch (NumberFormatException e) {
+            sendText(chatId, "❌ El ID de mascota debe ser un número válido.\n\nEjemplo: /desuscribir 123");
+        }
+    }
+
+    private void handlePreguntar(long chatId, String messageText) {
         // Verificar límite de rate
         if(isRateLimited(chatId)) {
             sendText(chatId, "⏱️ Has alcanzado el límite de preguntas. Por favor espera un minuto.");
@@ -78,6 +158,10 @@ public class IATelegramBot extends TelegramLongPollingBot {
             System.err.println("API callback failed: " + e.getMessage());
             sendText(chatId, "❌ Lo siento, hubo un error al procesar tu pregunta. Intenta de nuevo más tarde.");
         }
+    }
+
+    public void sendNotification(Long chatId, String message) {
+        sendMarkdownText(chatId, message);
     }
 
     @Override
@@ -109,6 +193,16 @@ public class IATelegramBot extends TelegramLongPollingBot {
             execute(msg);
         } catch (TelegramApiException e) {
             System.err.println("Error sending message: " + e.getMessage());
+        }
+    }
+
+    private void sendMarkdownText(long chatId, String text) {
+        SendMessage msg = new SendMessage(String.valueOf(chatId), text);
+        msg.setParseMode(ParseMode.MARKDOWN);
+        try {
+            execute(msg);
+        } catch (TelegramApiException e) {
+            System.err.println("Error sending markdown message: " + e.getMessage());
         }
     }
 

@@ -23,14 +23,17 @@ public class SightingService {
     private final PetService petService;
     private final EmailService emailService;
     private final GeorefService georefService;
+    private final TelegramNotificationService telegramNotificationService;
 
     public SightingService(SightingRepository sightingRepository, UserService userService, PetService petService, 
-                           EmailService emailService, GeorefService georefService) {
+                           EmailService emailService, GeorefService georefService, 
+                           TelegramNotificationService telegramNotificationService) {
         this.sightingRepository = sightingRepository;
         this.userService = userService;
         this.petService = petService;
         this.emailService = emailService;
         this.georefService = georefService;
+        this.telegramNotificationService = telegramNotificationService;
     }
 
     // TODO: Test de integracion
@@ -69,6 +72,9 @@ public class SightingService {
         
         // Enviar email al dueño de la mascota
         sendSightingNotificationEmail(savedSighting, creator);
+        
+        // Enviar notificaciones de Telegram a suscriptores
+        telegramNotificationService.notificarAvistamiento(savedSighting);
         
         return SightingResponseDTO.fromSighting(savedSighting);
     }
