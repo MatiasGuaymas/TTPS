@@ -12,6 +12,7 @@ public record UserPublicProfileDTO(
         String phone,
         String city,
         String neighborhood,
+        int points,
         List<PetResponseDTO> pets
 ) {
     public static UserPublicProfileDTO fromUser(User user) {
@@ -22,6 +23,7 @@ public record UserPublicProfileDTO(
                 user.getPhone(),
                 user.getCity(),
                 user.getNeighborhood(),
+                user.getPoints(),
                 user.getCreatedPets().stream()
                         .map(PetResponseDTO::fromPet)
                         .toList()

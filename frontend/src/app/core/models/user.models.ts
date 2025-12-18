@@ -45,6 +45,7 @@ interface UserPublicProfile {
     phone: string;
     city: string;
     neighborhood: string;
+    points: number;
     pets: PetResponse[];
 }
 
