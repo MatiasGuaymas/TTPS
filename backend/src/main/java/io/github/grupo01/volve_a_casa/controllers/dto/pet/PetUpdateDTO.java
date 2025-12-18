@@ -3,6 +3,7 @@ package io.github.grupo01.volve_a_casa.controllers.dto.pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record PetUpdateDTO(
@@ -33,6 +34,9 @@ public record PetUpdateDTO(
 
         @DecimalMin(value = "-180.0", message = "Longitude must be >= -180")
         @DecimalMax(value = "180.0", message = "Longitude must be <= 180")
-        Float longitude
+        Float longitude,
+
+        @NotBlank(message = "Photo Base64 is required")
+        String photoBase64
 ) {
 }
