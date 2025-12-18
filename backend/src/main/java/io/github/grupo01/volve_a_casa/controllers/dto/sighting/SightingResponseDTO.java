@@ -13,7 +13,8 @@ public record SightingResponseDTO(
         Float latitude,
         Float longitude,
         LocalDate date,
-        String comment
+        String comment,
+        String photoBase64
 ) {
     public static SightingResponseDTO fromSighting(Sighting sighting) {
         return new SightingResponseDTO(
@@ -25,7 +26,8 @@ public record SightingResponseDTO(
                 sighting.getCoordinates().getLatitude(),
                 sighting.getCoordinates().getLongitude(),
                 sighting.getDate(),
-                sighting.getComment()
+                sighting.getComment(),
+                sighting.getPhotoBase64()
         );
     }
 }

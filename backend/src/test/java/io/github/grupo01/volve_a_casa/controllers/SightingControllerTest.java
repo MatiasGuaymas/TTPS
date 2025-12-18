@@ -178,7 +178,8 @@ public class SightingControllerTest {
                 -54f,
                 -21f,
                 LocalDate.now(),
-                "comentario"
+                "comentario",
+                "photo"
         );
     }
 }
