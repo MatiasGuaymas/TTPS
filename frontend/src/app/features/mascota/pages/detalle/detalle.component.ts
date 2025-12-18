@@ -229,26 +229,19 @@ export class DetalleComponent implements OnInit, AfterViewInit {
             }
 
             const reader = new FileReader();
+            reader.readAsDataURL(file);
             reader.onload = e => {
+                const base64String = (reader.result as string).split(',')[1];
+                this.photoBase64.set(base64String);
                 this.photoPreview.set(reader.result);
             };
-            reader.readAsDataURL(file);
-
-            this.convertToBase64(file);
+            reader.onerror = (error) => {
+                console.error('Error al convertir a Base64: ', error);
+                this.photoBase64.set(undefined);
+                this.photoPreview.set(null);
+                this.alertService.error('Error', 'No se pudo procesar la imagen seleccionada');
+            };
         }
-    }
-
-    private convertToBase64(file: File): void {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const base64String = (reader.result as string).split(',')[1];
-            this.photoBase64.set(base64String);
-        }
-        reader.onerror = (error) => {
-            console.error('Error al convertir a Base64: ', error);
-            this.photoBase64.set(undefined);
-        };
     }
 
     submitSighting(): void {
