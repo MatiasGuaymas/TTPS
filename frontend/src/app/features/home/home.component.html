@@ -16,12 +16,19 @@
   
     <carousel class="w-full max-w-4xl mt- mb-4"></carousel>
 
-    <div class="mt-12 flex flex-col items-center">
-      <!-- TODO: CAMBIAR EL COMPONENTE DE MAPA PARA QUE TOME UNA LISTA DE LAT Y LON -->
-      <leaflet-map
+    <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8">
+      Avistamientos Recientes
+    </h2>
 
-      ></leaflet-map>
-    </div>
+    <div class="mt-12 flex flex-col items-center w-full mb-12">
+      <app-map 
+          class="w-full max-w-6xl h-[500px] block rounded-lg overflow-hidden shadow-xl mx-auto"
+          [markersList]="sightingsLocationList" 
+          [readonly]="true"
+          [showDefaultMarker]="false"> 
+      </app-map>
+  </div>
+
     
     <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8">
       Ranking de rescatistas

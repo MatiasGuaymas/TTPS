@@ -7,7 +7,7 @@ import { AvistamientoService } from '../../avistamiento.service';
 import { PetResponse, State, Size, TipoMascota } from '../../mascota.model';
 import { AlertService } from '../../../../core/services/alert.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { Map } from '../../../../shared/components/map/map';
+import { MapComponent } from '../../../../shared/components/map/map';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
 
@@ -16,7 +16,7 @@ import { initFlowbite } from 'flowbite';
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,
-    imports: [CommonModule, RouterLink, ReactiveFormsModule, Map],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule, MapComponent],
     templateUrl: './detalle.component.html',
     styles: [`
         #map, #sightingMap {
