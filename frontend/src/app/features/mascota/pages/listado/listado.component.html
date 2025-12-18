@@ -1,8 +1,8 @@
-<main class="bg-background dark:bg-background-dark min-h-screen flex flex-col md:flex-row gap-8 p-4 md:p-8" [formGroup]="filterForm">        
+<main class="bg-background dark:bg-background-dark min-h-screen flex flex-col md:flex-row gap-8 p-4 md:p-8" [formGroup]="filterForm">
     <aside class="w-full md:w-64 flex-none self-start">
             <div class="sticky top-24 space-y-6 self-start">
                 <h2 class="text-xl font-bold border-b dark:border-border-dark pb-2 text-text dark:text-text-dark">Filtros</h2>
-                
+
             <div class="flex-1 min-w-[140px]">
                 <label class="block text-[10px] text-text dark:text-text-dark  uppercase opacity-60 mb-1">Nombre</label>
                 <input type="text" formControlName="name" class="w-full p-2 text-sm border border-gray-300 text-text rounded bg-transparent dark:text-text-dark" placeholder="Toby" />
@@ -55,7 +55,7 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold mb-1 uppercase opacity-70 text-text dark:text-text-dark">Tamaño</label>
-                            <select formControlName="size" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 text-text dark:text-text-dark">
+                            <select formControlName="petSize" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 text-text dark:text-text-dark">
                                 <option [ngValue]="null">Todos</option>
                                 <option value="PEQUENO">Pequeño</option>
                                 <option value="MEDIANO">Mediano</option>
@@ -73,6 +73,7 @@
                         </div>
                     </div>
 
+                    <!--
                     <div class="p-3 border rounded-md bg-white dark:bg-primary-dark/30 shadow-sm">
                         <label class="flex items-center space-x-2 cursor-pointer">
                             <input type="checkbox" [formControl]="userCurrentLocation" class="form-checkbox h-4 w-4 text-navbar">
@@ -85,58 +86,64 @@
                             </div>
                         }
                     </div>
-                     <button (click)="buscarMascotas()" [disabled]="cargandoUbicacion.value"
+                    -->
+                     <button (click)="applyFilters()" [disabled]="cargandoUbicacion()"
                             class="bg-navbar dark:bg-navbar-dark text-white px-6 py-2 rounded font-bold hover:brightness-110 h-[38px] disabled:opacity-50 cursor-pointer">
-                        {{ cargandoUbicacion.value ? 'LOCALIZANDO...' : 'BUSCAR' }}
+                        {{ cargandoUbicacion() ? 'LOCALIZANDO...' : 'BUSCAR' }}
                     </button>
                 </div>
             </div>
         </aside>
 
         <section class="flex-1">
-            @if (busquedaRealizada) {
-                @if (pets.length === 0) {
-                    <div class="p-12 text-center rounded-lg bg-white dark:bg-primary-dark shadow-sm border dark:border-border-dark">
-                        <p class="text-lg opacity-60 italic dark:text-text-dark">No se encontraron mascotas con estos filtros.</p>
-                    </div>
-                } @else {
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @for (pet of pets; track pet.id) {
-                            <div class="max-w-sm rounded-xl overflow-hidden shadow-lg bg-background dark:bg-primary-dark border dark:border-border-dark transition-transform hover:scale-[1.02]">
-                                <div class="relative">
-                                    @if (pet.photosBase64 && pet.photosBase64.length > 0) {
-                                        <img class="w-full h-48 object-cover" 
-                                            [src]="pet.photosBase64[0]" 
-                                            alt="Imagen de {{ pet.name }}">
-                                    } @else {
-                                        <img class="w-full h-48 object-cover opacity-50" 
-                                            src="assets/img/pet-placeholder.jpg" 
-                                            alt="Sin foto disponible">
-                                    }
-                                </div>
-                                <div class="px-6 py-4">
+            @if (loading()) {
+                <div class="h-full w-full flex justify-center items-center">
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#37B47D]"></div>
+                </div>
+            }
+            @else if (!loading() && pets().length === 0) {
+                <div class="p-12 text-center rounded-lg bg-white dark:bg-primary-dark shadow-sm border dark:border-border-dark">
+                    <p class="text-lg opacity-60 italic dark:text-text-dark">No se encontraron mascotas con estos filtros.</p>
+                </div>
+            } @else if (!loading() && pets().length > 0) {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @for (pet of pets(); track pet.id) {
+                        <div (click)="goToPetDetail(pet.id)" class="max-w-sm rounded-xl overflow-hidden shadow-lg bg-background dark:bg-primary-dark border dark:border-border-dark transition-transform hover:scale-[1.02]">
+                            <div class="relative">
+                                @if (pet.photosBase64 && pet.photosBase64.length > 0) {
+                                    <img class="w-full h-48 object-cover"
+                                        [src]="decodePhoto(pet.photosBase64[0])"
+                                        alt="Imagen de {{ pet.name }}">
+                                } @else {
+                                    <img class="w-full h-48 object-cover opacity-50"
+                                        src="assets/img/pet-placeholder.jpg"
+                                        alt="Sin foto disponible">
+                                }
+                            </div>
+                            <div class="px-6 py-4">
                                 <div class="font-bold text-xl mb-2 text-navbar dark:text-navbar-dark">
-                                    {{ pet.name }}         
+                                    {{ pet.name }}
                                 </div>
                                 <p class="text-text dark:text-text-dark text-base opacity-80">
-                                    Esta mascota fue vista por última vez el día <strong>{{ pet.lostDate }}</strong>. 
+                                    Esta mascota fue vista por última vez el día <strong>{{ pet.lostDate }}</strong>.
                                 </p>
                                 <div class="px-6 pt-4 pb-2">
                                     <span class="inline-block bg-primary dark:bg-border-dark rounded-full px-3 py-1 text-sm font-semibold text-text dark:text-text-dark mr-2 mb-2">
-                                        #{{ pet.type }}
+                                        Animal: {{ pet.type }}
                                     </span>
                                     <span class="inline-block bg-primary dark:bg-border-dark rounded-full px-3 py-1 text-sm font-semibold text-text dark:text-text-dark mr-2 mb-2">
-                                        #{{ pet.size }}
+                                        Tamaño: {{ pet.size }}
                                     </span>
                                     @if (pet.race) {
                                         <span class="inline-block bg-primary dark:bg-border-dark rounded-full px-3 py-1 text-sm font-semibold text-text dark:text-text-dark mr-2 mb-2">
-                                            #{{ pet.race }}
+                                            Raza: {{ pet.race }}
                                         </span>
                                     }
                                 </div>
+                            </div>
                         </div>
-                    </div> } 
-            </div> }
-    }
-    </section>
+                    }
+                </div>
+            }
+        </section>
 </main>

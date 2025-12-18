@@ -10,7 +10,7 @@ import { NotFoundComponent } from './features/error/not-found/not-found.componen
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { adminGuard } from './core/guards/admin.guard';
-import { ListadoMascotas } from './features/mascota/pages/listado/listado';
+import { ListadoMascotas } from './features/mascota/pages/listado/listado.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -27,8 +27,8 @@ export const routes: Routes = [
         component: LoginComponent,
         canActivate: [guestGuard]
     },
-    { 
-        path: 'listado-mascotas', 
+    {
+        path: 'listado-mascotas',
         component: ListadoMascotas,
 
     },
@@ -50,7 +50,7 @@ export const routes: Routes = [
         component: AdminUsersComponent,
         canActivate: [adminGuard]
     },
-    // Ruta 404 
+    // Ruta 404
     {
         path: '**',
         component: NotFoundComponent
