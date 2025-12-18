@@ -1,7 +1,9 @@
 package io.github.grupo01.volve_a_casa.services;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetDetailDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetSummaryDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.persistence.Specifications;
@@ -104,5 +106,24 @@ public class PetService {
         return pet.getSightings().stream()
                 .map(SightingResponseDTO::fromSighting)
                 .toList();
+    }
+
+    /**
+     * Obtiene un listado resumido de todas las mascotas perdidas para el bot de Telegram
+     */
+    public List<PetSummaryDTO> getAllLostPetsSummary() {
+        return petRepository.findAllByStateInOrderByLostDate(Pet.State.PERDIDO_PROPIO, Pet.State.PERDIDO_AJENO)
+                .stream()
+                .map(PetSummaryDTO::fromPet)
+                .toList();
+    }
+
+    /**
+     * Obtiene información detallada de una mascota por ID para el bot de Telegram
+     * Excluye las imágenes para optimizar el tamaño de la respuesta
+     */
+    public PetDetailDTO getPetDetailForTelegram(Long petId) {
+        Pet pet = this.findById(petId);
+        return PetDetailDTO.fromPet(pet);
     }
 }

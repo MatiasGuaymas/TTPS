@@ -11,8 +11,6 @@ import { Map } from '../../../../shared/components/map/map';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
 
-// TODO: Agregar foto a avistamiento -> no funciono :(
-
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,

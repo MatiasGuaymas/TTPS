@@ -1,6 +1,9 @@
 package io.github.grupo01.volve_a_casa.telegram;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetDetailDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetSummaryDTO;
 import io.github.grupo01.volve_a_casa.integrations.IACliente;
+import io.github.grupo01.volve_a_casa.services.PetService;
 import io.github.grupo01.volve_a_casa.services.TelegramNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +23,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -33,6 +37,9 @@ public class IATelegramBot extends TelegramLongPollingBot {
     
     @Autowired
     private TelegramNotificationService notificationService;
+
+    @Autowired
+    private PetService petService;
 
     private final ConcurrentHashMap<Long, UserWindow> userWindows = new ConcurrentHashMap<>();
 
@@ -61,6 +68,13 @@ public class IATelegramBot extends TelegramLongPollingBot {
             String commandsHelp = """
                     📋 *Comandos disponibles:*
                     
+                    🐾 /mascotas
+                    Lista todas las mascotas perdidas con información resumida.
+                    
+                    🔍 /mascota <id>
+                    Muestra información detallada de una mascota específica.
+                    Ejemplo: /mascota 123
+                    
                     🤖 /preguntar <pregunta>
                     Realiza cualquier pregunta sobre mascotas perdidas o la aplicación.
                     Ejemplo: /preguntar ¿Cómo reportar una mascota?
@@ -77,6 +91,18 @@ public class IATelegramBot extends TelegramLongPollingBot {
                     Muestra este mensaje de ayuda.
                     """;
             sendMarkdownText(chatId, commandsHelp);
+            return;
+        }
+
+        // Comando /mascotas
+        if(messageText.equals("/mascotas")) {
+            handleMascotas(chatId);
+            return;
+        }
+
+        // Comando /mascota
+        if(messageText.startsWith("/mascota")) {
+            handleMascota(chatId, messageText);
             return;
         }
 
@@ -161,6 +187,65 @@ public class IATelegramBot extends TelegramLongPollingBot {
         } catch (IOException e) {
             System.err.println("API callback failed: " + e.getMessage());
             sendText(chatId, "❌ Lo siento, hubo un error al procesar tu pregunta. Intenta de nuevo más tarde.");
+        }
+    }
+
+    private void handleMascotas(long chatId) {
+        try {
+            List<PetSummaryDTO> pets = petService.getAllLostPetsSummary();
+            
+            if (pets.isEmpty()) {
+                sendText(chatId, "✅ ¡Buenas noticias! No hay mascotas perdidas en este momento.");
+                return;
+            }
+
+            StringBuilder message = new StringBuilder();
+            message.append("🐾 *Mascotas Perdidas* (").append(pets.size()).append(" encontradas)\n\n");
+            
+            // Enviar en lotes para evitar mensajes muy largos
+            int batchSize = 5;
+            for (int i = 0; i < pets.size(); i += batchSize) {
+                StringBuilder batch = new StringBuilder();
+                if (i == 0) {
+                    batch.append(message);
+                }
+                
+                int end = Math.min(i + batchSize, pets.size());
+                for (int j = i; j < end; j++) {
+                    batch.append(pets.get(j).toTelegramFormat());
+                    if (j < end - 1) {
+                        batch.append("\n---\n\n");
+                    }
+                }
+                
+                sendMarkdownText(chatId, batch.toString());
+            }
+            
+            sendText(chatId, "💡 Usa /mascota <id> para ver más detalles de una mascota específica.");
+            
+        } catch (Exception e) {
+            System.err.println("Error al obtener listado de mascotas: " + e.getMessage());
+            sendText(chatId, "❌ Lo siento, hubo un error al obtener el listado de mascotas. Intenta de nuevo más tarde.");
+        }
+    }
+
+    private void handleMascota(long chatId, String messageText) {
+        String[] parts = messageText.split("\\s+");
+        
+        if(parts.length < 2) {
+            sendText(chatId, "⚠️ Formato incorrecto. Usa: /mascota <id>\n\nEjemplo: /mascota 123");
+            return;
+        }
+
+        try {
+            Long petId = Long.parseLong(parts[1]);
+            PetDetailDTO pet = petService.getPetDetailForTelegram(petId);
+            sendMarkdownText(chatId, pet.toTelegramFormat());
+        } catch (NumberFormatException e) {
+            sendText(chatId, "❌ El ID de mascota debe ser un número válido.\n\nEjemplo: /mascota 123");
+        } catch (Exception e) {
+            System.err.println("Error al obtener detalle de mascota: " + e.getMessage());
+            sendText(chatId, "❌ No se encontró una mascota con ese ID o hubo un error al obtener la información.");
         }
     }
 
