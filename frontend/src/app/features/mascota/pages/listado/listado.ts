@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
-import { combineLatest, debounceTime, distinctUntilChanged, EMPTY, filter, Observable, race, startWith, Subject, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, distinctUntilChanged, EMPTY, filter, Observable, race, startWith, Subject, switchMap } from 'rxjs';
 
 import { GeolocationService } from '../../../../core/services/geolocation.service';
 import { AlertService } from '../../../../core/services/alert.service';
@@ -31,8 +31,7 @@ export class ListadoMascotas implements OnInit{
   userCurrentLocation=new FormControl(false);
   cargandoUbicacion=new FormControl(false);
 
-  private searchTrigger$ = new Subject<void>();
-
+  private searchTrigger$ = new Subject<void>();  
   constructor(private fb:FormBuilder, private petService: MascotaService, private alert: AlertService) {
     this.filterForm = new FormGroup({
       name: new FormControl(''),
@@ -60,12 +59,11 @@ export class ListadoMascotas implements OnInit{
       } else {
         this.filterForm.patchValue({ userLatitude: null, userLongitude: null });
 
-   
       }
     });
   }
 
-  async loadUserLocation(): Promise<void>{
+  async loadUserLocation(): Promise<{latitude: number, longitude: number} | null>{
     this.cargandoUbicacion.setValue(true);
     try {
       const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000));
@@ -79,70 +77,60 @@ export class ListadoMascotas implements OnInit{
         userLatitude: coords.latitude,
         userLongitude: coords.longitude
       });
+      return coords;
     } catch (error) {
       this.alerts.error('No pudimos obtener tu ubicación automáticamente.');
       this.userCurrentLocation.setValue(false);
+      return null;
     } finally {
       this.cargandoUbicacion.setValue(false); 
     }
   }
 
   pets:PetResponse[] = [];
-  busquedaRealizada = false;
+  busquedaRealizada = true;
 
-  buscarMascotas(): void {
-    this.searchTrigger$.next(); 
-    this.busquedaRealizada = true;
-  }
   ngOnInit(): void {
+  this.searchTrigger$.asObservable().pipe(
+    switchMap(() => {
+      const rawValues = this.filterForm.getRawValue(); 
+      const useLocation = this.userCurrentLocation.value;
+      const finalFilters: Record<string, any> = {};
+
+      Object.keys(rawValues).forEach(key => {
+          const value = rawValues[key];
+          if (value !== undefined && value !== null && value !== '' && value !== 'null') {
+              if (!useLocation && ['userLatitude', 'userLongitude', 'maxDistanceInKm'].includes(key)) return;
+              finalFilters[key] = value;
+          }
+      });
+      
+      console.log("Enviando filtros:", finalFilters);
+      return this.petService.listAllPets(finalFilters as PetFilter);
+    })
+  ).subscribe({ 
+    next: (pets) => { 
+      this.pets = pets || []; 
+      this.busquedaRealizada = true; 
+    },
+    error: (err) => {
+      this.alerts.error('Error al conectar con el servidor.');
+      this.pets = [];
+    }
+  });
+
+  this.searchTrigger$.next();
+}
+
+async buscarMascotas(): Promise<void> {
+  if (this.userCurrentLocation.value && !this.filterForm.get('userLatitude')?.value) {
+    const coords = await this.loadUserLocation();
+    if (!coords) return; 
     
-    this.searchTrigger$.asObservable().pipe(
-      filter(() => {
-        if (this.cargandoUbicacion.value) {
-          this.alerts.error('Espera a que termine de cargar tu ubicación.');
-          return false;
-        }
-        return true;
-      }),
-      switchMap(() => {
-        const formValues = this.filterForm.value;
-        const useLocation = this.userCurrentLocation.value;
-
-        if (useLocation && (formValues.userLatitude === null || formValues.userLongitude === null)) {
-          this.alerts.error('Ubicación no disponible aún.');
-          return EMPTY; 
-        }
-
-            const filters: any = { ...formValues };
-
-            if (!useLocation) {
-                delete filters.userLatitude;
-                delete filters.userLongitude;
-                delete filters.maxDistanceInKm;
-            }
-
-            const finalFilters: Record<string, any> = {};
-
-            Object.keys(filters).forEach(key => {
-                let value = filters[key];
-
-                if (value !== undefined && value !== null && value !== '') {
-                    finalFilters[key] = value;
-                }
-            });
-
-            return this.petService.listAllPets(finalFilters as PetFilter);
-        })
-    ).subscribe({
-        next: (pets) => {
-            this.pets = pets;
-        },
-        error: (err) => {
-        console.error(err);
-        this.alerts.error('Error al conectar con el servidor.');
-        this.pets = [];
-      }
-    });
-
+    
+    setTimeout(() => this.searchTrigger$.next(), 100);
+  } else {
+    this.searchTrigger$.next();
   }
+}
 }

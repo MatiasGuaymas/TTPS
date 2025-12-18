@@ -15,6 +15,7 @@ export enum State {
     ADOPTADO='ADOPTADO',
 }
 
+
 export enum Size {
     PEQUENO='PEQUENO',
     MEDIANO='MEDIANO',

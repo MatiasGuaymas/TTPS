@@ -1,114 +1,100 @@
-<main class="bg-background dark:bg-background-dark min-h-screen">
-    <div class="w-full bg-background dark:bg-primary-dark shadow-md sticky top-0 z-50 px-4 py-3 border-b dark:border-border-dark">
-        <form [formGroup]="filterForm" class="max-w-7xl mx-auto flex flex-wrap lg:flex-nowrap items-end gap-3">
+<main class="bg-background dark:bg-background-dark min-h-screen flex flex-col md:flex-row gap-8 p-4 md:p-8" [formGroup]="filterForm">        
+    <aside class="w-full md:w-64 flex-none self-start">
+            <div class="sticky top-24 space-y-6 self-start">
+                <h2 class="text-xl font-bold border-b dark:border-border-dark pb-2 text-text dark:text-text-dark">Filtros</h2>
+                
             <div class="flex-1 min-w-[140px]">
-                <label class="block text-[10px] font-bold uppercase text-text dark:text-text-dark opacity-60 mb-1">Nombre</label>
-                <input type="text" formControlName="name" placeholder="Toby" 
-                       class="w-full p-2 text-sm border border-gray-300 rounded bg-transparent dark:text-text-dark focus:ring-1 focus:ring-navbar" />
+                <label class="block text-[10px] text-text dark:text-text-dark  uppercase opacity-60 mb-1">Nombre</label>
+                <input type="text" formControlName="name" class="w-full p-2 text-sm border border-gray-300 text-text rounded bg-transparent dark:text-text-dark" placeholder="Toby" />
             </div>
 
-            <div class="flex flex-[2] min-w-[140px] border border-gray-300 rounded overflow-hidden">
+            <div class="flex flex-[2] min-w-[140px] border border-gray-300 text-text dark:text-text-dark rounded overflow-hidden">
                 <div class="flex-1 border-r border-gray-300 p-1">
-                    <label class="block text-[9px] font-bold uppercase opacity-50 dark:text-text-dark px-1">Desde</label>
-                    <input type="date" formControlName="initialLostDate" class="w-full bg-transparent text-xs p-1 dark:text-white outline-none" />
+                    <label class="block text-[9px] font-bold uppercase opacity-50 px-1">Desde</label>
+                    <input type="date" formControlName="initialLostDate" class="w-full bg-transparent text-xs p-1 outline-none dark:text-white" />
                 </div>
                 <div class="flex-1 p-1">
-                    <label class="block text-[9px] font-bold uppercase opacity-50 dark:text-text-dark px-1">Hasta</label>
-                    <input type="date" formControlName="finalLostDate" class="w-full bg-transparent text-xs p-1 dark:text-white outline-none" />
+                    <label class="block text-[9px] font-bold uppercase opacity-50 px-1">Hasta</label>
+                    <input type="date" formControlName="finalLostDate" class="w-full bg-transparent text-xs p-1 outline-none dark:text-white" />
                 </div>
             </div>
+
             <div class="flex-1 min-w-[140px]">
-                <label class="block text-[9px] font-bold uppercase text-text dark:text-text-dark opacity-60 px-1">Ordenar</label>
-                <select formControlName="sort" class="w-full p-2 text-sm border border-gray-300 rounded bg-transparent dark:text-white dark:bg-primary-dark">
+                <label class="block text-[9px] font-bold uppercase opacity-60 px-1 text-text dark:text-text-dark">Ordenar</label>
+                <select formControlName="sort" class="w-full p-2 text-sm border border-gray-300 rounded bg-transparent dark:text-text-dark dark:bg-primary-dark">
                     @for (option of sortOptions; track option.value) {
                         <option [value]="option.value">{{ option.label }}</option>
                     }
                 </select>
             </div>
-
-            <button (click)="buscarMascotas()" [disabled]="cargandoUbicacion.value"
-                    class="bg-navbar dark:bg-navbar-dark text-white px-6 py-2 rounded font-bold hover:brightness-110 transition-all flex-none h-[38px] cursor-pointer disabled:opacity-50">
-                {{ cargandoUbicacion.value ? '...' : 'BUSCAR' }}
-            </button>
-        </form>
-    </div>
-
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 p-4 md:p-6">
-        
-        <aside class="w-full md:w-64 flex-none">
-            <div class="sticky top-24 space-y-6">
-                <h2 class="text-xl font-bold border-b dark:border-border-dark pb-2 text-text dark:text-text-dark">Filtra tus resultados</h2>
-                
-                <form [formGroup]="filterForm" class="space-y-5">
+                <div class="space-y-5">
                     <div>
-                        <label class="block text-xs font-bold mb-2 uppercase opacity-70 dark:text-text-dark">Estado</label>
+                        <label class="block text-xs font-bold mb-2 uppercase opacity-70 text-text dark:text-text-dark">Estado</label>
                         <select formControlName="state" class="w-full p-2 text-sm border border-gray-300 rounded dark:bg-gray-800 dark:text-white">
                             <option [ngValue]="null">Todos</option>
-                            <option value="perdido_propio">Perdido propio</option>
-                            <option value="perdido_ajeno">Perdido ajeno</option>
-                            <option value="recuperado">Recuperado</option>
-                            <option value="adoptado">Adoptado</option>
+                            <option value="PERDIDO_PROPIO">Perdido propio</option>
+                            <option value="PERDIDO_AJENO">Perdido ajeno</option>
+                            <option value="RECUPERADO">Recuperado</option>
+                            <option value="ADOPTADO">Adoptado</option>
                         </select>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-[10px] font-bold mb-1 uppercase opacity-70 dark:text-text-dark">Tipo</label>
-                            <select formControlName="type" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-white">
+                            <label class="block text-[10px] font-bold mb-1 uppercase opacity-70 text-text dark:text-text-dark">Tipo</label>
+                            <select formControlName="type" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 text-text dark:text-text-dark">
                                 <option [ngValue]="null">Todos</option>
-                                <option value="Perro">Perro</option>
-                                <option value="Gato">Gato</option>
-                                <option value="Cobaya">Cobaya</option>
-                                <option value="Loro">Loro</option>
-                                <option value="Conejo">Conejo</option>
-                                <option value="Caballo">Caballo</option>
-                                <option value="Tortuga">Tortuga</option>
-                            </select>
+                                <option value="PERRO">Perro</option>
+                                <option value="GATO">Gato</option>
+                                <option value="COBAYA">Cobaya</option>
+                                <option value="LORO">Loro</option>
+                                <option value="CONEJO">Conejo</option>
+                                <option value="CABALLO">Caballo</option>
+                                <option value="TORTUGA">Tortuga</option>
+                                </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold mb-1 uppercase opacity-70 dark:text-text-dark">Tamaño</label>
-                            <select formControlName="size" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-white">
+                            <label class="block text-[10px] font-bold mb-1 uppercase opacity-70 text-text dark:text-text-dark">Tamaño</label>
+                            <select formControlName="size" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 text-text dark:text-text-dark">
                                 <option [ngValue]="null">Todos</option>
-                                <option value="Pequeño">Pequeño</option>
-                                <option value="Mediano">Mediano</option>
-                                <option value="Grande">Grande</option>
+                                <option value="PEQUENO">Pequeño</option>
+                                <option value="MEDIANO">Mediano</option>
+                                <option value="GRANDE">Grande</option>
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold mb-2 uppercase opacity-70 dark:text-text-dark">Peso (kg)</label>
+                        <label class="block text-xs font-bold mb-2 uppercase opacity-70 text-text dark:text-text-dark">Peso (kg)</label>
                         <div class="flex items-center gap-2">
-                            <input type="number" formControlName="weightMin" placeholder="Mín" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-white" />
-                            <span class="dark:text-text-dark">-</span>
-                            <input type="number" formControlName="weightMax" placeholder="Máx" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-white" />
+                            <input type="number" formControlName="weightMin" placeholder="Mín" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-background-dark dark:text-text-dark text-text " />
+                            <span>-</span>
+                            <input type="number" formControlName="weightMax" placeholder="Máx" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-text-dark text-text " />
                         </div>
                     </div>
 
-                    <div class="p-3 border rounded-md bg-white dark:bg-primary-dark/30 dark:border-border-dark shadow-sm">
+                    <div class="p-3 border rounded-md bg-white dark:bg-primary-dark/30 shadow-sm">
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" [formControl]="userCurrentLocation" class="form-checkbox h-4 w-4 text-navbar rounded">
-                            <span class="text-xs font-bold dark:text-text-dark">Buscar mascotas cerca de mi</span>
+                            <input type="checkbox" [formControl]="userCurrentLocation" class="form-checkbox h-4 w-4 text-navbar">
+                            <span class="text-xs font-bold text-text dark:text-text-dark">Cerca de mi</span>
                         </label>
                         @if (userCurrentLocation.value) {
-                            <div class="mt-2 animate-in fade-in slide-in-from-top-1">
-                                <label class="block text-[9px] uppercase font-bold dark:text-text-dark mb-1">Radio (Km)</label>
+                            <div class="mt-2">
+                                <label class="block text-[9px] uppercase font-bold mb-1">Radio (Km)</label>
                                 <input type="number" formControlName="maxDistanceInKm" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-white" />
                             </div>
                         }
                     </div>
-                </form>
+                     <button (click)="buscarMascotas()" [disabled]="cargandoUbicacion.value"
+                            class="bg-navbar dark:bg-navbar-dark text-white px-6 py-2 rounded font-bold hover:brightness-110 h-[38px] disabled:opacity-50 cursor-pointer">
+                        {{ cargandoUbicacion.value ? 'LOCALIZANDO...' : 'BUSCAR' }}
+                    </button>
+                </div>
             </div>
         </aside>
 
         <section class="flex-1">
             @if (busquedaRealizada) {
-                <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between border-b dark:border-border-dark pb-3">
-                    <h2 class="text-xl font-bold text-text dark:text-text-dark">
-                        Resultados encontrados <span class="text-navbar">({{ pets.length }})</span>
-                    </h2>
-                </div>
-
                 @if (pets.length === 0) {
                     <div class="p-12 text-center rounded-lg bg-white dark:bg-primary-dark shadow-sm border dark:border-border-dark">
                         <p class="text-lg opacity-60 italic dark:text-text-dark">No se encontraron mascotas con estos filtros.</p>
@@ -118,7 +104,7 @@
                         @for (pet of pets; track pet.id) {
                             <div class="max-w-sm rounded-xl overflow-hidden shadow-lg bg-background dark:bg-primary-dark border dark:border-border-dark transition-transform hover:scale-[1.02]">
                                 <div class="relative">
-                                   @if (pet.photosBase64 && pet.photosBase64.length > 0) {
+                                    @if (pet.photosBase64 && pet.photosBase64.length > 0) {
                                         <img class="w-full h-48 object-cover" 
                                             [src]="pet.photosBase64[0]" 
                                             alt="Imagen de {{ pet.name }}">
@@ -127,17 +113,13 @@
                                             src="assets/img/pet-placeholder.jpg" 
                                             alt="Sin foto disponible">
                                     }
-                                    <div class="absolute top-0 right-0 bg-navbar dark:bg-navbar-dark text-text px-3 py-1 m-2 rounded-full text-xs font-bold uppercase">
-                                        {{ pet.state }}
-                                    </div>
                                 </div>
                                 <div class="px-6 py-4">
                                 <div class="font-bold text-xl mb-2 text-navbar dark:text-navbar-dark">
-                                    {{ pet.name }}
+                                    {{ pet.name }}         
                                 </div>
                                 <p class="text-text dark:text-text-dark text-base opacity-80">
                                     Esta mascota fue vista por última vez el día <strong>{{ pet.lostDate }}</strong>. 
-                                    Tipo:<strong>{{ pet.type }}</strong>.
                                 </p>
                                 <div class="px-6 pt-4 pb-2">
                                     <span class="inline-block bg-primary dark:bg-border-dark rounded-full px-3 py-1 text-sm font-semibold text-text dark:text-text-dark mr-2 mb-2">
@@ -152,16 +134,9 @@
                                         </span>
                                     }
                                 </div>
-                            </div>
                         </div>
-                    }
-                </div>
-            }
-            } @else {
-                <div class="h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-border-dark rounded-2xl">
-                    <p class="text-xl font-medium opacity-40 dark:text-text-dark">Configura los filtros para ver resultados</p>
-                </div>
-            }
-        </section>
-    </div>
+                    </div> } 
+            </div> }
+    }
+    </section>
 </main>

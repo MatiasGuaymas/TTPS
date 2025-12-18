@@ -25,12 +25,15 @@ export class MascotaService {
         let params = new HttpParams();
         Object.keys(filters).forEach(key => {
             const value = filters[key as keyof PetFilter];
-            if(value !== undefined && value !== null) {
-                params= params.set(key, value.toString());
+            if(value !== undefined && value !== null && value !== '') {
+                if (value instanceof Date) {
+                    params = params.set(key, value.toISOString().split('T')[0]);
+                } else {
+                    params = params.set(key, value.toString());
+            }
             }
         });
-        return this.http.get<PetResponse[]>("http://localhost:8080/api/pets", { params });
-    }
+        return this.http.get<PetResponse[]>("http://localhost:8080/api/pets", { params });    }
 
     getPetById(id: number): Observable<PetResponse> {
         return this.http.get<PetResponse>(`${this.apiUrl}/${id}`);
