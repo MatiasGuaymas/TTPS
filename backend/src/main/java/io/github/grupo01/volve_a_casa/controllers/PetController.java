@@ -3,19 +3,21 @@ package io.github.grupo01.volve_a_casa.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
@@ -25,10 +27,9 @@ import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseD
 import io.github.grupo01.volve_a_casa.controllers.interfaces.IPetController;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
 import io.github.grupo01.volve_a_casa.services.PetService;
 import jakarta.validation.Valid;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/pets", produces = MediaType.APPLICATION_JSON_VALUE, name = "PetRestController")
@@ -82,9 +83,11 @@ public class PetController implements IPetController {
 
     @Override
     @GetMapping
-    public ResponseEntity<?> listAllPets() {
-        List<PetResponseDTO> pets = petService.findAll(Sort.by(Sort.Direction.DESC, "lostDate"));
-
+    public ResponseEntity<?> listAllPets(
+            @ModelAttribute PetFilter filter,
+            @PageableDefault(sort = "lostDate", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        List<PetResponseDTO> pets = petService.findAll(filter, pageable);
         if (pets.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

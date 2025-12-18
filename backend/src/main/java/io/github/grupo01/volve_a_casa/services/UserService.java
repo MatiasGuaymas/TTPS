@@ -2,14 +2,18 @@ package io.github.grupo01.volve_a_casa.services;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.auth.AuthResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.AdminUserUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserCreateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserPublicProfileDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
 import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
+import io.github.grupo01.volve_a_casa.persistence.Specifications;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,8 +42,17 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found"));
     }
 
-    public List<UserResponseDTO> findAll(Sort sorted) {
-        return userRepository.findAll(sorted)
+    public List<UserResponseDTO> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .stream()
+                .map(UserResponseDTO::fromUser)
+                .toList();
+    }
+
+    public List<UserResponseDTO> findAllFiltered(UserFilter filter, Pageable pageable) {
+        Specification<User> spec = Specifications.getUserSpecification(filter);
+
+        return userRepository.findAll(spec, pageable)
                 .stream()
                 .map(UserResponseDTO::fromUser)
                 .toList();
@@ -102,5 +115,64 @@ public class UserService {
         AuthResponseDTO.UserAuthDTO userAuthDTO = new AuthResponseDTO.UserAuthDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
 
         return new AuthResponseDTO(token, userAuthDTO);
+    }
+
+    public UserResponseDTO updateUserStatus(Long userId, Boolean enabled) {
+        User user = findById(userId);
+        
+        // No se pueden deshabilitar Administradores
+        if (user.getRole() == User.Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot modify admin user status");
+        }
+        
+        user.setEnabled(enabled);
+        User savedUser = userRepository.save(user);
+        return UserResponseDTO.fromUser(savedUser);
+    }
+
+    public UserResponseDTO adminUpdateUser(Long userId, AdminUserUpdateDTO dto) {
+        User user = findById(userId);
+
+        UserUpdateDTO basicUpdate = new UserUpdateDTO(
+            dto.name(),
+            dto.lastName(),
+            dto.phoneNumber(),
+            dto.city(),
+            dto.neighborhood(),
+            dto.latitude(),
+            dto.longitude()
+        );
+
+        user.updateFromDTO(basicUpdate);
+        
+        // Actualizar el rol 
+        if (dto.role() != null) {
+            user.setRole(dto.role());
+        }
+        
+        User savedUser = userRepository.save(user);
+        return UserResponseDTO.fromUser(savedUser);
+    }
+
+    public UserResponseDTO createAdminUser(UserCreateDTO dto) {
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El email ya está siendo utilizado por otro usuario"
+            );
+        }
+
+        String hashedPassword = passwordEncoder.encode(dto.password());
+        GeorefResponse response = georefService.getUbication(dto.latitude(), dto.longitude());
+
+        User user = getUser(dto, response, hashedPassword);
+        user.setRole(User.Role.ADMIN);
+
+        return UserResponseDTO.fromUser(userRepository.save(user));
+    }
+
+    public UserPublicProfileDTO getUserPublicProfile(Long userId) {
+        User user = findById(userId);
+        return UserPublicProfileDTO.fromUser(user);
     }
 }

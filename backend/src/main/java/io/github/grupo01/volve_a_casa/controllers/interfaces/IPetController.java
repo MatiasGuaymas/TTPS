@@ -6,7 +6,7 @@ import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
-import io.github.grupo01.volve_a_casa.security.UserAuthentication;
+import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,7 +15,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Tag(name = "Mascotas", description = "API para gestión de mascotas")
 public interface IPetController {
@@ -86,7 +91,10 @@ public interface IPetController {
             @ApiResponse(responseCode = "200", description = "Lista de mascotas obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PetResponseDTO.class))),
             @ApiResponse(responseCode = "204", description = "No hay mascotas registradas")
     })
-    ResponseEntity<?> listAllPets();
+    ResponseEntity<?> listAllPets(
+            @ParameterObject PetFilter filter,
+            @ParameterObject Pageable pageable
+    );
 
     @Operation(summary = "Obtener avistamientos por mascota", description = "Obtiene todos los avistamientos de una mascota específica. "
             +

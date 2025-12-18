@@ -1,0 +1,127 @@
+package io.github.grupo01.volve_a_casa.persistence;
+
+import org.springframework.data.jpa.domain.Specification;
+
+import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
+import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
+import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
+import jakarta.persistence.criteria.Predicate;
+
+public class Specifications {
+    public static Specification<Pet> getPetSpecification(PetFilter filter) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (filter.getName() != null && !filter.getName().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("name")), "%" + filter.getName() + "%"));
+            }
+            if (filter.getColor() != null && !filter.getColor().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("color")), "%" + filter.getColor() + "%"));
+            }
+            if (filter.getRace() != null && !filter.getRace().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("race")), "%" + filter.getRace() + "%"));
+            }
+            if (filter.getState() != null) {
+                predicates = cb.and(predicates,
+                        cb.equal(root.get("state"), filter.getState()));
+            }
+            if (filter.getType() != null) {
+                predicates = cb.and(predicates,
+                        cb.equal(root.get("type"), filter.getType()));
+            }
+            if (filter.getSize() != null) {
+                predicates = cb.and(predicates,
+                        cb.equal(root.get("size"), filter.getSize()));
+            }
+            if (filter.getFinalLostDate() != null) {
+                predicates = cb.and(predicates,
+                        cb.lessThanOrEqualTo(root.get("lostDate"), filter.getFinalLostDate()));
+            }
+            if (filter.getInitialLostDate() != null) {
+                predicates = cb.and(predicates,
+                        cb.greaterThanOrEqualTo(root.get("lostDate"), filter.getInitialLostDate()));
+            }
+            if (filter.getWeightMin() > 0) {
+                predicates = cb.and(predicates,
+                        cb.greaterThanOrEqualTo(root.get("weight"), filter.getWeightMin()));
+            }
+            if (filter.getWeightMax() > 0) {
+                predicates = cb.and(predicates,
+                        cb.lessThanOrEqualTo(root.get("weight"), filter.getWeightMax()));
+            }
+
+            //agrego filtros para busqueda por barrio
+            if (filter.getUserLatitude() != null && 
+            filter.getUserLongitude() != null && 
+            filter.getMaxDistanceInKm() != null &&
+            filter.getMaxDistanceInKm() > 0) {
+                double lat = filter.getUserLatitude();
+                double lon = filter.getUserLongitude();
+                double maxDistanceInKm = filter.getMaxDistanceInKm();
+
+                var petLat= root.get("coordinates").get("latitude");
+                var petLon= root.get("coordinates").get("longitude");
+
+                jakarta.persistence.criteria.Expression<Double> distanceExpression = cb.function(
+                        "calculate_distance", 
+                        Double.class,
+                        cb.literal(lat),
+                        cb.literal(lon),
+                        petLat,
+                        petLon
+                );
+
+                Predicate distancePredicate = cb.lessThanOrEqualTo(distanceExpression, maxDistanceInKm);
+
+                predicates=cb.and(predicates, distancePredicate);
+            }
+
+            return predicates;
+        };
+    }
+
+    public static Specification<User> getUserSpecification(UserFilter user) {
+        return (root, query, cb) -> {
+            var predicates = cb.conjunction();
+
+            if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("email")), "%" + user.getEmail().toLowerCase() + "%"));
+            }
+            if (user.getName() != null && !user.getName().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("name")), "%" + user.getName().toLowerCase() + "%"));
+            }
+            if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("lastName")), "%" + user.getLastName().toLowerCase() + "%"));
+            }
+            if (user.getCity() != null && !user.getCity().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("city")), "%" + user.getCity().toLowerCase() + "%"));
+            }
+            if (user.getNeighborhood() != null && !user.getNeighborhood().isEmpty()) {
+                predicates = cb.and(predicates,
+                        cb.like(cb.lower(root.get("neighborhood")), "%" + user.getNeighborhood().toLowerCase() + "%"));
+            }
+            if (user.getMinPoints() != null && user.getMinPoints() > 0) {
+                predicates = cb.and(predicates,
+                        cb.greaterThanOrEqualTo(root.get("points"), user.getMinPoints()));
+            }
+            if (user.getMaxPoints() != null && user.getMaxPoints() > 0) {
+                predicates = cb.and(predicates,
+                        cb.lessThanOrEqualTo(root.get("points"), user.getMaxPoints()));
+            }
+            if (user.getRole() != null) {
+                predicates = cb.and(predicates,
+                        cb.equal(root.get("role"), user.getRole()));
+            }
+
+            return predicates;
+        };
+    }
+}

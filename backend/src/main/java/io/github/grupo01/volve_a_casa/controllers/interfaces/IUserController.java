@@ -3,6 +3,7 @@ package io.github.grupo01.volve_a_casa.controllers.interfaces;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.user.UserUpdateDTO;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
+import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,33 +11,40 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Tag(name = "Usuarios", description = "API para gestión de usuarios")
 public interface IUserController {
 
-    @Operation(summary = "Listar usuarios", description = "Obtiene todos los usuarios ordenados alfabéticamente por nombre. "
-            +
-            "Tests: UserControllerTest.listAllUsersOrderByName_whenEmpty_returnsNoContent(), " +
-            "UserControllerTest.listAllUsersOrderByName_whenUsersExist_returnsOkAndList()")
+    @Operation(
+            summary = "Listar usuarios con filtros y paginación",
+            description = "Obtiene una página de usuarios filtrados dinámicamente y ordenados. " +
+                    "Soporta paginación (page, size) y ordenamiento múltiple (sort). " +
+                    "Tests: UserControllerTest.listAllUsers_..."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
-            @ApiResponse(responseCode = "204", description = "No hay usuarios registrados")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Página de usuarios obtenida exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "No se encontraron usuarios con los filtros proporcionados"
+            )
     })
-    ResponseEntity<?> listAllUsers();
-
-//    @Operation(summary = "Crear usuario", description = "Registra un nuevo usuario en el sistema. El email debe ser único. "
-//            +
-//            "Tests: UserControllerTest.createUser_whenUserDoesNotExist_returnsCreated(), " +
-//            "UserControllerTest.createUser_whenUserExists_returnsConflict()")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
-//            @ApiResponse(responseCode = "400", description = "Datos inválidos o incompletos"),
-//            @ApiResponse(responseCode = "409", description = "El email ya está registrado")
-//    })
-//    ResponseEntity<?> createUser(
-//            @Parameter(description = "Datos del usuario a crear", required = true) UserCreateDTO userCreateDTO
-//    );
+    ResponseEntity<?> listAllUsers(
+            @ParameterObject UserFilter filter,
+            @ParameterObject Pageable pageable
+    );
 
     @Operation(summary = "Obtener usuario por ID", description = "Obtiene los detalles de un usuario específico (requiere token de autenticación en formato {userId}123456). "
             +

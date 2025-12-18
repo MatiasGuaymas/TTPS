@@ -13,8 +13,8 @@ public record PetCreateDTO(
         @NotBlank(message = "Name is required")
         String name,
 
-        @NotBlank(message = "Size is required")
-        String size,
+        @NotNull(message = "Size is required")
+        Pet.Size size,
 
         @NotBlank(message = "Description is required")
         @Size(max = 500, message = "Description must have at most 500 characters")

@@ -2,7 +2,7 @@
     <!-- Imagen de fondo (Oculta) -->
     <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-none">
         <div class="absolute inset-0 bg-gradient-to-br from-[#37B47D]/40 via-[#009F87]/50 to-[#008A88]/60 z-10"></div>
-        <img src="https://images8.alphacoders.com/528/thumb-1920-528602.jpg" alt="Perro pastor alemán"
+        <img src="/assets/auth/register_wallpaper.jpg" alt="Perro pastor alemán"
             class="w-full h-full object-cover object-[25%_center]">
     </div>
 
@@ -31,104 +31,115 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <!-- Nombre -->
                     <div>
-                        <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                             Nombre
                         </label>
-                        <input type="text" id="nombre" formControlName="nombre" placeholder="John"
+                        <input type="text" id="name" formControlName="name" placeholder="John"
                             class="w-full px-4 py-2.5 bg-gray-50 dark:bg-primary-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:border-transparent transition-all"
-                            [class.border-red-500]="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched">
-                        <p *ngIf="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched"
-                            class="mt-1 text-xs text-red-500">
-                            {{ getErrorMessage('nombre') }}
-                        </p>
+                            [class.border-red-500]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+                        @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+                            <p class="mt-1 text-xs text-red-500">{{ getErrorMessage('name') }}</p>
+                        }
                     </div>
 
                     <!-- Apellidos -->
                     <div>
-                        <label for="apellidos"
+                        <label for="lastName"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                             Apellidos
                         </label>
-                        <input type="text" id="apellidos" formControlName="apellidos" placeholder="Doe"
+                        <input type="text" id="lastName" formControlName="lastName" placeholder="Doe"
                             class="w-full px-4 py-2.5 bg-gray-50 dark:bg-primary-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:border-transparent transition-all"
-                            [class.border-red-500]="registerForm.get('apellidos')?.invalid && registerForm.get('apellidos')?.touched">
-                        <p *ngIf="registerForm.get('apellidos')?.invalid && registerForm.get('apellidos')?.touched"
+                            [class.border-red-500]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+                        <p *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
                             class="mt-1 text-xs text-red-500">
-                            {{ getErrorMessage('apellidos') }}
+                            {{ getErrorMessage('lastName') }}
                         </p>
                     </div>
                 </div>
 
                 <!-- Barrio y Ciudad -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <!-- Barrio -->
-                    <div>
-                        <label for="barrio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Barrio
-                        </label>
-                        <input type="text" id="barrio" formControlName="barrio" placeholder="Gonnet"
-                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-primary-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:border-transparent transition-all"
-                            [class.border-red-500]="registerForm.get('barrio')?.invalid && registerForm.get('barrio')?.touched">
-                        <p *ngIf="registerForm.get('barrio')?.invalid && registerForm.get('barrio')?.touched"
-                            class="mt-1 text-xs text-red-500">
-                            {{ getErrorMessage('barrio') }}
-                        </p>
-                    </div>
+                <!-- TODO: Agregar mapa para que se pueda seleccionar -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Ubicación
+                    </label>
 
-                    <!-- Ciudad -->
-                    <div>
-                        <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Ciudad
-                        </label>
-                        <input type="text" id="ciudad" formControlName="ciudad" placeholder="La Plata"
-                            class="w-full px-4 py-2.5 bg-gray-50 dark:bg-primary-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:border-transparent transition-all"
-                            [class.border-red-500]="registerForm.get('ciudad')?.invalid && registerForm.get('ciudad')?.touched">
-                        <p *ngIf="registerForm.get('ciudad')?.invalid && registerForm.get('ciudad')?.touched"
-                            class="mt-1 text-xs text-red-500">
-                            {{ getErrorMessage('ciudad') }}
-                        </p>
-                    </div>
+                    <button type="button"
+                        (click)="getLocation()"
+                        [disabled]="cargandoUbicacion() || ubicacionLista()"
+                        [ngClass]="{
+                            'bg-green-100 border-[#37B47D] text-[#008A88] dark:bg-[#37B47D]/20 dark:text-[#37B47D]': ubicacionLista(),
+                            'bg-gray-50 dark:bg-primary-dark border-gray-200 dark:border-border-dark text-gray-900 dark:text-gray-200 hover:border-[#37B47D]': !ubicacionLista()
+                        }"
+                        class="w-full h-[46px] px-4 border rounded-lg flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-2 focus:ring-[#37B47D] font-medium">
+
+                        @if (cargandoUbicacion()) {
+                            <svg class="animate-spin h-5 w-5 text-[#37B47D]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Obteniendo...</span>
+
+                        } @else if (ubicacionLista()) {
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Ubicación lista</span>
+
+                        } @else {
+                            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span>Usar mi ubicación actual</span>
+                        }
+                    </button>
+
+                    @if (registerForm.get('latitude')?.invalid && (registerForm.touched || registerForm.dirty)) {
+                        <p class="mt-1 text-xs text-red-500">Debes obtener tu ubicación para continuar.</p>
+                    }
                 </div>
 
-                <!-- Mail -->
+                <!-- Email -->
                 <div>
-                    <label for="mail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Email
                     </label>
-                    <input type="email" id="mail" formControlName="mail" placeholder="johndoe@gmail.com"
+                    <input type="email" id="email" formControlName="email" placeholder="johndoe@gmail.com"
                         class="w-full px-4 py-2.5 bg-gray-50 dark:bg-primary-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:border-transparent transition-all"
-                        [class.border-red-500]="registerForm.get('mail')?.invalid && registerForm.get('mail')?.touched">
-                    <p *ngIf="registerForm.get('mail')?.invalid && registerForm.get('mail')?.touched"
+                        [class.border-red-500]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+                    <p *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
                         class="mt-1 text-xs text-red-500">
-                        {{ getErrorMessage('mail') }}
+                        {{ getErrorMessage('email') }}
                     </p>
                 </div>
 
                 <!-- Teléfono -->
                 <div>
-                    <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Teléfono
                     </label>
-                    <input type="tel" id="telefono" formControlName="telefono" placeholder="2216783039"
+                    <input type="tel" id="phoneNumber" formControlName="phoneNumber" placeholder="2216783039"
                         class="w-full px-4 py-2.5 bg-gray-50 dark:bg-primary-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:border-transparent transition-all"
-                        [class.border-red-500]="registerForm.get('telefono')?.invalid && registerForm.get('telefono')?.touched">
-                    <p *ngIf="registerForm.get('telefono')?.invalid && registerForm.get('telefono')?.touched"
+                        [class.border-red-500]="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched">
+                    <p *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched"
                         class="mt-1 text-xs text-red-500">
-                        {{ getErrorMessage('telefono') }}
+                        {{ getErrorMessage('phoneNumber') }}
                     </p>
                 </div>
 
                 <!-- Contraseña -->
                 <div>
-                    <label for="contrasena" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Contraseña
                     </label>
-                    <input type="password" id="contrasena" formControlName="contrasena" placeholder="••••••••"
+                    <input type="password" id="password" formControlName="password" placeholder="••••••••"
                         class="w-full px-4 py-2.5 bg-gray-50 dark:bg-primary-dark border border-gray-200 dark:border-border-dark rounded-lg text-gray-900 dark:text-text-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#37B47D] focus:border-transparent transition-all"
-                        [class.border-red-500]="registerForm.get('contrasena')?.invalid && registerForm.get('contrasena')?.touched">
-                    <p *ngIf="registerForm.get('contrasena')?.invalid && registerForm.get('contrasena')?.touched"
+                        [class.border-red-500]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+                    <p *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
                         class="mt-1 text-xs text-red-500">
-                        {{ getErrorMessage('contrasena') }}
+                        {{ getErrorMessage('password') }}
                     </p>
                 </div>
 

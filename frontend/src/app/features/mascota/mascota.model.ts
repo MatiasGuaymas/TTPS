@@ -8,6 +8,18 @@ export enum TipoMascota {
     TORTUGA = 'TORTUGA',
 }
 
+export enum State {
+    PERDIDO_PROPIO='PERDIDO_PROPIO',
+    PERDIDO_AJENO='PERDIDO_AJENO',
+    RECUPERADO='RECUPERADO',
+    ADOPTADO='ADOPTADO',
+}
+
+export enum Size {
+    PEQUENO='PEQUENO',
+    MEDIANO='MEDIANO',
+    GRANDE='GRANDE',
+}
 export interface PetCreate {
     name: string;
     size: string;
@@ -17,6 +29,42 @@ export interface PetCreate {
     weight: number;
     latitude: number;
     longitude: number;
+    state: State;
     type: TipoMascota;
     photoBase64: string;
+}
+
+export interface PetResponse{
+    id:number,
+    name:number,
+    size: Size,
+    description: string;
+    color: string;
+    race: string;
+    weight: number;
+    latitude: number;
+    longitude: number;
+    lostDate:Date,
+    state:State,
+    type:TipoMascota,
+    photosBase64: string[],
+    creatorId:number
+}
+
+export interface PetFilter{
+    name?:string,
+    state?:State,
+    type?:TipoMascota;
+    size?:Size;
+    color?:string;
+    race?:string;
+    weightMin?:number;
+    weightMax?: number;
+    initialLostDate?:string;
+    finalLostDate:Date;
+
+    page?:number;
+    perPage?:number;
+    sort?:string;
+    filterByNeighbordhood?:boolean;
 }

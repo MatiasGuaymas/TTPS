@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
+import { AlertService } from '../../core/services/alert.service';
 
 @Component({
   selector: 'app-navbar',
@@ -9,10 +12,23 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: 'navbar.component.html'
 })
 export class NavbarComponent {
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private alertService = inject(AlertService);
+  private router = inject(Router);
+
   profileMenuOpen = false;
   mobileMenuOpen = false;
 
-  constructor(private router: Router) { }
+  isLoggedIn = computed(() => this.authService.isLoggedIn());
+  userData = computed(() => this.userService.currentUser());
+  isAdmin = computed(() => this.userData()?.role === 'ADMIN');
+
+  userInitials = computed(() => {
+    const user = this.userData();
+    if (!user?.name || !user?.lastName) return '?';
+    return `${user.name.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+  });
 
   toggleProfileMenu() {
     this.profileMenuOpen = !this.profileMenuOpen;
@@ -31,10 +47,16 @@ export class NavbarComponent {
   }
 
   logout() {
-    // Acá va a estar la lógica del logout
-    console.log('Cerrando sesión...');
-    this.closeProfileMenu();
-    this.closeMobileMenu();
-    this.router.navigate(['/login']);
+    this.alertService.confirm(
+      '¿Cerrar sesión?',
+      '¿Estás seguro que deseas salir?',
+      'Sí, salir',
+      'Cancelar'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.authService.logout();
+        this.alertService.success('Sesión cerrada', 'Has cerrado sesión exitosamente');
+      }
+    });
   }
 }

@@ -1,165 +1,144 @@
-<div class="min-h-screen flex items-center justify-center p-6 bg-background dark:bg-background-dark transition-colors duration-300">
-    
-    <div class="max-w-6xl w-full bg-white dark:bg-background-dark shadow-lg dark:shadow-2xl dark:shadow-black/90 rounded-lg overflow-hidden md:flex">
-        
-        <div class="md:w-1/2 p-4 hidden md:block bg-cover bg-center relative" 
-             style="background-image: url('/assets/alta.jpg'); min-height: 700px;">
-             <div class="absolute inset-0 bg-black/10 dark:bg-black/30"></div>
-        </div>
+<div class="min-h-screen flex items-center justify-center p-6 bg-background dark:bg-background-dark textos">
+    <div class="max-w-6xl w-full bg-white dark:bg-primary-dark textos shadow-2xl rounded-lg overflow-hidden md:flex">
 
-        <div class="md:w-1/2 p-10">
-            <h2 class="text-3xl font-extrabold text-center mb-8 text-text dark:text-text-dark">
-                ¡Ayudanos a encontrar a tu mascota!
-            </h2>
+       <div class="md:w-1/2 p-4 hidden md:block bg-cover bg-center"
+           style="background-image: url('/assets/alta.jpg'); min-height: 700px;">
+        </div>
+        <div class="md:w-1/2 p-10 w-full"> <h2 class="text-3xl font-bold text-center mb-8 text-text dark:text-text-dark">Ayudanos A Encontrar A Tu Mascota!</h2>
 
             <form [formGroup]="formMascota" (ngSubmit)="onSubmit()">
-                
-                <div class="mb-6 flex flex-col items-center">
-                    
-                    <input type="file" 
-                           #fileInput 
-                           (change)="onFileSelected($event)" 
-                           accept="image/*" 
-                           class="hidden"
-                           formControlName="photoFile"> 
 
-                    <div (click)="fileInput.click()" 
-                         class="flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-lg cursor-pointer transition-all w-full max-w-xs group shadow-sm dark:shadow-lg dark:shadow-black/50"
+                <div class="mb-6 flex flex-col items-center">
+
+                    <input type="file"
+                           #fileInput
+                           (change)="onFileSelected($event)"
+                           accept="image/*"
+                           class="hidden"
+                           formControlName="photoFile">
+
+                    <div (click)="fileInput.click()"
+                         class="flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-lg cursor-pointer transition-colors w-full max-w-xs"
                          [ngClass]="{
-                            'border-button-dark bg-button-dark/10 dark:bg-button-dark/20': imagenPreVisualizacion,
-                            'border-navbar hover:bg-gray-50 dark:border-border-dark dark:hover:bg-navbar-dark': !imagenPreVisualizacion
+                            'border-blue-500 bg-blue-50': imagenPreVisualizacion,
+                            'border-gray-300 dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-800': !imagenPreVisualizacion
                          }">
 
-                        <ng-container *ngIf="imagenPreVisualizacion; else uploadPlaceholder">
-                            <img [src]="imagenPreVisualizacion" 
-                                 alt="Previsualización de Mascota" 
+                        @if (imagenPreVisualizacion) {
+                            <img [src]="imagenPreVisualizacion"
+                                 alt="Previsualización de Mascota"
                                  class="max-h-40 max-w-full object-contain rounded-md shadow-md mb-2">
-                            <p class="text-xs text-button-dark font-bold">Click para cambiar foto</p>
-                        </ng-container>
-
-                        <ng-template #uploadPlaceholder>
-                            <i class="fas fa-cloud-upload-alt text-2xl mb-2 text-button-dark"></i>
-                            <p class="text-sm font-medium text-text dark:text-text-dark">Subí una foto</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 group-hover:text-button-dark transition-colors">
-                                (Haz click aquí)
-                            </p>
-                        </ng-template>
+                            <p class="text-xs text-text dark:text-text-dark font-medium">Click para cambiar foto</p>
+                        } @else {
+                            <i class="fas fa-cloud-upload-alt text-2xl text-text dark:text-text-dark mb-2"></i>
+                            <p class="text-sm font-medium text-text dark:text-text-dark">Subi Una Foto De Tu Mascota</p>
+                            <p class="text-xs text-text dark:text-text-dark mt-1" style="opacity: 0.6;">(Haz click aquí)</p>
+                        }
 
                     </div>
-                    <div *ngIf="formMascota.get('photoFile')?.invalid && formMascota.get('photoFile')?.touched" class="text-red-500 text-xs mt-1">
-                        La foto es obligatoria.
-                    </div>
+                    @if (formMascota.get('photoFile')?.invalid && formMascota.get('photoFile')?.touched) {
+                        <div class="text-red-500 text-xs mt-1">
+                            La foto es obligatoria.
+                        </div>
+                    }
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Nombre</label>
-                            <input type="text" formControlName="name" placeholder="Toby" 
-                                   class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all">
-                            <div *ngIf="formMascota.get('name')?.invalid && formMascota.get('name')?.touched" class="text-red-500 text-xs mt-1">
-                                Requerido.
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Nombre De Tu Mascota</label>
+                        <input type="text" formControlName="name" placeholder="Toby" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
+                        @if (formMascota.get('name')?.invalid && formMascota.get('name')?.touched) {
+                            <div class="text-red-500 text-xs mt-1">
+                                El nombre es requerido.
                             </div>
-                        </div>
+                        }
 
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Tamaño (cm)</label>
-                            <input type="text" formControlName="size" placeholder="35 Cm" 
-                                   class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Fecha Desaparición</label>
-                            <input type="date" formControlName="fechaDesaparicion" 
-                                   class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all">
-                        </div>
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Tamaño</label>
+                        <select formControlName="size" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
+                            @for (tamano of tamanosMascota; track tamano) {
+                                <option [value]="tamano">{{ tamano }}</option>
+                            }
+                        </select>
 
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Tipo</label>
-                            <select formControlName="type" 
-                                    class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all">
-                                <option *ngFor="let tipo of tiposMascota" [value]="tipo">{{ tipo }}</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Peso (kg)</label>
-                            <input type="number" formControlName="weight" placeholder="5.5" step="0.1" 
-                                   class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all">
-                            <div *ngIf="formMascota.get('weight')?.hasError('min')" class="text-red-500 text-xs mt-1">
-                                Debe ser mayor a 0.
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Fecha Desaparicion</label>
+                        <input type="date" formControlName="fechaDesaparicion" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
+
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Tipo</label>
+                        <select formControlName="type" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
+                            @for (tipo of tiposMascota; track tipo) {
+                                <option [value]="tipo">{{ tipo }}</option>
+                            }
+                        </select>
+
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Peso (kg)</label>
+                        <input type="number" formControlName="weight" placeholder="5.5" step="0.1" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
+                        @if (formMascota.get('weight')?.hasError('min')) {
+                            <div class="text-red-500 text-xs mt-1">
+                                El peso debe ser mayor a 0.
                             </div>
-                        </div>
+                        }
                     </div>
-                    
+
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Tu Nombre</label>
-                            <input type="text" formControlName="ownerName" placeholder="Jose Benito" 
-                                   class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Estado</label>
-                            <div class="grid grid-cols-2 gap-2"> 
-                                <button type="button" 
-                                        *ngFor="let estado of estados" 
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Tu Nombre</label>
+                        <input type="text" formControlName="ownerName" placeholder="Jose Benito" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
+
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Estado</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            @for (estado of estados; track estado) {
+                                <button type="button"
                                         (click)="seleccionarEstado(estado)"
                                         [ngClass]="{
-                                            'bg-button-dark text-text-dark shadow-md dark:shadow-lg dark:shadow-black/50': formMascota.get('estado')?.value === estado,
-                                            'bg-gray-100 dark:bg-navbar-dark text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-navbar-dark/80 dark:shadow-lg dark:shadow-black/40': formMascota.get('estado')?.value !== estado
+                                            'bg-navbar dark:bg-navbar-dark text-white': formMascota.get('estado')?.value === estado,
+                                            'bg-primary dark:bg-primary-dark text-text dark:text-text-dark hover:opacity-80': formMascota.get('estado')?.value !== estado
                                         }"
-                                        class="px-2 py-2 rounded-md font-semibold transition-all text-xs text-center border border-transparent shadow-sm">
-                                    {{ estado }} 
+                                        class="px-2 py-2 rounded-md font-semibold transition-colors text-xs text-center">
+                                    {{ estado.replace('_', ' ') }}
                                 </button>
-                            </div>
+                            }
                         </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Color Principal</label>
-                            <div class="flex items-center gap-2">
-                                <input type="color" formControlName="color" class="h-10 w-14 p-1 border border-gray-200 dark:border-transparent rounded bg-white dark:bg-navbar-dark cursor-pointer shadow-sm dark:shadow-lg dark:shadow-black/60">
-                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ formMascota.get('color')?.value }}</span>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-text dark:text-text-dark mb-1">Raza</label>
-                            <input type="text" formControlName="race" placeholder="Border Collie" 
-                                   class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all">
-                        </div>
+
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">COLOR</label>
+                        <input type="text" formControlName="color" placeholder="Marron" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
+
+                        <label class="block text-sm font-medium text-text dark:text-text-dark">Raza</label>
+                        <input type="text" formControlName="race" placeholder="Border Collie" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark">
                     </div>
                 </div>
 
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-text dark:text-text-dark mb-2">Ubicación donde fue visto</label>
-                    <div class="w-full h-72 rounded-md relative overflow-hidden border border-gray-200 dark:border-transparent shadow-sm dark:shadow-lg dark:shadow-black/60"> 
-                        <leaflet-map 
-                            [lat]="formMascota.get('latitude')?.value" 
-                            [lng]="formMascota.get('longitude')?.value"
-                            (locationChange)="actualizarUbicacionDesdeMapa($event)">
-                        </leaflet-map>
+                <div style="margin-top:20px">
+                    <label class="block text-sm font-medium text-text dark:text-text-dark mb-2">Ubicación donde se perdió la mascota (Arrastra el marcador)</label>
+                    <app-map (coordinatesChanged)="onCoordinatesChange($event)"></app-map>
+
+                    <div class="mt-2 text-sm text-text dark:text-text-dark" style="opacity: 0.7;">
+                        Latitud: {{ formMascota.get('latitude')?.value | number:'1.6-6' }}, Longitud: {{ formMascota.get('longitude')?.value | number:'1.6-6' }}
                     </div>
+                    @if ((formMascota.get('latitude')?.invalid && formMascota.get('latitude')?.touched) || (formMascota.get('longitude')?.invalid && formMascota.get('longitude')?.touched)) {
+                        <div class="text-red-500 text-xs mt-1">
+                            Debes seleccionar una ubicación válida en el mapa.
+                        </div>
+                    }
                 </div>
 
                 <div class="mt-6">
-                    <label class="block text-sm font-medium text-text dark:text-text-dark mb-2">Descripción Adicional</label>
-                    <textarea formControlName="description" rows="3" placeholder="Detalles extra..." 
-                              class="w-full p-2 rounded-md border border-gray-200 dark:border-transparent bg-white dark:bg-navbar-dark text-text dark:text-text-dark shadow-sm dark:shadow-lg dark:shadow-black/60 focus:ring-2 focus:ring-button-dark outline-none transition-all"></textarea>
-                    <div *ngIf="formMascota.get('description')?.hasError('maxlength')" class="text-red-500 text-xs mt-1">
-                        Máximo 500 caracteres.
-                    </div>
+                    <label class="block text-sm font-medium text-text dark:text-text-dark">Descripcion Adicional</label>
+                    <textarea formControlName="description" rows="3" placeholder="Descripción Adicional (Máx. 500 caracteres)" class="w-full p-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white dark:border-border-dark"></textarea>
+                    @if (formMascota.get('description')?.hasError('maxlength')) {
+                        <div class="text-red-500 text-xs mt-1">
+                            Máximo 500 caracteres.
+                        </div>
+                    }
                 </div>
-                
+
                 <div class="mt-8 flex justify-end">
-                    <button type="submit" 
+                    <button type="submit"
                             [disabled]="formMascota.invalid || !imagenBase64"
-                            class="px-8 py-3 bg-button-dark hover:bg-button-hover-dark text-text-dark font-bold rounded-md shadow-lg dark:shadow-xl dark:shadow-black/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
-                        Registrar Mascota
+                            class="px-8 py-3 bg-navbar dark:bg-navbar-dark text-white font-bold rounded-md shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                        Subir
                     </button>
                 </div>
-                
+
             </form>
         </div>
     </div>
