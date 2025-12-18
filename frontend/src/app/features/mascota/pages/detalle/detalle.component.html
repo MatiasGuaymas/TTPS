@@ -202,7 +202,11 @@
                                         </path>
                                     </svg>
                                     <span class="text-gray-900 dark:text-white font-medium">
-                                        Reportado por: {{ sighting.reporterName }} {{ sighting.reporterLastName }}
+                                        Reportado por:
+                                        <a [routerLink]="['/user', sighting.reporterId]"
+                                            class="text-[#37B47D] hover:text-[#2d9563] underline cursor-pointer">
+                                            {{ sighting.reporterName }} {{ sighting.reporterLastName }}
+                                        </a>
                                     </span>
                                 </div>
 
