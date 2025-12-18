@@ -65,7 +65,7 @@ export interface PetFilter{
     finalLostDate?:Date;
     userLatitude?:number;
     userLongitude?:number;
-    maxDistanceKm?:number;
+    maxDistanceInKm?:number;
 }
 
 export interface PetUpdate{

@@ -7,6 +7,7 @@ import { AlertService } from '../../../../core/services/alert.service';
 import { PetFilter, PetResponse, Size, State, TipoMascota } from '../../mascota.model';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { GeolocationService } from '../../../../core/services/geolocation.service';
 
 @Component({
     selector: 'listado-mascotas',
@@ -18,6 +19,8 @@ export class ListadoMascotas implements OnInit{
 
     pets = signal<PetResponse[]>([]);
     loading = signal(true);
+
+    private geoService = inject(GeolocationService);
 
     // Paginación
     currentPage = signal(0);
@@ -62,7 +65,7 @@ export class ListadoMascotas implements OnInit{
             finalLostDate: [null],
             userLatitude: [null],
             userLongitude: [null],
-            maxDistanceKm: [null],
+            maxDistanceInKm: [null],
         });
     }
 
@@ -94,28 +97,24 @@ export class ListadoMascotas implements OnInit{
     }
 
     loadUserLocation() {
-        if (navigator.geolocation) {
-            this.cargandoUbicacion.set(true);
-            this.alerts.info('Obteniendo ubicación...', 'Por favor permite el acceso a tu ubicación');
+    this.cargandoUbicacion.set(true);
+    this.alerts.info('Obteniendo ubicación...', 'Por favor permite el acceso');
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.filterForm.patchValue({
-                        userLatitude: position.coords.latitude,
-                        userLongitude: position.coords.longitude
-                    });
-                    this.cargandoUbicacion.set(false);
-                },
-                (error) => {
-                    console.error('Error al obtener ubicación:', error);
-                    this.alerts.error('Error de ubicación', 'No se pudo obtener tu ubicación. Verifica los permisos.');
-                    this.cargandoUbicacion.set(false);
-                }
-            );
-        } else {
-            this.alerts.error('Navegador no compatible', 'Tu navegador no soporta geolocalización.');
-        }
+    this.geoService.getLocation()
+        .then(coords => {
+            this.filterForm.patchValue({
+                userLatitude: coords.latitude,
+                userLongitude: coords.longitude,
+                maxDistanceInKm: 10
+            });
+            this.alerts.success('Ubicación obtenida', 'Ahora podes filtrar por cercanía');
+        })
+        .catch(err => {
+            this.alerts.error('Error', 'No se pudo obtener la ubicación: ' + err);
+        })
+        .finally(() => this.cargandoUbicacion.set(false));
     }
+
 
     applyFilters(): void {
         // Limpiar valores vacíos del formulario
@@ -137,13 +136,13 @@ export class ListadoMascotas implements OnInit{
         }
 
         if (formValues.userLatitude !== null && formValues.userLatitude !== undefined && formValues.userLatitude !== '') {
-            cleanedFilters.userLatitude = Number(formValues.userLatitude);
+        cleanedFilters.userLatitude = Number(formValues.userLatitude);
         }
         if (formValues.userLongitude !== null && formValues.userLongitude !== undefined && formValues.userLongitude !== '') {
             cleanedFilters.userLongitude = Number(formValues.userLongitude);
         }
-        if (formValues.maxDistanceKm !== null && formValues.maxDistanceKm !== undefined && formValues.maxDistanceKm !== '' && formValues.maxDistanceKm > 0) {
-            cleanedFilters.maxDistanceKm = Number(formValues.maxDistanceKm);
+        if (formValues.maxDistanceInKm !== null && formValues.maxDistanceInKm !== undefined && formValues.maxDistanceInKm !== '') {
+            cleanedFilters.maxDistanceInKm = Number(formValues.maxDistanceInKm); 
         }
 
         if (formValues.initialLostDate) {
@@ -197,4 +196,7 @@ export class ListadoMascotas implements OnInit{
     goToPetDetail(petId: number): void {
         this.router.navigate(['/mascota', petId]);
     }
+
+    
+    
 }

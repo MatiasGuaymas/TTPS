@@ -40,7 +40,7 @@ export class MascotaService {
         if (filters.weightMax !== undefined && filters.weightMax !== null) params.weightMax = filters.weightMax.toString();
         if (filters.userLatitude !== undefined && filters.userLatitude !== null) params.userLatitude = filters.userLatitude.toString();
         if (filters.userLongitude !== undefined && filters.userLongitude !== null) params.userLongitude = filters.userLongitude.toString();
-        if (filters.maxDistanceKm !== undefined && filters.maxDistanceKm !== null) params.maxDistanceKm = filters.maxDistanceKm.toString();
+        if (filters.maxDistanceInKm !== undefined) {params.maxDistanceInKm = filters.maxDistanceInKm.toString();}
 
         if (filters.initialLostDate) params.initialLostDate = filters.initialLostDate;
         if (filters.finalLostDate) params.finalLostDate = filters.finalLostDate;
