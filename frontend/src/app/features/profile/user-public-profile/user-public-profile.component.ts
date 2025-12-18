@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { UserPublicProfile } from '../../../core/models/user.models';
 
 @Component({
     selector: 'app-user-public-profile',

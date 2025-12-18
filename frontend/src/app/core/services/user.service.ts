@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { AuthService } from './auth.service';
+import { AdminUserUpdateRequest, UserFilter, UserProfile, UserPublicProfile, UserUpdateRequest } from '../models/user.models';
 
 @Injectable({
   providedIn: 'root'

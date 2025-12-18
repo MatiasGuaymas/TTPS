@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { UserService} from '../../core/services/user.service';
 import { AlertService } from '../../core/services/alert.service';
+import { UserUpdateRequest } from '../../core/models/user.models';
 
 @Component({
     selector: 'app-profile',
