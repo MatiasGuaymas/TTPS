@@ -80,8 +80,8 @@ public class DataInitializer implements CommandLineRunner {
                 return;
             }
 
-            // URL de imagen placeholder para un perro
-            String photoUrl = "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400";
+            // Imagen Base64 pequeña de ejemplo (1x1 pixel naranja - placeholder)
+            String photoBase64 = "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8A/9k=";
 
             Pet samplePet = new Pet(
                     "Max",
@@ -95,7 +95,7 @@ public class DataInitializer implements CommandLineRunner {
                     Pet.Type.PERRO,
                     Pet.State.PERDIDO_PROPIO,
                     creator,
-                    photoUrl
+                    photoBase64
             );
 
             petRepository.save(samplePet);
