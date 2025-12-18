@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,6 +10,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { Map } from '../../../../shared/components/map/map';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
+import { UserService } from '../../../../core/services/user.service';
+
 
 // TODO: Agregar foto a avistamiento -> no funciono :(
 
@@ -29,6 +31,11 @@ import { initFlowbite } from 'flowbite';
     `]
 })
 export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
+    userData = computed(() => this.userService.currentUser());
+    isAdmin = computed(() => this.userData()?.role === 'ADMIN');
+    isEditing = signal(false);
+
+
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private fb = inject(FormBuilder);
@@ -36,6 +43,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     private avistamientoService = inject(AvistamientoService);
     private alertService = inject(AlertService);
     private authService = inject(AuthService);
+    private userService = inject(UserService);
 
     pet = signal<PetResponse | null>(null);
     loading = signal(true);
@@ -277,6 +285,15 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         });
     }
 
+    //edicion de mascota
+   
+    goToPetUpdate(petId: number): void {
+        this.router.navigate(['admin/edicion-mascota', petId]);
+    }
+
+    goToPetDelete(petId: number): void {
+        this.router.navigate(['admin/eliminar-mascota', petId]);
+    }
     ngOnDestroy(): void {
     }
 }

@@ -83,6 +83,17 @@
                                 [ngClass]="getEstadoBadgeClass(pet()!.state)">
                                 {{ getEstadoLabel(pet()!.state) }}
                             </span>
+                            <!-- edicion y borrado de mascota -->
+                            @if (isAdmin()){
+                                <button  (click)="goToPetUpdate(pet()!.id)"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                    Editar 
+                                </button>
+                                <button  (click)="goToPetDelete(pet()!.id)"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                    Eliminar
+                                </button>
+                            }
                         </div>
                         <p class="text-gray-600 dark:text-gray-400 text-lg">{{ getTipoLabel(pet()!.type) }} · {{
                             pet()!.race }}</p>
