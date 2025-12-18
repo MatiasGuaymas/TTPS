@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -120,8 +121,9 @@ public class PetService {
 
     /**
      * Obtiene información detallada de una mascota por ID para el bot de Telegram
-     * Excluye las imágenes para optimizar el tamaño de la respuesta
+     * Incluye la primera foto de la mascota
      */
+    @Transactional(readOnly = true)
     public PetDetailDTO getPetDetailForTelegram(Long petId) {
         Pet pet = this.findById(petId);
         return PetDetailDTO.fromPet(pet);

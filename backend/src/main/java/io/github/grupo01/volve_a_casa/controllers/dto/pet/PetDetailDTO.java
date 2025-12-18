@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 /**
  * DTO con información detallada de una mascota para el bot de Telegram
- * Excluye las imágenes para optimizar el tamaño de las respuestas
+ * Incluye la primera foto para enviarla por Telegram
  */
 public record PetDetailDTO(
         Long id,
@@ -21,12 +21,16 @@ public record PetDetailDTO(
         LocalDate lostDate,
         Pet.State state,
         Pet.Type type,
-        Long creatorId
-        // TODO: Agregar soporte para imágenes en el futuro
-        // Las imágenes Base64 son muy grandes para enviar por Telegram de forma eficiente
-        // Se podría considerar enviar URLs o usar SendPhoto en lugar de texto
+        Long creatorId,
+        String photoBase64  // Primera foto de la mascota para Telegram
 ) {
     public static PetDetailDTO fromPet(Pet pet) {
+        // Obtener la primera foto si existe
+        String firstPhoto = null;
+        if (pet.getPhotosBase64() != null && !pet.getPhotosBase64().isEmpty()) {
+            firstPhoto = pet.getPhotosBase64().get(0);
+        }
+        
         return new PetDetailDTO(
                 pet.getId(),
                 pet.getName(),
@@ -40,7 +44,8 @@ public record PetDetailDTO(
                 pet.getLostDate(),
                 pet.getState(),
                 pet.getType(),
-                pet.getCreator().getId()
+                pet.getCreator().getId(),
+                firstPhoto
         );
     }
 
@@ -82,9 +87,6 @@ public record PetDetailDTO(
         
         message.append("\n👤 *Contacto:*\n");
         message.append("• ID del dueño: ").append(creatorId).append("\n");
-        
-        // TODO: Agregar imagen cuando se implemente el soporte
-        message.append("\n_Nota: Las imágenes se agregarán en una versión futura_");
         
         return message.toString();
     }

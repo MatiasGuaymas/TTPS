@@ -240,7 +240,13 @@ public class IATelegramBot extends TelegramLongPollingBot {
         try {
             Long petId = Long.parseLong(parts[1]);
             PetDetailDTO pet = petService.getPetDetailForTelegram(petId);
-            sendMarkdownText(chatId, pet.toTelegramFormat());
+            
+            // Enviar con foto si está disponible
+            if (pet.photoBase64() != null && !pet.photoBase64().isEmpty()) {
+                sendPhotoNotification(chatId, pet.toTelegramFormat(), pet.photoBase64());
+            } else {
+                sendMarkdownText(chatId, pet.toTelegramFormat());
+            }
         } catch (NumberFormatException e) {
             sendText(chatId, "❌ El ID de mascota debe ser un número válido.\n\nEjemplo: /mascota 123");
         } catch (Exception e) {
