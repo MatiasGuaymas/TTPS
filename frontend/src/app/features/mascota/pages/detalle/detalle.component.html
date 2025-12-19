@@ -84,7 +84,7 @@
                                 {{ getEstadoLabel(pet()!.state) }}
                             </span>
                             <!-- edicion y borrado de mascota -->
-                            @if (isAdmin()){
+                            @if (canEditOrDelete()){
                                 <button  (click)="goToPetUpdate(pet()!.id)"
                                     class="px-4 py-2 bg-blue-600 text-text dark:text-text-dark rounded-lg bg-background dark:bg-background-dark hover:bg-blue-700 transition cursor-pointer">
                                     Editar 

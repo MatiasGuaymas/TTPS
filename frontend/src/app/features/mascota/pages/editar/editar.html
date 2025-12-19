@@ -7,13 +7,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <div>
-                    <label class="block text-sm font-medium text-text dark:text-text-dark">Nombre</label>
-                    <input type="text" formControlName="name" class="mt-1 block w-full border rounded-md p-2 text-text dark:text-text-dark dark:border-border-dark border ">
+                    <label class="block text-sm font-medium text-text dark:text-text-dark border-gray-300">Nombre</label>
+                    <input type="text" formControlName="name" class="mt-1 block w-full border rounded-md p-2 text-text dark:text-text-dark  border border-gray-300 ">
                 </div>
 
                 <div>
-                <label class="block text-sm font-medium text-text dark:text-text-dark">Tipo de Mascota</label>
-                <select formControlName="type" class="mt-1 block w-full border dark:border-border-dark text-text dark:text-text-dark p-2 bg-transparent">
+                <label class="block text-sm font-medium text-text dark:text-text-dark border-gray-300">Tipo de Mascota</label>
+                <select formControlName="type" class="mt-1 block w-full border  text-text dark:text-text-dark p-2 bg-transparent border-gray-300">
                     <option value="" disabled>Seleccione tipo</option>
                     @for (t of tiposMascota; track t) {
                         <option [value]="t">{{ t }}</option>
@@ -22,8 +22,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-text dark:text-text-dark">Estado</label>
-                    <select formControlName="state" class="mt-1 block w-full border dark:border-border-dark rounded-md p-2 text-text dark:text-text-dark bg-transparent">
+                    <label class="block text-sm font-medium text-text dark:text-text-dark border-gray-300">Estado</label>
+                    <select formControlName="state" class="mt-1 block w-full border rounded-md p-2 text-text dark:text-text-dark bg-transparent border-gray-300">
                         @for (s of estadosMascota; track s) {
                             <option [value]="s">{{ s }}</option>
                         }
@@ -31,35 +31,35 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-text dark:text-text-dark">Tamaño</label>
-                    <select formControlName="size" class="mt-1 block w-full border dark:border-border-dark rounded-md p-2 text-text dark:text-text-dark bg-transparent">
+                    <label class="block text-sm font-medium text-text dark:text-text-dark border-gray-300">Tamaño</label>
+                    <select formControlName="size" class="mt-1 block w-full border  rounded-md p-2 text-text dark:text-text-dark bg-transparent border-gray-300">
                         @for (sz of tamanosMascota; track sz) {
                             <option [value]="sz">{{ sz }}</option>
                         }
                     </select>
                 </div>
                 <div>
-                    <label for="race" class="block text-sm font-medium text-text dark:text-text-dark">Raza</label>
+                    <label for="race" class="block text-sm font-medium text-text dark:text-text-dark border-gray-300">Raza</label>
                     <input id="race" type="text" formControlName="race" placeholder="Raza" 
-                        class="mt-1 block w-full border dark:border-border-dark rounded-md p-2 text-text dark:text-text-dark bg-transparent">
+                        class="mt-1 block w-full border  rounded-md p-2 text-text dark:text-text-dark bg-transparent border-gray-300">
                 </div>
 
                 <div>
                     <label for="weight" class="block text-sm font-medium text-text dark:text-text-dark">Peso</label>
                     <input id="weight" type="number" formControlName="weight" placeholder="Peso (kg)" 
-                        class="mt-1 block w-full border dark:border-border-dark rounded-md p-2 text-text dark:text-text-dark bg-transparent">
+                        class="mt-1 block w-full border rounded-md p-2 text-text dark:text-text-dark bg-transparent border-gray-300">
                 </div>
             </div>
             <div>
                 <label for="description"class="block text-sm font-medium text-text dark:text-text-dark">Descripción</label>
-                <textarea id="description" formControlName="description" rows="3" class="mt-1 block w-full border dark:border-border-dark rounded-md p-2 text-text dark:text-text-dark"></textarea>
+                <textarea id="description" formControlName="description" rows="3" class="mt-1 block w-full border rounded-md p-2 text-text dark:text-text-dark border-gray-300"></textarea>
             </div>
 
             <div class="space-y-2">
                 <label class="block text-sm font-medium text-text dark:text-text-dark">Foto de la mascota</label>
-                <div class="flex items-center gap-4">
-                    <img *ngIf="imagePreview()" [src]="imagePreview()" class="w-24 h-24 object-cover rounded-lg border dark:border-border-dark border text-text dark:text-text-dark" alt="Foto de la mascota">
-                    <input type="file" (change)="onFileSelected($event)" accept="image/*" class="text-sm text-text dark:text-text-dark">
+                <div class="flex items-center gap-4 border-gray-300 cursor-pointer">
+                    <img *ngIf="imagePreview()" [src]="imagePreview()" class="w-24 h-24 object-cover rounded-lg border  border text-text dark:text-text-dark border-gray-300 cursor-pointer" alt="Foto de la mascota">
+                    <input type="file" (change)="onFileSelected($event)" accept="image/*" class="text-sm text-text dark:text-text-dark border-gray-300 cursor-pointer">
                 </div>
             </div>
 

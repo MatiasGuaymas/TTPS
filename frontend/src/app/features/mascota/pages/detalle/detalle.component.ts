@@ -35,6 +35,13 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     isAdmin = computed(() => this.userData()?.role === 'ADMIN');
     isEditing = signal(false);
 
+    isOwner = computed(() => {
+        const user = this.userData();
+        const pet = this.pet();
+        return user && pet && user.id === pet.creatorId;
+    });
+
+    canEditOrDelete = computed(() => this.isAdmin() || this.isOwner());
 
     private route = inject(ActivatedRoute);
     private router = inject(Router);
