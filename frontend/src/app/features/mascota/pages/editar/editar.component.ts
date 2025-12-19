@@ -4,11 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MascotaService } from '../../mascota.service';
 import { AlertService } from '../../../../core/services/alert.service';
 import { PetUpdate, Size, State, TipoMascota } from '../../mascota.model';
-import { Map } from "../../../../shared/components/map/map";
+import { MapComponent } from "../../../../shared/components/map/map";
 
 @Component({
   selector: 'app-editar',
-  imports: [ReactiveFormsModule, Map],
+  imports: [ReactiveFormsModule, MapComponent],
   templateUrl: './editar.component.html',
   styleUrl: './editar.component.css',
 })

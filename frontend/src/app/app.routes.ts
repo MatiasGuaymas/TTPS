@@ -15,7 +15,6 @@ import { PetListComponent } from './features/mascota/pages/listado/listado.compo
 import { UserPublicProfileComponent } from './features/profile/user-public-profile/user-public-profile.component';
 import { PetEditComponent } from './features/mascota/pages/editar/editar.component';
 import { PetDeleteComponent } from './features/mascota/pages/eliminar/eliminar.component';
-import { ListadoMascotas } from './features/mascota/pages/listado/listado';
 import { RankingComponent } from './features/ranking/ranking.component';
 
 export const routes: Routes = [
@@ -75,7 +74,7 @@ export const routes: Routes = [
         path: 'ranking',
         component: RankingComponent
     },
-    // Ruta 404 
+    // Ruta 404
     {
         path: '**',
         component: NotFoundComponent
