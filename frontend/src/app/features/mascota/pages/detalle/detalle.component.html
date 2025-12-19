@@ -29,7 +29,7 @@
                  <div class="space-y-4">
                     <div class="rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 aspect-square">
                         <img *ngIf="pet()?.photosBase64 && pet()!.photosBase64.length > 0"
-                            [src]="decodePhoto(pet()!.photosBase64[0])" 
+                            [src]="decodePhoto(pet()!.photosBase64[0])"
                             [alt]="pet()!.name"
                             class="w-full h-full object-cover">
                         <div *ngIf="!pet()?.photosBase64 || pet()!.photosBase64.length === 0"
@@ -54,7 +54,7 @@
                             @if (canEditOrDelete()){
                                 <button  (click)="goToPetUpdate(pet()!.id)"
                                     class="px-4 py-2 bg-blue-600 text-text dark:text-text-dark rounded-lg bg-background dark:bg-background-dark hover:bg-blue-700 transition cursor-pointer">
-                                    Editar 
+                                    Editar
                                 </button>
                                 <button  (click)="goToPetDelete(pet()!.id)"
                                     class="px-4 py-2 bg-blue-600 text-text dark:text-text-dark rounded-lg hover:bg-blue-700 transition bg-background dark:bg-background-dark cursor-pointer">
@@ -300,25 +300,24 @@
                                 [ngClass]="{
                                     'border-blue-500 bg-blue-50': photoPreview(),
                                     'border-gray-300 dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-800': !photoPreview()
-                                }">
-
-                                @if (photoPreview()) {
-                                <img [src]="photoPreview()" alt="Previsualización de Mascota"
-                                    class="max-h-40 max-w-full object-contain rounded-md shadow-md mb-2">
-                                <p class="text-xs text-text dark:text-text-dark font-medium">Click para cambiar foto</p>
-                                } @else {
-                                <i class="fas fa-cloud-upload-alt text-2xl text-text dark:text-text-dark mb-2"></i>
-                                <p class="text-sm font-medium text-text dark:text-text-dark">Subi Una Foto De Tu Mascota
-                                </p>
-                                <p class="text-xs text-text dark:text-text-dark mt-1" style="opacity: 0.6;">(Haz click
-                                    aquí)</p>
                                 }
-
+                            ">
+                                @if (photoPreview()) {
+                                    <img [src]="photoPreview()" alt="Previsualización de Mascota"
+                                        class="max-h-40 max-w-full object-contain rounded-md shadow-md mb-2">
+                                    <p class="text-xs text-text dark:text-text-dark font-medium">Click para cambiar foto</p>
+                                } @else {
+                                    <i class="fas fa-cloud-upload-alt text-2xl text-text dark:text-text-dark mb-2"></i>
+                                    <p class="text-sm font-medium text-text dark:text-text-dark">Subi Una Foto De Tu Mascota
+                                    </p>
+                                    <p class="text-xs text-text dark:text-text-dark mt-1" style="opacity: 0.6;">(Haz click
+                                        aquí)</p>
+                                }
                             </div>
                             @if (sightingForm.get('photoFile')?.invalid && sightingForm.get('photoFile')?.touched) {
-                            <div class="text-red-500 text-xs mt-1">
-                                La foto es obligatoria.
-                            </div>
+                                <div class="text-red-500 text-xs mt-1">
+                                    La foto es obligatoria.
+                                </div>
                             }
                         </div>
 

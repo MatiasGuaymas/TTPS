@@ -26,7 +26,8 @@ export class PetEditComponent implements OnInit {
     petForm: FormGroup;
     petId: number | null = null;
     loading = signal(true);
-    imagePreview = signal<string | null>(null);
+    imagePreview = signal<string | ArrayBuffer | null>(null);
+    imageBase64 = signal<string | undefined>(undefined);
 
     constructor() {
         this.petForm = this.fb.group({
@@ -51,6 +52,7 @@ export class PetEditComponent implements OnInit {
             this.loadPetData(this.petId);
         }
     }
+
     loadPetData(petId: number) {
         this.petService.getPetById(petId).subscribe({
             next: (pet) => {
@@ -75,7 +77,40 @@ export class PetEditComponent implements OnInit {
         });
     }
 
-    onFileSelected(event: any) {
+    onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Validar tipo de archivo
+            if (!file.type.startsWith('image/')) {
+                this.alerts.error('Error', 'Solo se permiten archivos de imagen');
+                return;
+            }
+
+            // Validar tamaño (máx 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                this.alerts.error('Error', 'La imagen no puede superar los 5MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = e => {
+                const base64String = (reader.result as string).split(',')[1];
+                this.imageBase64.set(base64String);
+                this.imagePreview.set(reader.result);
+            };
+            reader.onerror = (error) => {
+                console.error('Error al convertir a Base64: ', error);
+                this.imageBase64.set(undefined);
+                this.imagePreview.set(null);
+                this.alerts.error('Error', 'No se pudo procesar la imagen seleccionada');
+            };
+        }
+    }
+
+    /* onFileSelected(event: any) {
         const file: File = event.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -86,7 +121,7 @@ export class PetEditComponent implements OnInit {
             };
             reader.readAsDataURL(file);
         }
-    }
+    }*/
 
     onLocationChanged(coords: { latitude: number; longitude: number }) {
         this.petForm.patchValue({
@@ -98,6 +133,8 @@ export class PetEditComponent implements OnInit {
     onSave(){
         if(this.petForm.valid && this.petId!==null){
             const payload:PetUpdate=this.petForm.value;
+            payload.photoBase64=this.imageBase64()!;
+            console.log(payload)
             this.petService.updatePet(this.petId, payload, localStorage.getItem('token')!).subscribe({
                 next:()=>{
                     this.alerts.success('Éxito', 'Mascota actualizada correctamente');

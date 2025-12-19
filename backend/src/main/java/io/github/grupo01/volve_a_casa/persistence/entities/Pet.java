@@ -95,7 +95,7 @@ public class Pet {
 
     public void addFotoBase64(String fotoBase64) {
         if (fotoBase64 != null && !this.photosBase64.contains(fotoBase64))
-            this.photosBase64.add(fotoBase64);
+            this.photosBase64.set(0, fotoBase64);
     }
 
     public void removeFotoBase64(String fotoBase64) {
@@ -114,6 +114,7 @@ public class Pet {
         if (dto.state() != null) this.state = dto.state();
         if (dto.latitude() != null && dto.longitude() != null)
             this.actualizarUbicacion(dto.latitude(), dto.longitude());
+        if (dto.photoBase64() != null) this.addFotoBase64(dto.photoBase64());
     }
 
     /**
