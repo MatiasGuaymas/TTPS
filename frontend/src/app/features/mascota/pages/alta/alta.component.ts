@@ -107,11 +107,6 @@ export class AltaMascota implements OnInit {
         };
     }
 
-    goToListadoMascotas(): void {
-        this.alert.success('Éxito', 'Mascota registrada con éxito!');
-        this.router.navigate(['/listado-mascotas']);
-    }
-
     onSubmit(): void {
         if (this.formMascota.valid && this.imagenBase64) {
             const formValue = this.formMascota.value;
@@ -133,9 +128,11 @@ export class AltaMascota implements OnInit {
 
             this.mascotaService.crearMascota(petCreateDto, localStorage.getItem("token") ?? "").subscribe({
                 next: (response) => {
+                    this.alert.success('Éxito', 'Mascota registrada con éxito!');
                     this.formMascota.reset();
                     this.imagenPreVisualizacion = null;
                     this.imagenBase64 = null;
+                    this.router.navigate(['/listado-mascotas']);
                 },
                 error: (error) => {
                     console.error('Error al registrar mascota:', error);

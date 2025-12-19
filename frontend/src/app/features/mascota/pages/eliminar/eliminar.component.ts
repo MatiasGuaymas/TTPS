@@ -7,16 +7,16 @@ import { AlertService } from '../../../../core/services/alert.service';
 @Component({
   selector: 'app-eliminar',
   imports: [],
-  templateUrl: './eliminar.html',
-  styleUrl: './eliminar.css',
+  templateUrl: './eliminar.component.html',
+  styleUrl: './eliminar.component.css',
 })
-export class Eliminar implements OnInit{
+export class PetDeleteComponent implements OnInit{
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private mascotaService = inject(MascotaService);
   private authService = inject(AuthService);
   private alert = inject(AlertService);
-  
+
   petId!: number;
 
   ngOnInit() {
@@ -43,8 +43,8 @@ export class Eliminar implements OnInit{
   }
 
   private deletePet() {
-    const token = localStorage.getItem('token') || ""; 
-    
+    const token = localStorage.getItem('token') || "";
+
     this.mascotaService.deletePet(this.petId, token).subscribe({
       next: () => {
         this.alert.success('Eliminado', 'La mascota ha sido eliminada exitosamente.')

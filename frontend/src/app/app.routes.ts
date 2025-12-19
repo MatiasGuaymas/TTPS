@@ -11,10 +11,10 @@ import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { adminGuard } from './core/guards/admin.guard';
 
-import { ListadoMascotas } from './features/mascota/pages/listado/listado.component';
+import { PetListComponent } from './features/mascota/pages/listado/listado.component';
 import { UserPublicProfileComponent } from './features/profile/user-public-profile/user-public-profile.component';
-import { Editar } from './features/mascota/pages/editar/editar';
-import { Eliminar } from './features/mascota/pages/eliminar/eliminar';
+import { PetEditComponent } from './features/mascota/pages/editar/editar.component';
+import { PetDeleteComponent } from './features/mascota/pages/eliminar/eliminar.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -33,10 +33,10 @@ export const routes: Routes = [
     },
     {
         path: 'listado-mascotas',
-        component: ListadoMascotas,
+        component: PetListComponent,
 
     },
-    
+
     // Rutas para usuarios autenticados
     {
         path: 'profile',
@@ -50,17 +50,17 @@ export const routes: Routes = [
     },
     {
         path: 'user/:id',
-        component: UserPublicProfileComponent, 
+        component: UserPublicProfileComponent,
         canActivate: [authGuard]
     },
     {
         path:'edicion-mascota/:id',
-        component:Editar,
+        component:PetEditComponent,
         canActivate: [authGuard]
     },
     {
         path:'eliminar-mascota/:id',
-        component:Eliminar,
+        component:PetDeleteComponent,
         canActivate: [authGuard]
     },
     // Rutas para administradores
@@ -69,11 +69,11 @@ export const routes: Routes = [
         component: AdminUsersComponent,
         canActivate: [adminGuard]
     },
-    
+
     // Ruta 404
     {
         path: '**',
         component: NotFoundComponent
     }
-    
+
 ];

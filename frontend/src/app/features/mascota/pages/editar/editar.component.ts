@@ -9,10 +9,10 @@ import { Map } from "../../../../shared/components/map/map";
 @Component({
   selector: 'app-editar',
   imports: [ReactiveFormsModule, Map],
-  templateUrl: './editar.html',
-  styleUrl: './editar.css',
+  templateUrl: './editar.component.html',
+  styleUrl: './editar.component.css',
 })
-export class Editar implements OnInit{
+export class PetEditComponent implements OnInit {
     private fb = inject(FormBuilder);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
@@ -57,8 +57,8 @@ export class Editar implements OnInit{
 
                 let photo=pet.photosBase64?.[0]||'';
 
-                const displayPhoto = photo.startsWith('data:image') 
-                ? photo 
+                const displayPhoto = photo.startsWith('data:image')
+                ? photo
                 : `data:image/jpeg;base64,${photo}`;
 
                 this.petForm.patchValue({
@@ -107,7 +107,7 @@ export class Editar implements OnInit{
                     this.alerts.error('Error', 'No se pudo actualizar la mascota');
                     this.router.navigate(['/mascota/{}'.replace('{}',this.petId!.toString())]);
                 }
-                
+
             });
         }
             else{

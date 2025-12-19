@@ -1,12 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
-import { Subject, switchMap } from 'rxjs';
 
 import { AlertService } from '../../../../core/services/alert.service';
 import { PetFilter, PetResponse, Size, State, TipoMascota } from '../../mascota.model';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
 import { GeolocationService } from '../../../../core/services/geolocation.service';
 
 @Component({
@@ -15,7 +13,7 @@ import { GeolocationService } from '../../../../core/services/geolocation.servic
     templateUrl: './listado.component.html',
     styleUrl: './listado.component.css',
 })
-export class ListadoMascotas implements OnInit{
+export class PetListComponent implements OnInit{
 
     pets = signal<PetResponse[]>([]);
     loading = signal(true);
@@ -142,7 +140,7 @@ export class ListadoMascotas implements OnInit{
             cleanedFilters.userLongitude = Number(formValues.userLongitude);
         }
         if (formValues.maxDistanceInKm !== null && formValues.maxDistanceInKm !== undefined && formValues.maxDistanceInKm !== '') {
-            cleanedFilters.maxDistanceInKm = Number(formValues.maxDistanceInKm); 
+            cleanedFilters.maxDistanceInKm = Number(formValues.maxDistanceInKm);
         }
 
         if (formValues.initialLostDate) {
@@ -198,6 +196,6 @@ export class ListadoMascotas implements OnInit{
         this.router.navigate(['/mascota', petId]);
     }
 
-    
-    
+
+
 }

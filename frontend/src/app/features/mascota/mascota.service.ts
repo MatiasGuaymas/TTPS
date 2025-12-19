@@ -52,19 +52,10 @@ export class MascotaService {
         return this.http.get<PetResponse>(`${this.apiUrl}/${id}`);
     }
     updatePet(id: number, petDto: any, token: string): Observable<any> {
-        const headers = new HttpHeaders({
-            'Content-Type': 'application/json',
-            'token': token
-        });
-
-        return this.http.put(`${this.apiUrl}/${id}`, petDto, { headers });
+        return this.http.put(`${this.apiUrl}/${id}`, petDto);
     }
 
     deletePet(id: number, token: string): Observable<any> {
-        const headers = new HttpHeaders({
-            'token': token
-        });
-        
-        return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+        return this.http.delete(`${this.apiUrl}/${id}`);
     }
 }
