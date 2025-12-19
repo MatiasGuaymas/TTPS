@@ -4,12 +4,12 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { PetCreate, Size, State, TipoMascota } from "../../mascota.model";
 import { MascotaService } from "../../mascota.service";
 import { AlertService } from '../../../../core/services/alert.service';
-import { Map } from "../../../../shared/components/map/map";
+import { MapComponent } from "../../../../shared/components/map/map";
 
 @Component({
     selector: "app-alta-mascota",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule, Map],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, MapComponent],
     templateUrl: "./alta.component.html",
     styleUrls: ['./alta.component.css']
 })

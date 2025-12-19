@@ -1,2 +1,11 @@
-<app-navbar></app-navbar>
-<router-outlet />
+<app-navbar class="fixed top-0 left-0 w-full z-50"></app-navbar>
+
+<div class="pt-20 min-h-screen flex flex-col justify-between bg-background dark:bg-background-dark">
+  
+  <div class="flex-grow">
+    <router-outlet></router-outlet>
+  </div>
+
+  <footer></footer>
+
+</div>
