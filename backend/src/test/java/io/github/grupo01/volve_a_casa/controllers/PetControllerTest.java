@@ -327,7 +327,8 @@ public class PetControllerTest {
                 -54f,
                 -21f,
                 LocalDate.now(),
-                "comentario"
+                "comentario",
+                "photo"
         );
     }
 }

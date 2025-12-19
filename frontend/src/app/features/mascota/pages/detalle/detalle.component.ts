@@ -28,7 +28,7 @@ import { initFlowbite } from 'flowbite';
         }
     `]
 })
-export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DetalleComponent implements OnInit, AfterViewInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private fb = inject(FormBuilder);
@@ -42,7 +42,8 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     currentPhotoIndex = signal(0);
     showSightingModal = signal(false);
     submittingSighting = signal(false);
-    photoPreview = signal<string | null>(null);
+    photoPreview = signal<string | ArrayBuffer | null>(null);
+    photoBase64 = signal<string | undefined>(undefined);
     maxDate = new Date().toISOString().split('T')[0];
     sightings = signal<SightingResponse[]>([]);
     loadingSightings = signal(false);
@@ -54,7 +55,8 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         // Inicializar formulario de avistamiento
         this.sightingForm = this.fb.group({
             date: [new Date().toISOString().split('T')[0], [Validators.required]],
-            comment: ['', [Validators.maxLength(200)]]
+            comment: ['', [Validators.maxLength(200)]],
+            photoFile: [null, Validators.required]
         });
 
         const iconRetinaUrl = 'assets/leaflet/marker-icon-2x.png';
@@ -190,7 +192,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         this.sightingForm.reset({
             date: new Date().toISOString().split('T')[0],
             comment: '',
-            photo: null
+            photoFile: null
         });
         this.selectedSightingLocation.set(null);
 
@@ -227,12 +229,18 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             }
 
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64 = e.target?.result as string;
-                this.photoPreview.set(base64);
-                this.sightingForm.patchValue({ photo: base64 });
-            };
             reader.readAsDataURL(file);
+            reader.onload = e => {
+                const base64String = (reader.result as string).split(',')[1];
+                this.photoBase64.set(base64String);
+                this.photoPreview.set(reader.result);
+            };
+            reader.onerror = (error) => {
+                console.error('Error al convertir a Base64: ', error);
+                this.photoBase64.set(undefined);
+                this.photoPreview.set(null);
+                this.alertService.error('Error', 'No se pudo procesar la imagen seleccionada');
+            };
         }
     }
 
@@ -258,6 +266,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             latitude: location.latitude,
             longitude: location.longitude,
             date: this.sightingForm.value.date,
+            photoBase64: this.photoBase64(),
             comment: this.sightingForm.value.comment || ''
         };
 
@@ -277,6 +286,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         });
     }
 
-    ngOnDestroy(): void {
+    decodePhoto(photoBase64: string): string {
+        return `data:image/jpeg;base64,${photoBase64}`;
     }
 }

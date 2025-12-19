@@ -18,9 +18,8 @@ public record SightingCreateDTO(
         @DecimalMin(value = "-180.0", message = "Longitude must be >= -180")
         @DecimalMax(value = "180.0", message = "Longitude must be <= 180")
         Float longitude,
-
-        // FIXME: Descomentar cuando se implemente la carga de imagenes
-        // @NotBlank(message = "Photo is required")
+        
+        @NotBlank(message = "Photo is required")
         String photoBase64,
 
         @NotNull(message = "Date is required")
