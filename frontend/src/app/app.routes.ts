@@ -36,6 +36,7 @@ export const routes: Routes = [
         component: ListadoMascotas,
 
     },
+    
     // Rutas para usuarios autenticados
     {
         path: 'profile',
@@ -52,22 +53,23 @@ export const routes: Routes = [
         component: UserPublicProfileComponent, 
         canActivate: [authGuard]
     },
+    {
+        path:'edicion-mascota/:id',
+        component:Editar,
+        canActivate: [authGuard]
+    },
+    {
+        path:'eliminar-mascota/:id',
+        component:Eliminar,
+        canActivate: [authGuard]
+    },
     // Rutas para administradores
     {
         path: 'admin/users',
         component: AdminUsersComponent,
         canActivate: [adminGuard]
     },
-    {
-        path:'admin/edicion-mascota/:id',
-        component:Editar,
-        canActivate:[adminGuard]
-    },
-    {
-        path:'admin/eliminar-mascota/:id',
-        component:Eliminar,
-        canActivate:[adminGuard]
-    },
+    
     // Ruta 404
     {
         path: '**',

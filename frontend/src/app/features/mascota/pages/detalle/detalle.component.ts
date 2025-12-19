@@ -295,11 +295,11 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     //edicion y borraado de mascota
    
     goToPetUpdate(petId: number): void {
-        this.router.navigate(['admin/edicion-mascota', petId]);
+        this.router.navigate(['/edicion-mascota', petId]);
     }
 
     goToPetDelete(petId: number): void {
-        this.router.navigate(['admin/eliminar-mascota', petId]);
+        this.router.navigate(['/eliminar-mascota', petId]);
     }
     ngOnDestroy(): void {
     }
