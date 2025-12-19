@@ -80,6 +80,9 @@ public class PetService {
                 creator,
                 dto.photoBase64()
         );
+
+        creator.setPoints(creator.getPoints() + 10);
+
         return PetResponseDTO.fromPet(petRepository.save(newPet));
     }
 

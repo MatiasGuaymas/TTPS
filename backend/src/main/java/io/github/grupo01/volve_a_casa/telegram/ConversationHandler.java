@@ -58,7 +58,7 @@ public class ConversationHandler {
         conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_EMAIL);
         conversations.put(chatId, conversation);
 
-        messageSender.sendText(bot, chatId, messages.get("register.start"));
+        messageSender.sendText(bot, chatId, messages.get("perdida.start"));
     }
 
     /**
@@ -69,9 +69,9 @@ public class ConversationHandler {
         if (conversation != null && conversation.getCurrentStep() != ConversationState.ConversationStep.NONE) {
             conversation.reset();
             conversations.remove(chatId);
-            messageSender.sendText(bot, chatId, messages.get("register.cancel.success"));
+            messageSender.sendText(bot, chatId, messages.get("cancelar.success"));
         } else {
-            messageSender.sendText(bot, chatId, messages.get("register.cancel.no_active"));
+            messageSender.sendText(bot, chatId, messages.get("cancelar.no.active"));
         }
     }
 
@@ -109,13 +109,13 @@ public class ConversationHandler {
 
     private void processEmail(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.email.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.email.invalid"));
             return;
         }
 
         String email = update.getMessage().getText().trim();
         if (email.isEmpty() || email.startsWith("/") || !email.contains("@")) {
-            messageSender.sendText(bot, chatId, messages.get("register.email.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.email.format.error"));
             return;
         }
 
@@ -126,13 +126,13 @@ public class ConversationHandler {
 
     private void processPassword(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.password.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.password.invalid"));
             return;
         }
 
         String password = update.getMessage().getText().trim();
         if (password.isEmpty() || password.startsWith("/")) {
-            messageSender.sendText(bot, chatId, messages.get("register.password.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.password.format.error"));
             return;
         }
 
@@ -144,7 +144,7 @@ public class ConversationHandler {
             conversation.put("userName", authResponse.user().name());
             conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_NAME);
 
-            messageSender.sendText(bot, chatId, messages.get("register.password.auth.success", authResponse.user().name()));
+            messageSender.sendText(bot, chatId, messages.get("register.password.success", authResponse.user().name()));
         } catch (ResponseStatusException e) {
             messageSender.sendText(bot, chatId, messages.get("register.password.auth.error"));
             conversation.reset();
@@ -154,13 +154,13 @@ public class ConversationHandler {
 
     private void processName(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.name.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.name.invalid"));
             return;
         }
 
         String name = update.getMessage().getText().trim();
         if (name.isEmpty() || name.startsWith("/")) {
-            messageSender.sendText(bot, chatId, messages.get("register.name.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.name.format.error"));
             return;
         }
 
@@ -171,7 +171,7 @@ public class ConversationHandler {
 
     private void processSize(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.size.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.size.invalid"));
             return;
         }
 
@@ -184,7 +184,7 @@ public class ConversationHandler {
         };
 
         if (size == null) {
-            messageSender.sendText(bot, chatId, messages.get("register.size.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.size.format.error"));
             return;
         }
 
@@ -195,7 +195,7 @@ public class ConversationHandler {
 
     private void processState(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.state.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.state.invalid"));
             return;
         }
 
@@ -209,7 +209,7 @@ public class ConversationHandler {
         };
 
         if (state == null) {
-            messageSender.sendText(bot, chatId, messages.get("register.state.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.state.format.error"));
             return;
         }
 
@@ -220,7 +220,7 @@ public class ConversationHandler {
 
     private void processDate(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.date.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.date.invalid"));
             return;
         }
 
@@ -230,7 +230,7 @@ public class ConversationHandler {
         try {
             LocalDate date = LocalDate.parse(text, formatter);
             if (date.isAfter(LocalDate.now())) {
-                messageSender.sendText(bot, chatId, messages.get("register.date.future"));
+                messageSender.sendText(bot, chatId, messages.get("register.date.future.error"));
                 return;
             }
 
@@ -238,19 +238,19 @@ public class ConversationHandler {
             conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_COLOR);
             messageSender.sendText(bot, chatId, messages.get("register.date.success", date.format(formatter)));
         } catch (DateTimeParseException e) {
-            messageSender.sendText(bot, chatId, messages.get("register.date.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.date.format.error"));
         }
     }
 
     private void processColor(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.color.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.color.invalid"));
             return;
         }
 
         String color = update.getMessage().getText().trim();
         if (color.isEmpty() || color.startsWith("/")) {
-            messageSender.sendText(bot, chatId, messages.get("register.color.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.color.format.error"));
             return;
         }
 
@@ -261,7 +261,7 @@ public class ConversationHandler {
 
     private void processType(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.type.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.type.invalid"));
             return;
         }
 
@@ -278,7 +278,7 @@ public class ConversationHandler {
         };
 
         if (type == null) {
-            messageSender.sendText(bot, chatId, messages.get("register.type.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.type.format.error"));
             return;
         }
 
@@ -289,13 +289,13 @@ public class ConversationHandler {
 
     private void processRace(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.race.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.race.invalid"));
             return;
         }
 
         String race = update.getMessage().getText().trim();
         if (race.isEmpty() || race.startsWith("/")) {
-            messageSender.sendText(bot, chatId, messages.get("register.race.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.race.format.error"));
             return;
         }
 
@@ -306,7 +306,7 @@ public class ConversationHandler {
 
     private void processWeight(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.weight.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.weight.invalid"));
             return;
         }
 
@@ -314,7 +314,7 @@ public class ConversationHandler {
         try {
             float weight = Float.parseFloat(text);
             if (weight <= 0) {
-                messageSender.sendText(bot, chatId, messages.get("register.weight.positive"));
+                messageSender.sendText(bot, chatId, messages.get("register.weight.negative.error"));
                 return;
             }
 
@@ -322,13 +322,13 @@ public class ConversationHandler {
             conversation.setCurrentStep(ConversationState.ConversationStep.WAITING_PHOTO);
             messageSender.sendText(bot, chatId, messages.get("register.weight.success", weight));
         } catch (NumberFormatException e) {
-            messageSender.sendText(bot, chatId, messages.get("register.weight.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.weight.format.error"));
         }
     }
 
     private void processPhoto(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasPhoto()) {
-            messageSender.sendText(bot, chatId, messages.get("register.photo.required"));
+            messageSender.sendText(bot, chatId, messages.get("register.photo.invalid"));
             return;
         }
 
@@ -367,7 +367,7 @@ public class ConversationHandler {
 
     private void processLocation(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasLocation()) {
-            messageSender.sendText(bot, chatId, messages.get("register.location.required"));
+            messageSender.sendText(bot, chatId, messages.get("register.location.invalid"));
             return;
         }
 
@@ -381,13 +381,13 @@ public class ConversationHandler {
 
     private void processDescription(TelegramLongPollingBot bot, Update update, long chatId, ConversationState conversation) {
         if (!update.getMessage().hasText()) {
-            messageSender.sendText(bot, chatId, messages.get("register.description.text_required"));
+            messageSender.sendText(bot, chatId, messages.get("register.description.invalid"));
             return;
         }
 
         String description = update.getMessage().getText().trim();
         if (description.isEmpty() || description.startsWith("/")) {
-            messageSender.sendText(bot, chatId, messages.get("register.description.invalid"));
+            messageSender.sendText(bot, chatId, messages.get("register.description.format.error"));
             return;
         }
 
