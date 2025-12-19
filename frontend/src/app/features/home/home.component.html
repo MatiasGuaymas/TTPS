@@ -22,7 +22,7 @@
         </ng-container>
 
         <ng-template #carouselContent>
-            <carousel *ngIf="carouselImages().length > 0" [images]="carouselImages()"
+            <carousel *ngIf="carouselImages().length > 0" (imageClick)="goToDetail($event)" [images]="carouselImages()"
                 class="w-full max-w-4xl mt-4 mb-8">
             </carousel>
             <div *ngIf="!loadingCarousel() && carouselImages().length === 0"
@@ -79,7 +79,7 @@
             <ng-template #rankingContent>
                 <ng-container *ngFor="let user of topUsers(); let i = index">
                     <user-card [user]="user" [position]="i + 1" class="col-span-1 md:col-span-2 p-4" [ngClass]="{
-                        'md:col-start-2': i === 3  
+                        'md:col-start-2': i === 3
                     }">
                     </user-card>
                 </ng-container>
@@ -92,7 +92,7 @@
 
         <div class="fixed bottom-8 right-8 z-50 group flex items-center justify-end">
             <span class="absolute right-full mr-4 top-1/2 -translate-y-1/2
-                   px-4 py-2 
+                   px-4 py-2
                    bg-gray-800 dark:bg-gray-700 text-white text-sm font-bold
                    rounded-lg shadow-xl
                    opacity-0 group-hover:opacity-100
@@ -103,13 +103,13 @@
                     class="absolute top-1/2 -right-2 -translate-y-1/2 border-8 border-transparent border-l-gray-800 dark:border-l-gray-700"></span>
             </span>
 
-            <a href="https://t.me/VolveACasa_Bot" target="_blank" rel="noopener noreferrer" class="w-20 h-20 
-                bg-[#2AABEE] text-white 
-                flex items-center justify-center 
-                shadow-2xl shadow-blue-400/50 
+            <a href="https://t.me/VolveACasa_Bot" target="_blank" rel="noopener noreferrer" class="w-20 h-20
+                bg-[#2AABEE] text-white
+                flex items-center justify-center
+                shadow-2xl shadow-blue-400/50
                 hover:bg-[#229ED9] hover:shadow-blue-500/60
-                transition-all duration-300 
-                hover:-translate-y-2 hover:scale-110 
+                transition-all duration-300
+                hover:-translate-y-2 hover:scale-110
                 rounded-t-full rounded-bl-full rounded-br-none" aria-label="Telegram Bot">
                 <i class="fa-brands fa-telegram text-5xl mr-1 mb-2"></i>
             </a>

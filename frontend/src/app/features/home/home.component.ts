@@ -13,6 +13,7 @@ import { MascotaService } from "../../features/mascota/mascota.service";
 import { State } from "../../features/mascota/mascota.model";
 import { SightingResponse } from "../../core/models/sighting.models";
 import { UserProfile } from "../../core/models/user.models";
+import { Router } from "@angular/router";
 
 @Component({
     selector: 'app-home',
@@ -24,6 +25,7 @@ export class HomeComponent implements OnInit {
     private userService = inject(UserService);
     private mascotaService = inject(MascotaService);
     private sanitizer = inject(DomSanitizer);
+    private router = inject(Router);
 
     sightings = signal<SightingResponse[]>([]);
     sightingsLocationList = signal<MarkerInfo[]>([]);
@@ -107,5 +109,9 @@ export class HomeComponent implements OnInit {
                 next: (users) => this.topUsers.set(users),
                 error: (e) => console.error(e)
             });
+    }
+
+    goToDetail(index: number) {
+        this.router.navigate(['/mascota/', index + 1]);
     }
 }
