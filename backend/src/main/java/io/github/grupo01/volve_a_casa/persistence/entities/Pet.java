@@ -81,7 +81,7 @@ public class Pet {
         this.creator = creator;
         this.lostDate = LocalDate.now();
         this.actualizarUbicacion(latitude, longitude);
-        this.addFotoBase64(fotoDefaultBase64);
+        this.setPhotosBase64(fotoDefaultBase64);
 
     }
 
@@ -93,9 +93,14 @@ public class Pet {
         return Collections.unmodifiableList(this.photosBase64);
     }
 
+    public void setPhotosBase64(String fotoBase64) {
+        this.photosBase64 = new ArrayList<>();
+        this.addFotoBase64(fotoBase64);
+    }
+
     public void addFotoBase64(String fotoBase64) {
         if (fotoBase64 != null && !this.photosBase64.contains(fotoBase64))
-            this.photosBase64.set(0, fotoBase64);
+            this.photosBase64.add(fotoBase64);
     }
 
     public void removeFotoBase64(String fotoBase64) {
@@ -114,7 +119,7 @@ public class Pet {
         if (dto.state() != null) this.state = dto.state();
         if (dto.latitude() != null && dto.longitude() != null)
             this.actualizarUbicacion(dto.latitude(), dto.longitude());
-        if (dto.photoBase64() != null) this.addFotoBase64(dto.photoBase64());
+        if (dto.photoBase64() != null) this.setPhotosBase64(dto.photoBase64());
     }
 
     /**

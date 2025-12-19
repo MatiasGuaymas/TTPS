@@ -134,7 +134,6 @@ export class PetEditComponent implements OnInit {
         if(this.petForm.valid && this.petId!==null){
             const payload:PetUpdate=this.petForm.value;
             payload.photoBase64=this.imageBase64()!;
-            console.log(payload)
             this.petService.updatePet(this.petId, payload, localStorage.getItem('token')!).subscribe({
                 next:()=>{
                     this.alerts.success('Éxito', 'Mascota actualizada correctamente');
