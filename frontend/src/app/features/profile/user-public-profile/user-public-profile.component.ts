@@ -43,6 +43,6 @@ export class UserPublicProfileComponent implements OnInit {
     }
 
     goBack() {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/ranking']);
     }
 }

@@ -1,0 +1,43 @@
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <div *ngIf="loading" class="p-4 text-center">
+        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+            <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Cargando...</span>
+        </div>
+    </div>
+
+    <table *ngIf="!loading" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th *ngFor="let col of columns" scope="col" class="px-6 py-3">
+                    {{ col.header }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of data; let i = index" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                
+                <td *ngFor="let col of columns" class="px-6 py-4">
+                    <ng-container *ngIf="col.field === '#index'">
+                        <span class="font-bold text-gray-900 dark:text-white">#{{ i + 1 }}</span>
+                    </ng-container>
+
+                    <ng-container *ngIf="col.field === 'actions'">
+                        <button (click)="onAction(item)" 
+                                class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                            Ver perfil
+                        </button>
+                    </ng-container>
+
+                    <ng-container *ngIf="col.field !== '#index' && col.field !== 'actions'">
+                        {{ item[col.field] }}
+                    </ng-container>
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
+
+    <div *ngIf="!loading && data.length === 0" class="p-4 text-center text-gray-500">
+        No hay datos disponibles.
+    </div>
+</div>
