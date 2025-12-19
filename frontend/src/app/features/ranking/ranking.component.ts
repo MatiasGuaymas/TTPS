@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { GenericListComponent, TableColumn } from '../../shared/components/list/list.component';
 import { UserService } from '../../core/services/user.service';
@@ -14,6 +14,7 @@ import { UserProfile } from '../../core/models/user.models';
 export class RankingComponent implements OnInit {
   private userService = inject(UserService);
   private router = inject(Router);
+  private location = inject(Location);
 
   usersSignal = signal<UserProfile[]>([]);
   loadingSignal = signal<boolean>(true);
@@ -48,5 +49,9 @@ export class RankingComponent implements OnInit {
     if (user && user.id) {
         this.router.navigate(['/user', user.id]);
     }
+  }
+
+  goBack() {
+    this.location.back();
   }
 }
