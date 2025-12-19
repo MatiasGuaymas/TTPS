@@ -15,6 +15,7 @@ export enum State {
     ADOPTADO='ADOPTADO',
 }
 
+
 export enum Size {
     PEQUENO='PEQUENO',
     MEDIANO='MEDIANO',
@@ -36,7 +37,7 @@ export interface PetCreate {
 
 export interface PetResponse{
     id:number,
-    name:number,
+    name:string,
     size: Size,
     description: string;
     color: string;
@@ -47,8 +48,8 @@ export interface PetResponse{
     lostDate:Date,
     state:State,
     type:TipoMascota,
-    photosBase64: string[],
-    creatorId:number
+    creatorId:number,
+    photosBase64: string[];
 }
 
 export interface PetFilter{
@@ -60,11 +61,23 @@ export interface PetFilter{
     race?:string;
     weightMin?:number;
     weightMax?: number;
-    initialLostDate?:string;
+    initialLostDate?:Date;
     finalLostDate?:Date;
+    userLatitude?:number;
+    userLongitude?:number;
+    maxDistanceInKm?:number;
+}
 
-    page?:number;
-    perPage?:number;
-    sort?:string;
-    filterByNeighbordhood?:boolean;
+export interface PetUpdate{
+        name: string,
+        description:string,
+        color: string,
+        size:Size,
+        race:string,
+        weight: number,
+        type:TipoMascota,
+        state:State,
+        latitude:number,
+        longitude:number,
+        photoBase64:string
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, signal, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,6 +11,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { MapComponent } from '../../../../shared/components/map/map';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
+import { UserService } from '../../../../core/services/user.service';
+
 
 @Component({
     selector: 'app-pet-detalle',
@@ -28,6 +30,18 @@ import { initFlowbite } from 'flowbite';
     `]
 })
 export class DetalleComponent implements OnInit, AfterViewInit {
+    userData = computed(() => this.userService.currentUser());
+    isAdmin = computed(() => this.userData()?.role === 'ADMIN');
+    isEditing = signal(false);
+
+    isOwner = computed(() => {
+        const user = this.userData();
+        const pet = this.pet();
+        return user && pet && user.id === pet.creatorId;
+    });
+
+    canEditOrDelete = computed(() => this.isAdmin() || this.isOwner());
+
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private fb = inject(FormBuilder);
@@ -35,6 +49,7 @@ export class DetalleComponent implements OnInit, AfterViewInit {
     private sightingService = inject(SightingService);
     private alertService = inject(AlertService);
     private authService = inject(AuthService);
+    private userService = inject(UserService);
 
     pet = signal<PetResponse | null>(null);
     loading = signal(true);
@@ -270,6 +285,16 @@ export class DetalleComponent implements OnInit, AfterViewInit {
         });
     }
 
+    //edicion y borraado de mascota
+   
+    goToPetUpdate(petId: number): void {
+        this.router.navigate(['/edicion-mascota', petId]);
+    }
+
+    goToPetDelete(petId: number): void {
+        this.router.navigate(['/eliminar-mascota', petId]);
+    }
+   
     decodePhoto(photoBase64: string): string {
         return `data:image/jpeg;base64,${photoBase64}`;
     }

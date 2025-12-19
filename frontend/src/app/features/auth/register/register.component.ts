@@ -39,7 +39,6 @@ export class RegisterComponent {
 
     onSubmit() {
         if (this.registerForm.valid) {
-            console.log('Formulario válido:', this.registerForm.value);
             const registerData = this.registerForm.getRawValue();
 
             this.authService.register(registerData).subscribe({

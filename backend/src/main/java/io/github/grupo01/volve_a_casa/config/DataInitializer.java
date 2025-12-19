@@ -11,6 +11,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Base64;
+
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -80,8 +85,9 @@ public class DataInitializer implements CommandLineRunner {
                 return;
             }
 
-            // Imagen Base64 pequeña de ejemplo (1x1 pixel naranja - placeholder)
-            String photoBase64 = "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8A/9k=";
+            // imagen del perro
+            File file = new File("src/main/resources/static/perro.jpg");
+            String photoBase64 = Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath()));
 
             Pet samplePet = new Pet(
                     "Max",

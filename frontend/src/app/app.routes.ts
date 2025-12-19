@@ -10,7 +10,11 @@ import { NotFoundComponent } from './features/error/not-found/not-found.componen
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { adminGuard } from './core/guards/admin.guard';
+
+import { PetListComponent } from './features/mascota/pages/listado/listado.component';
 import { UserPublicProfileComponent } from './features/profile/user-public-profile/user-public-profile.component';
+import { PetEditComponent } from './features/mascota/pages/editar/editar.component';
+import { PetDeleteComponent } from './features/mascota/pages/eliminar/eliminar.component';
 import { ListadoMascotas } from './features/mascota/pages/listado/listado';
 import { RankingComponent } from './features/ranking/ranking.component';
 
@@ -31,8 +35,10 @@ export const routes: Routes = [
     },
     {
         path: 'listado-mascotas',
-        component: ListadoMascotas
+        component: PetListComponent,
+
     },
+
     // Rutas para usuarios autenticados
     {
         path: 'profile',
@@ -46,7 +52,17 @@ export const routes: Routes = [
     },
     {
         path: 'user/:id',
-        component: UserPublicProfileComponent, 
+        component: UserPublicProfileComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path:'edicion-mascota/:id',
+        component:PetEditComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path:'eliminar-mascota/:id',
+        component:PetDeleteComponent,
         canActivate: [authGuard]
     },
     // Rutas para administradores
@@ -64,4 +80,5 @@ export const routes: Routes = [
         path: '**',
         component: NotFoundComponent
     }
+
 ];

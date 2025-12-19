@@ -1,9 +1,9 @@
 package io.github.grupo01.volve_a_casa.controllers.dto.pet;
 
-import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 
 public record PetResponseDTO(
         Long id,

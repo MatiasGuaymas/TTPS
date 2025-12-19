@@ -1,9 +1,10 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { PetCreate, Size, State, TipoMascota } from "../../mascota.model";
 import { MascotaService } from "../../mascota.service";
 import { AlertService } from '../../../../core/services/alert.service';
+import { ActivatedRoute, Router } from "@angular/router";
 import { MapComponent } from "../../../../shared/components/map/map";
 
 @Component({
@@ -14,6 +15,10 @@ import { MapComponent } from "../../../../shared/components/map/map";
     styleUrls: ['./alta.component.css']
 })
 export class AltaMascota implements OnInit {
+
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+
 
     formMascota!: FormGroup;
 
@@ -102,7 +107,6 @@ export class AltaMascota implements OnInit {
         };
     }
 
-
     onSubmit(): void {
         if (this.formMascota.valid && this.imagenBase64) {
             const formValue = this.formMascota.value;
@@ -128,6 +132,7 @@ export class AltaMascota implements OnInit {
                     this.formMascota.reset();
                     this.imagenPreVisualizacion = null;
                     this.imagenBase64 = null;
+                    this.router.navigate(['/listado-mascotas']);
                 },
                 error: (error) => {
                     console.error('Error al registrar mascota:', error);

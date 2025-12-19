@@ -3,17 +3,19 @@ package io.github.grupo01.volve_a_casa.persistence.filters;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import lombok.Data;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserFilter {
-    private final String email;
-    private final String name;
-    private final String lastName;
-    private final String city;
-    private final String neighborhood;
-    private final Integer minPoints;
-    private final Integer maxPoints;
-    private final User.Role role;
+    private String email;
+    private String name;
+    private String lastName;
+    private String city;
+    private String neighborhood;
+    private Integer minPoints;
+    private Integer maxPoints;
+    private User.Role role;
 
 }

@@ -1,0 +1,198 @@
+<main class="bg-background dark:bg-background-dark min-h-screen flex flex-col md:flex-row gap-8 p-4 md:p-8" [formGroup]="filterForm">
+    <aside class="w-full md:w-64 flex-none self-start">
+            <div class="sticky top-24 space-y-6 self-start">
+                <h2 class="text-xl font-bold border-b dark:border-border-dark pb-2 text-text dark:text-text-dark">Filtros</h2>
+
+            <div class="flex-1 min-w-[140px]">
+                <label class="block text-[10px] text-text dark:text-text-dark  uppercase opacity-60 mb-1">Nombre</label>
+                <input type="text" formControlName="name" class="w-full p-2 text-sm border border-gray-300 text-text rounded bg-transparent dark:text-text-dark" placeholder="Toby" />
+            </div>
+
+            <div class="flex flex-[2] min-w-[140px] border border-gray-300 text-text dark:text-text-dark rounded overflow-hidden">
+                <div class="flex-1 border-r border-gray-300 p-1">
+                    <label class="block text-[9px] font-bold uppercase opacity-50 px-1">Desde</label>
+                    <input type="date" formControlName="initialLostDate" class="w-full bg-transparent text-xs p-1 outline-none dark:text-white" />
+                </div>
+                <div class="flex-1 p-1">
+                    <label class="block text-[9px] font-bold uppercase opacity-50 px-1">Hasta</label>
+                    <input type="date" formControlName="finalLostDate" class="w-full bg-transparent text-xs p-1 outline-none dark:text-white" />
+                </div>
+            </div>
+
+            <div class="flex-1 min-w-[140px]">
+                <label class="block text-[9px] font-bold uppercase opacity-60 px-1 text-text dark:text-text-dark">Ordenar</label>
+                <select formControlName="sort" class="w-full p-2 text-sm border border-gray-300 rounded bg-transparent dark:text-text-dark dark:bg-primary-dark">
+                    @for (option of sortOptions; track option.value) {
+                        <option [value]="option.value">{{ option.label }}</option>
+                    }
+                </select>
+            </div>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold mb-2 uppercase opacity-70 text-text dark:text-text-dark">Estado</label>
+                        <select formControlName="state" class="w-full p-2 text-sm border border-gray-300 rounded dark:bg-gray-800 dark:text-white">
+                            <option [ngValue]="null">Todos</option>
+                            <option value="PERDIDO_PROPIO">Perdido propio</option>
+                            <option value="PERDIDO_AJENO">Perdido ajeno</option>
+                            <option value="RECUPERADO">Recuperado</option>
+                            <option value="ADOPTADO">Adoptado</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold mb-1 uppercase opacity-70 text-text dark:text-text-dark">Tipo</label>
+                            <select formControlName="type" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 text-text dark:text-text-dark">
+                                <option [ngValue]="null">Todos</option>
+                                <option value="PERRO">Perro</option>
+                                <option value="GATO">Gato</option>
+                                <option value="COBAYA">Cobaya</option>
+                                <option value="LORO">Loro</option>
+                                <option value="CONEJO">Conejo</option>
+                                <option value="CABALLO">Caballo</option>
+                                <option value="TORTUGA">Tortuga</option>
+                                </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold mb-1 uppercase opacity-70 text-text dark:text-text-dark">Tamaño</label>
+                            <select formControlName="petSize" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 text-text dark:text-text-dark">
+                                <option [ngValue]="null">Todos</option>
+                                <option value="PEQUENO">Pequeño</option>
+                                <option value="MEDIANO">Mediano</option>
+                                <option value="GRANDE">Grande</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold mb-2 uppercase opacity-70 text-text dark:text-text-dark">Peso (kg)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" formControlName="weightMin" placeholder="Mín" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-background-dark dark:text-text-dark text-text " />
+                            <span>-</span>
+                            <input type="number" formControlName="weightMax" placeholder="Máx" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-text-dark text-text " />
+                        </div>
+                    </div>
+
+                    <!--
+                    <div class="p-3 border rounded-md bg-white dark:bg-primary-dark/30 shadow-sm">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" [formControl]="userCurrentLocation" class="form-checkbox h-4 w-4 text-navbar">
+                            <span class="text-xs font-bold text-text dark:text-text-dark">Cerca de mi</span>
+                        </label>
+                        @if (userCurrentLocation.value) {
+                            <div class="mt-2">
+                                <label class="block text-[9px] uppercase font-bold mb-1">Radio (Km)</label>
+                                <input type="number" formControlName="maxDistanceInKm" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-white" />
+                            </div>
+                        }
+                    </div>
+                    -->
+
+                    <div class="space-y-4 p-3 border border-gray-300 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[10px] font-bold uppercase opacity-70 dark:text-text-dark">Cerca de mí</label>
+                            <button (click)="loadUserLocation()" type="button" class="text-[10px] text-blue-500 hover:underline">
+                                {{ filterForm.value.userLatitude ? 'ACTUALIZAR' : 'PERMITIR UBICACIÓN' }}
+                            </button>
+                        </div>
+
+                        @if (filterForm.value.userLatitude) {
+                        <div>
+                            <label class="block text-[12px] uppercase opacity-60 mb-1 text-text dark:text-text-dark">
+                                Radio: {{ filterForm.value.maxDistanceInKm }} Km
+                            </label>
+                            <input type="number" formControlName="maxDistanceInKm" min="1" max="50" 
+                                class="w-full text-[12px] border border-gray-300 rounded p-1 bg-transparent text-text dark:text-text-dark">
+                        </div>
+}
+                    </div>
+                     <button (click)="applyFilters()" [disabled]="cargandoUbicacion()"
+                            class="bg-navbar dark:bg-navbar-dark text-white px-6 py-2 rounded font-bold hover:brightness-110 h-[38px] disabled:opacity-50 cursor-pointer">
+                        {{ cargandoUbicacion() ? 'LOCALIZANDO...' : 'BUSCAR' }}
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1">
+            @if (loading()) {
+                <div class="h-full w-full flex justify-center items-center">
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#37B47D]"></div>
+                </div>
+            }
+            @else if (!loading() && pets().length === 0) {
+                <div class="p-12 text-center rounded-lg bg-white dark:bg-primary-dark shadow-sm border dark:border-border-dark">
+                    <p class="text-lg opacity-60 italic dark:text-text-dark">No se encontraron mascotas con estos filtros.</p>
+                </div>
+            } @else if (!loading() && pets().length > 0) {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @for (pet of pets(); track pet.id) {
+                        <div (click)="goToPetDetail(pet.id)" class="max-w-sm rounded-xl overflow-hidden shadow-lg bg-background dark:bg-primary-dark border dark:border-border-dark transition-transform hover:scale-[1.02]">
+                            <div class="relative">
+                                @if (pet.photosBase64 && pet.photosBase64.length > 0) {
+                                    <img class="w-full h-48 object-cover"
+                                        [src]="decodePhoto(pet.photosBase64[0])"
+                                        alt="Imagen de {{ pet.name }}">
+                                } @else {
+                                    <img class="w-full h-48 object-cover opacity-50"
+                                        src="assets/img/pet-placeholder.jpg"
+                                        alt="Sin foto disponible">
+                                }
+                            </div>
+                            <div class="px-6 py-4">
+                                <div class="font-bold text-xl mb-2 text-navbar dark:text-navbar-dark">
+                                    {{ pet.name }}
+                                </div>
+                                <p class="text-text dark:text-text-dark text-base opacity-80">
+                                    Esta mascota fue vista por última vez el día <strong>{{ pet.lostDate }}</strong>.
+                                </p>
+                                <div class="px-6 pt-4 pb-2">
+                                    <span class="inline-block bg-primary dark:bg-border-dark rounded-full px-3 py-1 text-sm font-semibold text-text dark:text-text-dark mr-2 mb-2">
+                                        Animal: {{ pet.type }}
+                                    </span>
+                                    <span class="inline-block bg-primary dark:bg-border-dark rounded-full px-3 py-1 text-sm font-semibold text-text dark:text-text-dark mr-2 mb-2">
+                                        Tamaño: {{ pet.size }}
+                                    </span>
+                                    @if (pet.race) {
+                                        <span class="inline-block bg-primary dark:bg-border-dark rounded-full px-3 py-1 text-sm font-semibold text-text dark:text-text-dark mr-2 mb-2">
+                                            Raza: {{ pet.race }}
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+       
+
+            <div class="mt-12 mb-8 flex flex-col items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <button 
+                        (click)="changePage(currentPage() - 1)"
+                        [disabled]="currentPage() === 0"
+                        class="px-4 py-2 border rounded-lg bg-white dark:bg-primary-dark text-text dark:text-text-dark disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">
+                        Anterior
+                    </button>
+
+                    <div class="flex items-center gap-1">
+                        <span class="px-4 py-2 bg-background dark:bg-background-dark text-text dark:text-text-dark rounded-lg font-bold">
+                            {{ currentPage() + 1 }}
+                        </span>
+                    </div>
+
+                    <button 
+                        (click)="changePage(currentPage() + 1)"
+                        [disabled]="pets().length < pageSize()"
+                        class="px-4 py-2 border rounded-lg bg-white dark:bg-primary-dark text-text dark:text-text-dark disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">
+                        Siguiente
+                    </button>
+                </div>
+
+                <div class="text-xs text-text dark:text-text-dark opacity-70">
+                    Mostrando hasta {{ pageSize() }} mascotas por página
+                </div>
+            </div>
+        </div>
+</main>
