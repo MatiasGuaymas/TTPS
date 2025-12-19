@@ -30,16 +30,27 @@
   </div>
 
     
-    <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8">
-      Ranking de rescatistas
+    <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8 mt-12">
+    Ranking de rescatistas
     </h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 w-full max-w-6xl"> 
-      <user-card class="col-span-1 md:col-span-2 p-4">User 1</user-card>
-      <user-card class="col-span-1 md:col-span-2 p-4">User 2</user-card>
-      <user-card class="col-span-1 md:col-span-2 p-4">User 3</user-card>
-      <user-card class="col-span-1 md:col-start-2 md:col-span-2 p-4">User 4</user-card>
-      <user-card class="col-span-1 md:col-span-2 p-4">User 5</user-card>
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 w-full max-w-6xl mb-12">
+        
+        <ng-container *ngFor="let user of topUsers; let i = index">
+            <user-card 
+                [user]="user" 
+                [position]="i + 1"
+                class="col-span-1 md:col-span-2 p-4"
+                [ngClass]="{
+                    'md:col-start-2': i === 3  
+                }">
+                </user-card>
+        </ng-container>
+
+        <div *ngIf="topUsers.length === 0" class="col-span-1 md:col-span-6 text-center text-gray-500">
+            <p>Cargando ranking...</p>
+        </div>
+
     </div>
 
   </div>

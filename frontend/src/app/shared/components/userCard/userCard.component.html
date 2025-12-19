@@ -1,13 +1,30 @@
-<div class="relative bg-background dark:bg-background-dark w-full h-full p-6 rounded-base shadow-2xl">
-    <div class="flex flex-col items-center justify-center h-full"> <h3 class="mb-1 text-xl font-semibold tracking-tight text-text dark:text-text-dark">Top 1</h3>
+<div class="relative bg-background dark:bg-background-dark w-full h-full p-6 rounded-base shadow-2xl transition-transform hover:-translate-y-1 duration-300">
+    <div class="flex flex-col items-center justify-center h-full"> 
         
-        <img class="w-24 h-24 mb-6 rounded-full object-cover" src="https://img.freepik.com/vector-premium/icono-cuenta-icono-usuario-graficos-vectoriales_292645-552.jpg?semt=ais_hybrid&w=740&q=80" alt="Bonnie image"/>
+        <h3 class="mb-4 text-xl font-semibold tracking-tight text-text dark:text-text-dark">
+            Top <span class="text-[#37B47D] font-bold text-2xl">#{{ position }}</span>
+        </h3>
         
-        <h5 class="mb-0.5 text-xl font-semibold tracking-tight text-text dark:text-text-dark">Usuario_ejemplo</h5>
-        <span class="text-sm text-text dark:text-text-dark">100 puntos</span>
+        <div class="mb-6">
+            <div class="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 border-[#37B47D] shadow-md bg-gradient-to-br from-[#37B47D] to-[#008A88] select-none">
+                {{ initials }}
+            </div>
+        </div>
         
-        <div class="flex mt-4 md:mt-6 gap-4">
-            <button type="button" class="inline-flex items-center text-text bg-navbar hover:bg-button-hover dark:bg-button-dark text-text-dark hover:bg-button-hover-dark focus:ring-4 focus:ring-brand-medium shadow-2xl font-medium leading-5 rounded-base px-4 py-2.5 focus:outline-none">
+        <h5 class="mb-1 text-xl font-semibold tracking-tight text-text dark:text-text-dark text-center truncate w-full px-2" 
+            title="{{ user?.name }} {{ user?.lastName }}">
+            {{ user?.name }} {{ user?.lastName }}
+        </h5>
+        
+        <span class="text-sm text-gray-600 dark:text-gray-300 font-medium bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full mt-2">
+            <i class="fas fa-star text-yellow-500 mr-1"></i>
+            {{ user?.points || 0 }} puntos
+        </span>
+        
+        <div class="flex mt-6 w-full">
+            <button type="button" 
+                    (click)="verPerfil()"
+                    class="w-full inline-flex justify-center items-center text-text bg-navbar hover:bg-button-hover dark:bg-button-dark text-text-dark hover:bg-button-hover-dark focus:ring-4 focus:ring-brand-medium shadow-md font-medium leading-5 rounded-base px-4 py-2.5 focus:outline-none transition-all">
                 <i class="fa-solid fa-user me-2"></i>
                 Ver perfil 
             </button>
