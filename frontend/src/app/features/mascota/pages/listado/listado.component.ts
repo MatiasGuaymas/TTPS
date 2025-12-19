@@ -169,9 +169,10 @@ export class ListadoMascotas implements OnInit{
     }
 
     changePage(page: number): void {
-        if (page >= 0 && page < this.totalPages()) {
+        if (page >= 0) {
             this.currentPage.set(page);
             this.loadPets();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 

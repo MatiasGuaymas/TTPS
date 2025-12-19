@@ -114,7 +114,7 @@
             </div>
         </aside>
 
-        <section class="flex-1">
+        <div class="flex-1">
             @if (loading()) {
                 <div class="h-full w-full flex justify-center items-center">
                     <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#37B47D]"></div>
@@ -164,5 +164,35 @@
                     }
                 </div>
             }
-        </section>
+
+       
+
+            <div class="mt-12 mb-8 flex flex-col items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <button 
+                        (click)="changePage(currentPage() - 1)"
+                        [disabled]="currentPage() === 0"
+                        class="px-4 py-2 border rounded-lg bg-white dark:bg-primary-dark text-text dark:text-text-dark disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">
+                        Anterior
+                    </button>
+
+                    <div class="flex items-center gap-1">
+                        <span class="px-4 py-2 bg-background dark:bg-background-dark text-text dark:text-text-dark rounded-lg font-bold">
+                            {{ currentPage() + 1 }}
+                        </span>
+                    </div>
+
+                    <button 
+                        (click)="changePage(currentPage() + 1)"
+                        [disabled]="pets().length < pageSize()"
+                        class="px-4 py-2 border rounded-lg bg-white dark:bg-primary-dark text-text dark:text-text-dark disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">
+                        Siguiente
+                    </button>
+                </div>
+
+                <div class="text-xs text-text dark:text-text-dark opacity-70">
+                    Mostrando hasta {{ pageSize() }} mascotas por página
+                </div>
+            </div>
+        </div>
 </main>
