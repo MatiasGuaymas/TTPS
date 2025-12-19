@@ -73,39 +73,6 @@
                         </div>
                     </div>
 
-                    <!--
-                    <div class="p-3 border rounded-md bg-white dark:bg-primary-dark/30 shadow-sm">
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" [formControl]="userCurrentLocation" class="form-checkbox h-4 w-4 text-navbar">
-                            <span class="text-xs font-bold text-text dark:text-text-dark">Cerca de mi</span>
-                        </label>
-                        @if (userCurrentLocation.value) {
-                            <div class="mt-2">
-                                <label class="block text-[9px] uppercase font-bold mb-1">Radio (Km)</label>
-                                <input type="number" formControlName="maxDistanceInKm" class="w-full p-1.5 text-xs border border-gray-300 rounded dark:bg-gray-800 dark:text-white" />
-                            </div>
-                        }
-                    </div>
-                    -->
-
-                    <div class="space-y-4 p-3 border border-gray-300 rounded-lg">
-                        <div class="flex items-center justify-between">
-                            <label class="text-[10px] font-bold uppercase opacity-70 dark:text-text-dark">Cerca de mí</label>
-                            <button (click)="loadUserLocation()" type="button" class="text-[10px] text-blue-500 hover:underline">
-                                {{ filterForm.value.userLatitude ? 'ACTUALIZAR' : 'PERMITIR UBICACIÓN' }}
-                            </button>
-                        </div>
-
-                        @if (filterForm.value.userLatitude) {
-                        <div>
-                            <label class="block text-[12px] uppercase opacity-60 mb-1 text-text dark:text-text-dark">
-                                Radio: {{ filterForm.value.maxDistanceInKm }} Km
-                            </label>
-                            <input type="number" formControlName="maxDistanceInKm" min="1" max="50" 
-                                class="w-full text-[12px] border border-gray-300 rounded p-1 bg-transparent text-text dark:text-text-dark">
-                        </div>
-}
-                    </div>
                      <button (click)="applyFilters()" [disabled]="cargandoUbicacion()"
                             class="bg-navbar dark:bg-navbar-dark text-white px-6 py-2 rounded font-bold hover:brightness-110 h-[38px] disabled:opacity-50 cursor-pointer">
                         {{ cargandoUbicacion() ? 'LOCALIZANDO...' : 'BUSCAR' }}
@@ -165,11 +132,11 @@
                 </div>
             }
 
-       
+
 
             <div class="mt-12 mb-8 flex flex-col items-center gap-4">
                 <div class="flex items-center gap-2">
-                    <button 
+                    <button
                         (click)="changePage(currentPage() - 1)"
                         [disabled]="currentPage() === 0"
                         class="px-4 py-2 border rounded-lg bg-white dark:bg-primary-dark text-text dark:text-text-dark disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">
@@ -182,7 +149,7 @@
                         </span>
                     </div>
 
-                    <button 
+                    <button
                         (click)="changePage(currentPage() + 1)"
                         [disabled]="pets().length < pageSize()"
                         class="px-4 py-2 border rounded-lg bg-white dark:bg-primary-dark text-text dark:text-text-dark disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">

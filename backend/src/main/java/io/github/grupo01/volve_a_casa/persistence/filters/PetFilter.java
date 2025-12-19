@@ -21,8 +21,4 @@ public class PetFilter {
     private Float weightMax;
     private LocalDate initialLostDate;
     private LocalDate finalLostDate;
-    // filtro por barrio
-    private Float userLatitude;
-    private Float userLongitude;
-    private Float maxDistanceInKm;
 }

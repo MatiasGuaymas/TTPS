@@ -53,27 +53,8 @@ public class Specifications {
                         cb.lessThanOrEqualTo(root.get("weight"), filter.getWeightMax()));
             }
 
-            //agrego filtros para busqueda por barrio
-            System.out.println("Filtro Recibido - Lat: " + filter.getUserLatitude() + 
-                           ", Lon: " + filter.getUserLongitude() + 
-                           ", Dist: " + filter.getMaxDistanceInKm());
-
-            if (filter.getUserLatitude() != null && filter.getUserLongitude() != null && filter.getMaxDistanceInKm() != null) {
-                
-                jakarta.persistence.criteria.Expression<Double> distanceExpression = cb.function(
-                        "calculate_distance", 
-                        Double.class,
-                        cb.literal(filter.getUserLatitude().doubleValue()),
-                        cb.literal(filter.getUserLongitude().doubleValue()),
-                        root.get("coordinates").get("latitude").as(Double.class),
-                        root.get("coordinates").get("longitude").as(Double.class)
-                );
-
-                predicates = cb.and(predicates, cb.lessThanOrEqualTo(distanceExpression, filter.getMaxDistanceInKm().doubleValue()));
-            }
-
             return predicates;
-    };
+        };
     }
 
     public static Specification<User> getUserSpecification(UserFilter user) {
