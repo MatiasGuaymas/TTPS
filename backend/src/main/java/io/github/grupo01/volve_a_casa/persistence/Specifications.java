@@ -6,7 +6,6 @@ import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.filters.PetFilter;
 import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
-import jakarta.persistence.criteria.Predicate;
 
 public class Specifications {
     public static Specification<Pet> getPetSpecification(PetFilter filter) {
@@ -55,33 +54,26 @@ public class Specifications {
             }
 
             //agrego filtros para busqueda por barrio
-            if (filter.getUserLatitude() != null && 
-            filter.getUserLongitude() != null && 
-            filter.getMaxDistanceInKm() != null &&
-            filter.getMaxDistanceInKm() > 0) {
-                double lat = filter.getUserLatitude();
-                double lon = filter.getUserLongitude();
-                double maxDistanceInKm = filter.getMaxDistanceInKm();
+            System.out.println("Filtro Recibido - Lat: " + filter.getUserLatitude() + 
+                           ", Lon: " + filter.getUserLongitude() + 
+                           ", Dist: " + filter.getMaxDistanceInKm());
 
-                var petLat= root.get("coordinates").get("latitude");
-                var petLon= root.get("coordinates").get("longitude");
-
+            if (filter.getUserLatitude() != null && filter.getUserLongitude() != null && filter.getMaxDistanceInKm() != null) {
+                
                 jakarta.persistence.criteria.Expression<Double> distanceExpression = cb.function(
                         "calculate_distance", 
                         Double.class,
-                        cb.literal(lat),
-                        cb.literal(lon),
-                        petLat,
-                        petLon
+                        cb.literal(filter.getUserLatitude().doubleValue()),
+                        cb.literal(filter.getUserLongitude().doubleValue()),
+                        root.get("coordinates").get("latitude").as(Double.class),
+                        root.get("coordinates").get("longitude").as(Double.class)
                 );
 
-                Predicate distancePredicate = cb.lessThanOrEqualTo(distanceExpression, maxDistanceInKm);
-
-                predicates=cb.and(predicates, distancePredicate);
+                predicates = cb.and(predicates, cb.lessThanOrEqualTo(distanceExpression, filter.getMaxDistanceInKm().doubleValue()));
             }
 
             return predicates;
-        };
+    };
     }
 
     public static Specification<User> getUserSpecification(UserFilter user) {
