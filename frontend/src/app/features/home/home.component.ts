@@ -1,23 +1,23 @@
 import { Component, OnInit, signal, inject } from "@angular/core";
 import { DomSanitizer } from '@angular/platform-browser';
-import { CommonModule } from "@angular/common"; 
+import { CommonModule } from "@angular/common";
 import { forkJoin } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import { UserCardComponent } from "../../shared/components/userCard/userCard.component";
 import { CarouselComponent, CarouselImage } from "../../shared/components/carousel/carousel.component";
-import { MarkerInfo, MapComponent } from '../../shared/components/map/map'; 
+import { MarkerInfo, MapComponent } from '../../shared/components/map/map';
 import { SightingService } from "../../core/services/sigthing.service";
 import { UserService } from "../../core/services/user.service";
 import { MascotaService } from "../../features/mascota/mascota.service";
-import { State } from "../../features/mascota/mascota.model"; 
+import { State } from "../../features/mascota/mascota.model";
 import { SightingResponse } from "../../core/models/sighting.models";
 import { UserProfile } from "../../core/models/user.models";
 
 @Component({
     selector: 'app-home',
     templateUrl: 'home.component.html',
-    imports: [CommonModule, CarouselComponent, UserCardComponent, MapComponent], 
+    imports: [CommonModule, CarouselComponent, UserCardComponent, MapComponent],
 })
 export class HomeComponent implements OnInit {
     private sightingService = inject(SightingService);
@@ -39,13 +39,17 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         this.loadSightings();
         this.loadTopUsers();
-        this.loadLostPets(); 
+        this.loadLostPets();
     }
 
     loadLostPets() {
         this.loadingCarousel.set(true);
-        const requestPropios = this.mascotaService.listAllPets({ state: State.PERDIDO_PROPIO });
-        const requestAjenos = this.mascotaService.listAllPets({ state: State.PERDIDO_AJENO });
+        const requestPropios = this.mascotaService.listAllPets({ state: State.PERDIDO_PROPIO }).pipe(
+            map(pets => pets || [])
+        );
+        const requestAjenos = this.mascotaService.listAllPets({ state: State.PERDIDO_AJENO }).pipe(
+            map(pets => pets || [])
+        );
 
         forkJoin([requestPropios, requestAjenos])
             .pipe(finalize(() => this.loadingCarousel.set(false)))
@@ -60,7 +64,7 @@ export class HomeComponent implements OnInit {
                                 photoData = `data:image/jpeg;base64,${photoData}`;
                             }
                             return {
-                                src: this.sanitizer.bypassSecurityTrustUrl(photoData) as string,
+                                src: photoData,
                                 alt: `Mascota: ${pet.name || 'Sin nombre'}`
                             };
                         })
@@ -75,7 +79,10 @@ export class HomeComponent implements OnInit {
     loadSightings() {
         this.loadingMap.set(true);
         this.sightingService.getAllSightings()
-            .pipe(finalize(() => this.loadingMap.set(false)))
+            .pipe(
+                map(response => response || []),
+                finalize(() => this.loadingMap.set(false))
+            )
             .subscribe({
                 next: (response) => {
                     this.sightings.set(response);
@@ -92,7 +99,10 @@ export class HomeComponent implements OnInit {
     loadTopUsers() {
         this.loadingRanking.set(true);
         this.userService.getAllUsersFiltered({}, 0, 5, 'points', 'DESC')
-            .pipe(finalize(() => this.loadingRanking.set(false)))
+            .pipe(
+                map(users => users || []),
+                finalize(() => this.loadingRanking.set(false))
+            )
             .subscribe({
                 next: (users) => this.topUsers.set(users),
                 error: (e) => console.error(e)
