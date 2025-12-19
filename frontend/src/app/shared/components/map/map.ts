@@ -25,9 +25,10 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() popupText: string = 'Ubicación de la mascota';
   @Input() zoom: number = 13;
   @Input() showDefaultMarker: boolean = true;
-  
+  @Input() mapHeight: string = '400px';
+
   private _markersList: MarkerInfo[] = [];
-  @Input() 
+  @Input()
   set markersList(value: MarkerInfo[]) {
     console.log('markersList setter llamado con:', value?.length, 'marcadores');
     this._markersList = value || [];
@@ -57,7 +58,7 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
     const iconRetinaUrl = '/assets/leaflet/marker-icon-2x.png';
     const iconUrl = '/assets/leaflet/marker-icon.png';
     const shadowUrl = '/assets/leaflet/marker-shadow.png';
-    
+
     const iconDefault = L.icon({
       iconRetinaUrl,
       iconUrl,
@@ -68,7 +69,7 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
       tooltipAnchor: [16, -28],
       shadowSize: [41, 41]
     });
-    
+
     L.Marker.prototype.options.icon = iconDefault;
   }
 
@@ -99,14 +100,14 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
     if (!this.mapContainer?.nativeElement) return;
 
     console.log('🗺️ Inicializando mapa con', this.markersList.length, 'marcadores en memoria');
-    
+
     let centerLat = this.initialLatitude;
     let centerLng = this.initialLongitude;
 
     if (this.markersList.length > 0) {
-       const lat = Number(this.markersList[0].latitude);
-       const lng = Number(this.markersList[0].longitude);
-       if(!isNaN(lat)) { centerLat = lat; centerLng = lng; }
+      const lat = Number(this.markersList[0].latitude);
+      const lng = Number(this.markersList[0].longitude);
+      if (!isNaN(lat)) { centerLat = lat; centerLng = lng; }
     }
 
     this.map = L.map(this.mapContainer.nativeElement).setView([centerLat, centerLng], this.zoom);
@@ -128,57 +129,57 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     this.markersLayer.clearLayers();
     if (this.userMarker) {
-        this.map.removeLayer(this.userMarker);
-        this.userMarker = null;
+      this.map.removeLayer(this.userMarker);
+      this.userMarker = null;
     }
 
     if (this.markersList && this.markersList.length > 0) {
-        const bounds = L.latLngBounds([]);
-        let hasValid = false;
+      const bounds = L.latLngBounds([]);
+      let hasValid = false;
 
-        this.markersList.forEach(m => {
-            const lat = Number(m.latitude);
-            const lng = Number(m.longitude);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                const marker = L.marker([lat, lng], { draggable: false });
-                
-                if (m.popupText) marker.bindPopup(m.popupText);
-                
-                this.markersLayer?.addLayer(marker);
-                bounds.extend([lat, lng]);
-                hasValid = true;
-            }
-        });
+      this.markersList.forEach(m => {
+        const lat = Number(m.latitude);
+        const lng = Number(m.longitude);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const marker = L.marker([lat, lng], { draggable: false });
 
-        if (hasValid) {
-            setTimeout(() => {
-                this.map?.invalidateSize();
-                this.map?.fitBounds(bounds, { padding: [50, 50] });
-            }, 100);
+          if (m.popupText) marker.bindPopup(m.popupText);
+
+          this.markersLayer?.addLayer(marker);
+          bounds.extend([lat, lng]);
+          hasValid = true;
         }
+      });
 
-    } 
+      if (hasValid) {
+        setTimeout(() => {
+          this.map?.invalidateSize();
+          this.map?.fitBounds(bounds, { padding: [50, 50] });
+        }, 100);
+      }
+
+    }
     else if (this.showDefaultMarker) {
-        this.placeSingleMarker(this.initialLatitude, this.initialLongitude);
+      this.placeSingleMarker(this.initialLatitude, this.initialLongitude);
     }
   }
 
   private placeSingleMarker(lat: number, lng: number): void {
     if (!this.map) return;
-    
+
     this.userMarker = L.marker([lat, lng], { draggable: !this.readonly }).addTo(this.map);
 
     if (this.popupText) this.userMarker.bindPopup(this.popupText);
 
     if (!this.readonly) {
-        this.userMarker.on('dragend', (e) => {
-            const { lat, lng } = e.target.getLatLng();
-            this.coordinatesChanged.emit({ latitude: lat, longitude: lng });
-        });
-        this.map.on('click', (e) => {
-            this.userMarker?.setLatLng(e.latlng);
-            this.coordinatesChanged.emit({ latitude: e.latlng.lat, longitude: e.latlng.lng });
-        });
+      this.userMarker.on('dragend', (e) => {
+        const { lat, lng } = e.target.getLatLng();
+        this.coordinatesChanged.emit({ latitude: lat, longitude: lng });
+      });
+      this.map.on('click', (e) => {
+        this.userMarker?.setLatLng(e.latlng);
+        this.coordinatesChanged.emit({ latitude: e.latlng.lat, longitude: e.latlng.lng });
+      });
     }
   }
 
