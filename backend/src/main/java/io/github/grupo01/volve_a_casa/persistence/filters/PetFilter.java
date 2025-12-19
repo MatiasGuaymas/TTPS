@@ -7,23 +7,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 public class PetFilter {
-    private final String name;
-    private final Pet.State state;
-    private final Pet.Type type;
-    private final Pet.Size size;
-    private final String color;
-    private final String race;
-    private final float weightMin;
-    private final float weightMax;
-    private final LocalDate initialLostDate;
-    private final LocalDate finalLostDate;
+    private String name;
+    private Pet.State state;
+    private Pet.Type type;
+    private Pet.Size size;
+    private String color;
+    private String race;
+    private float weightMin;
+    private float weightMax;
+    private LocalDate initialLostDate;
+    private LocalDate finalLostDate;
 
     //agrego atributos para filtrar por barrio
-    private final Float userLatitude;
-    private final Float userLongitude;
-    private final Float maxDistanceInKm;
+    private Float userLatitude;
+    private Float userLongitude;
+    private Float maxDistanceInKm;
 
 
 

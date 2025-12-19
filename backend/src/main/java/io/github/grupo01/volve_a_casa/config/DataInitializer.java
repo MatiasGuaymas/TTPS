@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
-    
+
     private final UserRepository userRepository;
     private final PetRepository petRepository;
     private final PasswordEncoder passwordEncoder;
@@ -37,7 +37,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private User initializeAdminUser() {
         String adminEmail = "admin@volveacasa.com";
-        
+
         if (userRepository.existsByEmail(adminEmail)) {
             logger.info("Usuario administrador ya existe: {}", adminEmail);
             return userRepository.findByEmail(adminEmail).orElse(null);
@@ -45,7 +45,7 @@ public class DataInitializer implements CommandLineRunner {
 
         try {
             String hashedPassword = passwordEncoder.encode("admin123");
-            
+
             User admin = new User(
                     "Administrador",
                     "Sistema",
@@ -57,15 +57,15 @@ public class DataInitializer implements CommandLineRunner {
                     -34.9205f,  // Latitud de La Plata
                     -57.9536f   // Longitud de La Plata
             );
-            
+
             admin.setRole(User.Role.ADMIN);
-            
+
             User savedAdmin = userRepository.save(admin);
-            
+
             logger.info("Usuario administrador creado exitosamente");
-            
+
             return savedAdmin;
-            
+
         } catch (Exception e) {
             logger.error("Error al crear usuario administrador: {}", e.getMessage());
             return null;
@@ -80,8 +80,8 @@ public class DataInitializer implements CommandLineRunner {
                 return;
             }
 
-            // URL de imagen placeholder para un perro
-            String photoUrl = "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400";
+            // Imagen Base64 pequeña de ejemplo (1x1 pixel naranja - placeholder)
+            String photoBase64 = "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA8A/9k=";
 
             Pet samplePet = new Pet(
                     "Max",
@@ -95,13 +95,13 @@ public class DataInitializer implements CommandLineRunner {
                     Pet.Type.PERRO,
                     Pet.State.PERDIDO_PROPIO,
                     creator,
-                    photoUrl
+                    photoBase64
             );
 
             petRepository.save(samplePet);
-            
+
             logger.info("Mascota de ejemplo creada exitosamente: {}", samplePet.getName());
-            
+
         } catch (Exception e) {
             logger.error("Error al crear mascota de ejemplo: {}", e.getMessage());
         }
