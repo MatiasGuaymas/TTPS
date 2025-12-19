@@ -60,6 +60,7 @@ public class TelegramMessages {
                 get("help.preguntar"),
                 get("help.suscribir"),
                 get("help.desuscribir"),
+                get("help.ranking"),
                 get("help.cancelar"),
                 get("help.comandos")
         );

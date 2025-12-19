@@ -99,6 +99,12 @@ public class IATelegramBot extends TelegramLongPollingBot {
             return;
         }
 
+        // Comando /ranking
+        if (messageText.equals("/ranking")) {
+            commandHandler.handleRanking(this, chatId);
+            return;
+        }
+
         // Comando /perdida - inicia el registro de mascota
         if (messageText.equals("/perdida")) {
             conversationHandler.startRegistration(this, chatId);

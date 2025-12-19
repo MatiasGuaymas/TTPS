@@ -2,10 +2,16 @@ package io.github.grupo01.volve_a_casa.telegram;
 
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetDetailDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetSummaryDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.user.UserResponseDTO;
 import io.github.grupo01.volve_a_casa.integrations.IACliente;
+import io.github.grupo01.volve_a_casa.persistence.filters.UserFilter;
 import io.github.grupo01.volve_a_casa.services.PetService;
 import io.github.grupo01.volve_a_casa.services.TelegramNotificationService;
+import io.github.grupo01.volve_a_casa.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
@@ -29,6 +35,9 @@ public class CommandHandler {
 
     @Autowired
     private TelegramNotificationService notificationService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private IACliente iaCliente;
@@ -181,6 +190,49 @@ public class CommandHandler {
         } catch (IOException e) {
             System.err.println("API callback failed: " + e.getMessage());
             messageSender.sendText(bot, chatId, messages.get("preguntar.error"));
+        }
+    }
+
+    /**
+     * Maneja el comando /ranking - muestra el top 10 de usuarios por puntos.
+     */
+    public void handleRanking(TelegramLongPollingBot bot, long chatId) {
+        try {
+            Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "points"));
+            UserFilter filter = new UserFilter(null, null, null, null, null, null, null, null);
+            List<UserResponseDTO> topUsers = userService.findAllFiltered(filter, pageable);
+
+            if (topUsers.isEmpty()) {
+                messageSender.sendText(bot, chatId, messages.get("ranking.empty"));
+                return;
+            }
+
+            StringBuilder response = new StringBuilder();
+            response.append(messages.get("ranking.title"));
+
+            for (int i = 0; i < topUsers.size(); i++) {
+                UserResponseDTO user = topUsers.get(i);
+                String medal = switch (i) {
+                    case 0 -> "🥇";
+                    case 1 -> "🥈";
+                    case 2 -> "🥉";
+                    default -> "🔸";
+                };
+
+                response.append(String.format("%s *%s* - %s %s\n", 
+                    medal, 
+                    messages.get("ranking.position", i + 1),
+                    user.name(), 
+                    user.lastName()));
+                response.append(String.format("   %s\n\n", 
+                    messages.get("ranking.points", user.points())));
+            }
+
+            messageSender.sendMarkdownText(bot, chatId, response.toString());
+
+        } catch (Exception e) {
+            System.err.println("Error al obtener ranking: " + e.getMessage());
+            messageSender.sendText(bot, chatId, messages.get("ranking.error"));
         }
     }
 
