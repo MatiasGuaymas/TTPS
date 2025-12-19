@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
-import { AvistamientoService } from '../../avistamiento.service';
+import { SightingService } from '../../../../core/services/sigthing.service';
+import { SightingCreate, SightingResponse } from '../../../../core/models/sighting.models';
 import { PetResponse, State, Size, TipoMascota } from '../../mascota.model';
 import { AlertService } from '../../../../core/services/alert.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -33,7 +34,7 @@ export class DetalleComponent implements OnInit, AfterViewInit {
     private router = inject(Router);
     private fb = inject(FormBuilder);
     private mascotaService = inject(MascotaService);
-    private avistamientoService = inject(AvistamientoService);
+    private sightingService = inject(SightingService);
     private alertService = inject(AlertService);
     private authService = inject(AuthService);
 
@@ -107,7 +108,7 @@ export class DetalleComponent implements OnInit, AfterViewInit {
 
     loadSightings(petId: number): void {
         this.loadingSightings.set(true);
-        this.avistamientoService.getSightingsByPetId(petId).subscribe({
+        this.sightingService.getSightingsByPetId(petId).subscribe({
             next: (sightings) => {
                 this.sightings.set(sightings);
                 this.loadingSightings.set(false);
@@ -270,7 +271,7 @@ export class DetalleComponent implements OnInit, AfterViewInit {
             comment: this.sightingForm.value.comment || ''
         };
 
-        this.avistamientoService.createSighting(sightingData).subscribe({
+        this.sightingService.createSighting(sightingData).subscribe({
             next: () => {
                 this.submittingSighting.set(false);
                 this.alertService.success('Éxito', 'Avistamiento reportado correctamente');
