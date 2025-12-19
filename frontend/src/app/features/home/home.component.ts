@@ -1,10 +1,13 @@
-import { Component, OnInit, signal, inject } from "@angular/core"; // 1. Importamos signal
+import { Component, OnInit, signal, inject } from "@angular/core";
 import { CommonModule } from "@angular/common"; 
 import { UserCardComponent } from "../../shared/components/userCard/userCard.component";
-import { CarouselComponent } from "../../shared/components/carousel/carousel.component";
+import { CarouselComponent, CarouselImage } from "../../shared/components/carousel/carousel.component";
 import { MarkerInfo, MapComponent } from '../../shared/components/map/map'; 
 import { SightingService } from "../../core/services/sigthing.service";
 import { UserService } from "../../core/services/user.service";
+import { MascotaService } from "../../features/mascota/mascota.service";
+import { State } from "../../features/mascota/mascota.model"; 
+
 import { SightingResponse } from "../../core/models/sighting.models";
 import { UserProfile } from "../../core/models/user.models";
 
@@ -16,16 +19,37 @@ import { UserProfile } from "../../core/models/user.models";
 export class HomeComponent implements OnInit {
     private sightingService = inject(SightingService);
     private userService = inject(UserService);
+    private mascotaService = inject(MascotaService);
 
     sightings = signal<SightingResponse[]>([]);
     sightingsLocationList = signal<MarkerInfo[]>([]);
     topUsers = signal<UserProfile[]>([]);
     
+    carouselImages = signal<CarouselImage[]>([]);
+
     title = '¿Donde estás? Volvé a casa';
 
     ngOnInit() {
         this.loadSightings();
         this.loadTopUsers();
+        this.loadLostPets(); 
+    }
+
+    loadLostPets() {
+        this.mascotaService.listAllPets({ state: State.PERDIDO_PROPIO }).subscribe({
+            next: (pets) => {
+                const images: CarouselImage[] = pets
+                    .filter(pet => pet.photosBase64 && pet.photosBase64.length > 0)
+                    .map(pet => ({
+                        src: `data:image/jpeg;base64,${pet.photosBase64[0]}`,
+                        alt: `Foto de ${pet.name || 'Mascota perdida'}`
+                    }))
+                    .slice(0, 10); 
+
+                this.carouselImages.set(images);
+            },
+            error: (err) => console.error('Error cargando mascotas perdidas:', err)
+        });
     }
 
     loadSightings() {

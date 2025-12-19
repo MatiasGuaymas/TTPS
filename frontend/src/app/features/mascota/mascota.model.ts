@@ -61,7 +61,7 @@ export interface PetFilter{
     weightMin?:number;
     weightMax?: number;
     initialLostDate?:string;
-    finalLostDate:Date;
+    finalLostDate?:Date;
 
     page?:number;
     perPage?:number;

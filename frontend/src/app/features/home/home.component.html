@@ -9,22 +9,33 @@
       Plataforma colaborativa para búsqueda de mascotas perdidas
     </p>
   
-    <carousel class="w-full max-w-4xl mt- mb-4"></carousel>
+    <carousel *ngIf="carouselImages().length > 0" 
+              [images]="carouselImages()" 
+              class="w-full max-w-4xl mt-4 mb-8">
+    </carousel>
+
+    <div *ngIf="carouselImages().length === 0" 
+         class="w-full max-w-4xl h-64 mb-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700">
+        <div class="text-center text-gray-500">
+            <i class="fas fa-paw text-4xl mb-2 opacity-50"></i>
+            <p>No hay mascotas perdidas</p>
+        </div>
+    </div>
     
     <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8">
       Avistamientos Recientes
     </h2>
 
-    <div class="mt-12 flex flex-col items-center w-full mb-12">
+    <div class="mt-4 flex flex-col items-center w-full mb-12">
       <app-map 
-          class="w-full max-w-6xl h-[500px] block rounded-lg overflow-hidden shadow-xl mx-auto"
+          class="w-full max-w-6xl h-[500px] block rounded-lg overflow-hidden shadow-xl mx-auto border border-gray-200 dark:border-gray-700"
           [markersList]="sightingsLocationList()" 
           [readonly]="true"
           [showDefaultMarker]="false"> 
       </app-map>
     </div>
 
-    <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8 mt-12">
+    <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8 mt-4">
       Ranking de rescatistas
     </h2>
 
@@ -38,11 +49,14 @@
                 [ngClass]="{
                     'md:col-start-2': i === 3  
                 }">
-            </user-card>
+                </user-card>
         </ng-container>
 
-        <div *ngIf="topUsers().length === 0" class="col-span-1 md:col-span-6 text-center text-gray-500">
-            <p>Cargando ranking...</p>
+        <div *ngIf="topUsers().length === 0" class="col-span-1 md:col-span-6 text-center py-10">
+            <div class="animate-pulse flex flex-col items-center">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+            </div>
         </div>
 
     </div>
