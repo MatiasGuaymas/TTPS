@@ -12,6 +12,7 @@ import { guestGuard } from './core/guards/guest.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { UserPublicProfileComponent } from './features/profile/user-public-profile/user-public-profile.component';
 import { ListadoMascotas } from './features/mascota/pages/listado/listado';
+import { RankingComponent } from './features/ranking/ranking.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -53,6 +54,10 @@ export const routes: Routes = [
         path: 'admin/users',
         component: AdminUsersComponent,
         canActivate: [adminGuard]
+    },
+    {
+        path: 'ranking',
+        component: RankingComponent
     },
     // Ruta 404 
     {
