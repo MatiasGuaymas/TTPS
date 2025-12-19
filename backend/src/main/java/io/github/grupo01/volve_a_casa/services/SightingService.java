@@ -7,6 +7,7 @@ import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.Sighting;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.repositories.SightingRepository;
+import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,16 +20,19 @@ import java.util.List;
 public class SightingService {
 
     private final SightingRepository sightingRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
     private final PetService petService;
     private final EmailService emailService;
     private final GeorefService georefService;
     private final TelegramNotificationService telegramNotificationService;
 
-    public SightingService(SightingRepository sightingRepository, UserService userService, PetService petService, 
+    public SightingService(SightingRepository sightingRepository, UserRepository userRepository, 
+                           UserService userService, PetService petService, 
                            EmailService emailService, GeorefService georefService, 
                            TelegramNotificationService telegramNotificationService) {
         this.sightingRepository = sightingRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
         this.petService = petService;
         this.emailService = emailService;
@@ -69,6 +73,10 @@ public class SightingService {
                 dto.date()
         );
         Sighting savedSighting = sightingRepository.save(newSighting);
+        
+        // Incrementar puntos del usuario que reportó el avistamiento
+        creator.setPoints(creator.getPoints() + 10);
+        userRepository.save(creator);
         
         // Enviar email al dueño de la mascota
         sendSightingNotificationEmail(savedSighting, creator);

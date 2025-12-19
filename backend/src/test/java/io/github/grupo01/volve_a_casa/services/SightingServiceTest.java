@@ -7,6 +7,7 @@ import io.github.grupo01.volve_a_casa.persistence.entities.Pet;
 import io.github.grupo01.volve_a_casa.persistence.entities.Sighting;
 import io.github.grupo01.volve_a_casa.persistence.entities.User;
 import io.github.grupo01.volve_a_casa.persistence.repositories.SightingRepository;
+import io.github.grupo01.volve_a_casa.persistence.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,9 @@ import static org.mockito.Mockito.*;
 class SightingServiceTest {
     @Mock
     SightingRepository sightingRepository;
+
+    @Mock
+    UserRepository userRepository;
 
     @Mock
     UserService userService;
@@ -76,6 +80,7 @@ class SightingServiceTest {
 
         doNothing().when(emailService).sendEmail(any(String.class), any(String.class), any(String.class));
         doNothing().when(telegramNotificationService).notificarAvistamiento(any(Sighting.class));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         SightingCreateDTO dto = new SightingCreateDTO(
                 petId,
@@ -96,9 +101,12 @@ class SightingServiceTest {
         );
 
         when(sightingRepository.save(any(Sighting.class))).thenReturn(sighting);
+        when(user.getPoints()).thenReturn(0);
         SightingResponseDTO response = sightingService.createSighting(user, dto);
         assertEquals(petId, response.petId());
         assertEquals(userId, response.reporterId());
         verify(sightingRepository, times(1)).save(any(Sighting.class));
+        verify(userRepository, times(1)).save(user);
+        verify(user, times(1)).setPoints(10);
     }
 }
