@@ -11,12 +11,18 @@
     --color-primary:oklch(94.5% 0.129 101.54);
     --color-navbar: oklch(84.5% 0.143 164.978);
     --color-text: #000000;
+    --color-button: oklch(75.6% 0.122 102.212);
+    --color-button-hover: oklch(65.6% 0.122 102.212);
+    --color-card-background: oklch(92.4% 0.12 95.746);
     /* DARK */
-    --color-background-dark: oklch(21% 0.034 264.665);
+    --color-background-dark: #2F4858;
     --color-primary-dark: oklch(13% 0.028 261.692);
     --color-border-dark: oklch(25.7% 0.09 281.288);
-    --color-navbar-dark: oklch(50.8% 0.118 165.612);
+    --color-navbar-dark: #205D6F;
     --color-text-dark: oklch(96.7% 0.003 264.542);
+    --color-button-dark: #009f87;
+    --color-button-hover-dark: #008a88;
+
 }
 
 body {

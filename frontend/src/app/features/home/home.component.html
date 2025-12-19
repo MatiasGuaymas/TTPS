@@ -1,32 +1,118 @@
 <main>
-  <div class="min-h-screen w-full bg-background dark:bg-background-dark flex flex-col items-center justify-center px-6 py-12">
-    
-    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-4 text-center">
-      {{ title }}
-    </h1>
-    
-    <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 text-center">
-      Plataforma colaborativa para búsqueda de mascotas perdidas
-    </p>
-    
-    <button class="inline-flex items-center mb-4 bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition">
-      <i class="fa-brands fa-telegram mr-2"></i>
-      <p>Telegram Bot</p>
-    </button>
-  
-    <carousel class="w-full max-w-4xl mt- mb-4"></carousel>
-    
-    <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8">
-      Ranking de rescatistas
-    </h2>
+    <div
+        class="min-h-screen w-full bg-background dark:bg-background-dark flex flex-col items-center justify-center px-6 py-12">
 
-    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 w-full max-w-6xl"> 
-      <user-card class="col-span-1 md:col-span-2 p-4">User 1</user-card>
-      <user-card class="col-span-1 md:col-span-2 p-4">User 2</user-card>
-      <user-card class="col-span-1 md:col-span-2 p-4">User 3</user-card>
-      <user-card class="col-span-1 md:col-start-2 md:col-span-2 p-4">User 4</user-card>
-      <user-card class="col-span-1 md:col-span-2 p-4">User 5</user-card>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-4 text-center">
+            {{ title }}
+        </h1>
+
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-12 text-center">
+            Plataforma colaborativa para búsqueda de mascotas perdidas
+        </p>
+
+        <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark ">
+            Mascotas Perdidas
+        </h2>
+
+        <ng-container *ngIf="loadingCarousel(); else carouselContent">
+            <div
+                class="w-full max-w-4xl h-[400px] md:h-[500px] mt-4 mb-8 bg-gray-200 dark:bg-gray-800 rounded-xl animate-pulse flex items-center justify-center">
+                <i class="fas fa-images text-6xl text-gray-300 dark:text-gray-700"></i>
+            </div>
+        </ng-container>
+
+        <ng-template #carouselContent>
+            <carousel *ngIf="carouselImages().length > 0" [images]="carouselImages()"
+                class="w-full max-w-4xl mt-4 mb-8">
+            </carousel>
+            <div *ngIf="!loadingCarousel() && carouselImages().length === 0"
+                class="w-full max-w-4xl h-64 mb-8 flex items-center justify-center text-gray-500">
+                <p>No hay mascotas perdidas reportadas recientemente.</p>
+            </div>
+        </ng-template>
+
+        <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8">
+            Avistamientos Recientes
+        </h2>
+
+        <div class="mt-4 flex flex-col items-center w-full mb-12">
+            <ng-container *ngIf="loadingMap(); else mapContent">
+                <div
+                    class="w-full max-w-6xl h-[500px] rounded-lg shadow-xl mx-auto bg-gray-200 dark:bg-gray-800 animate-pulse flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                    <div class="text-center">
+                        <i class="fas fa-map-marked-alt text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <p class="text-gray-400 dark:text-gray-600 font-medium">Cargando mapa...</p>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-template #mapContent>
+                <app-map
+                    class="w-full max-w-6xl h-[500px] block rounded-lg overflow-hidden shadow-xl mx-auto border border-gray-200 dark:border-gray-700"
+                    [markersList]="sightingsLocationList()" [readonly]="true" [showDefaultMarker]="false">
+                </app-map>
+            </ng-template>
+        </div>
+
+        <h2 class="text-xl sm:text-5xl font-extrabold tracking-tight text-text dark:text-text-dark mb-8 mt-4">
+            Ranking de rescatistas
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-6 w-full max-w-6xl mb-12">
+            <ng-container *ngIf="loadingRanking(); else rankingContent">
+                <ng-container *ngFor="let i of [1,2,3,4,5]; let idx = index">
+                    <div class="col-span-1 md:col-span-2 p-6 rounded-base shadow-2xl bg-white dark:bg-background-dark animate-pulse h-full border border-gray-100 dark:border-gray-800"
+                        [ngClass]="{'md:col-start-2': idx === 3}">
+                        <div class="flex flex-col items-center h-full">
+                            <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+                            <div
+                                class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full mb-6 border-4 border-gray-100 dark:border-gray-600">
+                            </div>
+                            <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6"></div>
+                            <div class="h-10 bg-gray-200 dark:bg-gray-700 rounded-base w-full mt-auto"></div>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+
+            <ng-template #rankingContent>
+                <ng-container *ngFor="let user of topUsers(); let i = index">
+                    <user-card [user]="user" [position]="i + 1" class="col-span-1 md:col-span-2 p-4" [ngClass]="{
+                        'md:col-start-2': i === 3  
+                    }">
+                    </user-card>
+                </ng-container>
+
+                <div *ngIf="topUsers().length === 0" class="col-span-1 md:col-span-6 text-center text-gray-500">
+                    <p>No se encontró información del ranking.</p>
+                </div>
+            </ng-template>
+        </div>
+
+        <div class="fixed bottom-8 right-8 z-50 group flex items-center justify-end">
+            <span class="absolute right-full mr-4 top-1/2 -translate-y-1/2
+                   px-4 py-2 
+                   bg-gray-800 dark:bg-gray-700 text-white text-sm font-bold
+                   rounded-lg shadow-xl
+                   opacity-0 group-hover:opacity-100
+                   transition-opacity duration-300
+                   whitespace-nowrap pointer-events-none">
+                Telegram Bot
+                <span
+                    class="absolute top-1/2 -right-2 -translate-y-1/2 border-8 border-transparent border-l-gray-800 dark:border-l-gray-700"></span>
+            </span>
+
+            <a href="https://t.me/VolveACasa_Bot" target="_blank" rel="noopener noreferrer" class="w-20 h-20 
+                bg-[#2AABEE] text-white 
+                flex items-center justify-center 
+                shadow-2xl shadow-blue-400/50 
+                hover:bg-[#229ED9] hover:shadow-blue-500/60
+                transition-all duration-300 
+                hover:-translate-y-2 hover:scale-110 
+                rounded-t-full rounded-bl-full rounded-br-none" aria-label="Telegram Bot">
+                <i class="fa-brands fa-telegram text-5xl mr-1 mb-2"></i>
+            </a>
+        </div>
     </div>
-
-  </div>
 </main>

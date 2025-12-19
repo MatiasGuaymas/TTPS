@@ -9,10 +9,10 @@
                 
                 <img 
                     [src]="img.src" 
-                    class="w-full h-full object-cover" 
+                    class="w-full h-full object-cover"
                     [alt]="img.alt"
-                    [class.grayscale]="$index !== activeIndex"
-                    [class.brightness-75]="$index !== activeIndex">
+                    [class.grayscale]="$index !== activeIndex()"
+                    [class.brightness-75]="$index !== activeIndex()">
             </div>
         }
     </div>
@@ -23,12 +23,11 @@
                 (click)="goTo($index)"
                 class="w-3 h-3 rounded-full transition-all duration-300"
                 
-                [class.bg-navbar]="$index === activeIndex" 
-                [class.scale-125]="$index === activeIndex"
+                [ngClass]="{
+                    'bg-text dark:bg-text-dark scale-125': $index === activeIndex(),
+                    'bg-gray-300 dark:bg-gray-600 hover:bg-text/50 dark:hover:bg-text-dark/50': $index !== activeIndex()
+                }"
 
-                [class.bg-gray-300]="$index !== activeIndex"
-                [class.hover:bg-navbar/50]="$index !== activeIndex"
-                
                 [attr.aria-label]="'Slide ' + ($index + 1)">
             </button>
         }

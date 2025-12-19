@@ -1,24 +1,23 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, AfterViewInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MascotaService } from '../../mascota.service';
-import { AvistamientoService } from '../../avistamiento.service';
+import { SightingService } from '../../../../core/services/sigthing.service';
+import { SightingCreate, SightingResponse } from '../../../../core/models/sighting.models';
 import { PetResponse, State, Size, TipoMascota } from '../../mascota.model';
 import { AlertService } from '../../../../core/services/alert.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { Map } from '../../../../shared/components/map/map';
+import { MapComponent } from '../../../../shared/components/map/map';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
 import { UserService } from '../../../../core/services/user.service';
 
 
-// TODO: Agregar foto a avistamiento -> no funciono :(
-
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,
-    imports: [CommonModule, RouterLink, ReactiveFormsModule, Map],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule, MapComponent],
     templateUrl: './detalle.component.html',
     styles: [`
         #map, #sightingMap {
@@ -30,7 +29,7 @@ import { UserService } from '../../../../core/services/user.service';
         }
     `]
 })
-export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DetalleComponent implements OnInit, AfterViewInit {
     userData = computed(() => this.userService.currentUser());
     isAdmin = computed(() => this.userData()?.role === 'ADMIN');
     isEditing = signal(false);
@@ -47,7 +46,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     private router = inject(Router);
     private fb = inject(FormBuilder);
     private mascotaService = inject(MascotaService);
-    private avistamientoService = inject(AvistamientoService);
+    private sightingService = inject(SightingService);
     private alertService = inject(AlertService);
     private authService = inject(AuthService);
     private userService = inject(UserService);
@@ -57,7 +56,8 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     currentPhotoIndex = signal(0);
     showSightingModal = signal(false);
     submittingSighting = signal(false);
-    photoPreview = signal<string | null>(null);
+    photoPreview = signal<string | ArrayBuffer | null>(null);
+    photoBase64 = signal<string | undefined>(undefined);
     maxDate = new Date().toISOString().split('T')[0];
     sightings = signal<SightingResponse[]>([]);
     loadingSightings = signal(false);
@@ -69,7 +69,8 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         // Inicializar formulario de avistamiento
         this.sightingForm = this.fb.group({
             date: [new Date().toISOString().split('T')[0], [Validators.required]],
-            comment: ['', [Validators.maxLength(200)]]
+            comment: ['', [Validators.maxLength(200)]],
+            photoFile: [null, Validators.required]
         });
 
         const iconRetinaUrl = 'assets/leaflet/marker-icon-2x.png';
@@ -120,7 +121,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
 
     loadSightings(petId: number): void {
         this.loadingSightings.set(true);
-        this.avistamientoService.getSightingsByPetId(petId).subscribe({
+        this.sightingService.getSightingsByPetId(petId).subscribe({
             next: (sightings) => {
                 this.sightings.set(sightings);
                 this.loadingSightings.set(false);
@@ -134,21 +135,6 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.loadingSightings.set(false);
             }
         });
-    }
-
-    nextPhoto(): void {
-        const pet = this.pet();
-        if (pet && pet.photosBase64.length > 1) {
-            this.currentPhotoIndex.set((this.currentPhotoIndex() + 1) % pet.photosBase64.length);
-        }
-    }
-
-    prevPhoto(): void {
-        const pet = this.pet();
-        if (pet && pet.photosBase64.length > 1) {
-            const newIndex = this.currentPhotoIndex() - 1;
-            this.currentPhotoIndex.set(newIndex < 0 ? pet.photosBase64.length - 1 : newIndex);
-        }
     }
 
     getEstadoLabel(estado: State): string {
@@ -205,7 +191,7 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
         this.sightingForm.reset({
             date: new Date().toISOString().split('T')[0],
             comment: '',
-            photo: null
+            photoFile: null
         });
         this.selectedSightingLocation.set(null);
 
@@ -242,12 +228,18 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             }
 
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64 = e.target?.result as string;
-                this.photoPreview.set(base64);
-                this.sightingForm.patchValue({ photo: base64 });
-            };
             reader.readAsDataURL(file);
+            reader.onload = e => {
+                const base64String = (reader.result as string).split(',')[1];
+                this.photoBase64.set(base64String);
+                this.photoPreview.set(reader.result);
+            };
+            reader.onerror = (error) => {
+                console.error('Error al convertir a Base64: ', error);
+                this.photoBase64.set(undefined);
+                this.photoPreview.set(null);
+                this.alertService.error('Error', 'No se pudo procesar la imagen seleccionada');
+            };
         }
     }
 
@@ -273,10 +265,11 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
             latitude: location.latitude,
             longitude: location.longitude,
             date: this.sightingForm.value.date,
+            photoBase64: this.photoBase64(),
             comment: this.sightingForm.value.comment || ''
         };
 
-        this.avistamientoService.createSighting(sightingData).subscribe({
+        this.sightingService.createSighting(sightingData).subscribe({
             next: () => {
                 this.submittingSighting.set(false);
                 this.alertService.success('Éxito', 'Avistamiento reportado correctamente');
@@ -301,6 +294,8 @@ export class DetalleComponent implements OnInit, AfterViewInit, OnDestroy {
     goToPetDelete(petId: number): void {
         this.router.navigate(['/eliminar-mascota', petId]);
     }
-    ngOnDestroy(): void {
+   
+    decodePhoto(photoBase64: string): string {
+        return `data:image/jpeg;base64,${photoBase64}`;
     }
 }

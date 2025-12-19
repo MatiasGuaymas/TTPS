@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
 import { Observable, throwError } from 'rxjs';
@@ -17,6 +17,7 @@ export class UserPublicProfileComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private userService = inject(UserService);
+    private location = inject(Location);
 
     userProfile$!: Observable<UserPublicProfile>;
     error: string | null = null;
@@ -43,6 +44,6 @@ export class UserPublicProfileComponent implements OnInit {
     }
 
     goBack() {
-        this.router.navigate(['/home']);
+        this.location.back();
     }
 }

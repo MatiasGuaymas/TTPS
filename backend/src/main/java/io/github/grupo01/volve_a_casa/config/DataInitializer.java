@@ -20,7 +20,7 @@ import java.util.Base64;
 public class DataInitializer implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
-    
+
     private final UserRepository userRepository;
     private final PetRepository petRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private User initializeAdminUser() {
         String adminEmail = "admin@volveacasa.com";
-        
+
         if (userRepository.existsByEmail(adminEmail)) {
             logger.info("Usuario administrador ya existe: {}", adminEmail);
             return userRepository.findByEmail(adminEmail).orElse(null);
@@ -50,7 +50,7 @@ public class DataInitializer implements CommandLineRunner {
 
         try {
             String hashedPassword = passwordEncoder.encode("admin123");
-            
+
             User admin = new User(
                     "Administrador",
                     "Sistema",
@@ -62,15 +62,15 @@ public class DataInitializer implements CommandLineRunner {
                     -34.9205f,  // Latitud de La Plata
                     -57.9536f   // Longitud de La Plata
             );
-            
+
             admin.setRole(User.Role.ADMIN);
-            
+
             User savedAdmin = userRepository.save(admin);
-            
+
             logger.info("Usuario administrador creado exitosamente");
-            
+
             return savedAdmin;
-            
+
         } catch (Exception e) {
             logger.error("Error al crear usuario administrador: {}", e.getMessage());
             return null;
@@ -105,9 +105,9 @@ public class DataInitializer implements CommandLineRunner {
             );
 
             petRepository.save(samplePet);
-            
+
             logger.info("Mascota de ejemplo creada exitosamente: {}", samplePet.getName());
-            
+
         } catch (Exception e) {
             logger.error("Error al crear mascota de ejemplo: {}", e.getMessage());
         }

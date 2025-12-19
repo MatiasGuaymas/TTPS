@@ -1,7 +1,10 @@
 package io.github.grupo01.volve_a_casa.services;
 
+import io.github.grupo01.volve_a_casa.controllers.dto.openstreet.GeorefResponse;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetCreateDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetDetailDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetResponseDTO;
+import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetSummaryDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.pet.PetUpdateDTO;
 import io.github.grupo01.volve_a_casa.controllers.dto.sighting.SightingResponseDTO;
 import io.github.grupo01.volve_a_casa.persistence.Specifications;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -21,9 +25,11 @@ import java.util.List;
 @Service
 public class PetService {
     private final PetRepository petRepository;
+    private final GeorefService georefService;
 
-    public PetService(PetRepository petRepository) {
+    public PetService(PetRepository petRepository, GeorefService georefService) {
         this.petRepository = petRepository;
+        this.georefService = georefService;
     }
 
     // TODO: Test de integracion
@@ -104,5 +110,48 @@ public class PetService {
         return pet.getSightings().stream()
                 .map(SightingResponseDTO::fromSighting)
                 .toList();
+    }
+
+    public List<PetSummaryDTO> getAllLostPetsSummary() {
+        return petRepository.findAllByStateInOrderByLostDate(Pet.State.PERDIDO_PROPIO, Pet.State.PERDIDO_AJENO)
+                .stream()
+                .map(PetSummaryDTO::fromPet)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PetDetailDTO getPetDetailForTelegram(Long petId) {
+        Pet pet = this.findById(petId);
+        
+        // Obtener descripción de ubicación usando GeorefService
+        String locationDescription = null;
+        try {
+            GeorefResponse georef = georefService.getUbication(
+                pet.getCoordinates().getLatitude(),
+                pet.getCoordinates().getLongitude()
+            );
+            
+            if (georef != null && georef.ubicacion() != null) {
+                var ubicacion = georef.ubicacion();
+                StringBuilder location = new StringBuilder();
+                
+                if (ubicacion.municipio() != null && ubicacion.municipio().nombre() != null) {
+                    location.append(ubicacion.municipio().nombre());
+                }
+                
+                if (ubicacion.provincia() != null && ubicacion.provincia().nombre() != null) {
+                    if (location.length() > 0) {
+                        location.append(", ");
+                    }
+                    location.append(ubicacion.provincia().nombre());
+                }
+                
+                locationDescription = location.toString();
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener ubicación para mascota " + petId + ": " + e.getMessage());
+        }
+        
+        return PetDetailDTO.fromPet(pet, locationDescription);
     }
 }
