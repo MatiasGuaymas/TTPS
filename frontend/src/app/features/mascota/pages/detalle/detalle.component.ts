@@ -12,8 +12,6 @@ import { MapComponent } from '../../../../shared/components/map/map';
 import * as L from 'leaflet';
 import { initFlowbite } from 'flowbite';
 
-// TODO: Agregar foto a avistamiento -> no funciono :(
-
 @Component({
     selector: 'app-pet-detalle',
     standalone: true,
@@ -122,21 +120,6 @@ export class DetalleComponent implements OnInit, AfterViewInit {
                 this.loadingSightings.set(false);
             }
         });
-    }
-
-    nextPhoto(): void {
-        const pet = this.pet();
-        if (pet && pet.photosBase64.length > 1) {
-            this.currentPhotoIndex.set((this.currentPhotoIndex() + 1) % pet.photosBase64.length);
-        }
-    }
-
-    prevPhoto(): void {
-        const pet = this.pet();
-        if (pet && pet.photosBase64.length > 1) {
-            const newIndex = this.currentPhotoIndex() - 1;
-            this.currentPhotoIndex.set(newIndex < 0 ? pet.photosBase64.length - 1 : newIndex);
-        }
     }
 
     getEstadoLabel(estado: State): string {
