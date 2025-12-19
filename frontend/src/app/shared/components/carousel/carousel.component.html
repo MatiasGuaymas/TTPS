@@ -1,19 +1,30 @@
 <div class="relative w-full h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden">
     <div class="relative w-full h-full flex items-center justify-center">
-
         @for (img of images; track $index) {
             <div
                 class="absolute transition-all duration-500 ease-out rounded-xl overflow-hidden shadow-2xl cursor-pointer"
                 [class]="getCardClasses($index)"
                 (click)="goTo($index)">
 
-                <img
-                    (click)="fireImageClick($index)"
-                    [src]="img.src"
-                    class="w-full h-full object-cover"
-                    [alt]="img.alt"
-                    [class.grayscale]="$index !== activeIndex()"
-                    [class.brightness-75]="$index !== activeIndex()">
+                <div class="relative w-full h-full">
+
+                    <img
+                        (click)="fireImageClick($index)"
+                        [src]="img.src"
+                        class="w-full h-full object-cover"
+                        [alt]="img.alt"
+                        [class.grayscale]="$index !== activeIndex()"
+                        [class.brightness-75]="$index !== activeIndex()">
+
+                    <div class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+                        <h3 class="text-white font-bold text-lg truncate"
+                            [class.opacity-50]="$index !== activeIndex()"
+                            [class.opacity-100]="$index === activeIndex()">
+                            {{ img.alt }}
+                        </h3>
+                    </div>
+
+                </div>
             </div>
         }
     </div>

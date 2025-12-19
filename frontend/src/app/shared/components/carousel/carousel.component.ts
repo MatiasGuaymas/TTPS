@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, signal, Input, OnChanges, SimpleChanges, EventEmitter, Output } from "@angular/core";
+import { Component, OnDestroy, OnInit, signal, Input, OnChanges, SimpleChanges, EventEmitter, Output, computed } from "@angular/core";
 import { NgClass } from '@angular/common';
 
 export interface CarouselImage {
@@ -16,6 +16,7 @@ export class CarouselComponent implements OnInit, OnDestroy, OnChanges {
     intervalId: any;
 
     @Input() images: CarouselImage[] = [];
+
     @Output() imageClick = new EventEmitter<number>();
 
     ngOnInit() {
