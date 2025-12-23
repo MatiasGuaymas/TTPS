@@ -4,11 +4,10 @@ Sistema web integral para la gestión de mascotas perdidas y encontradas. Permit
 
 ## 👥 Colaboradores
 
-- [Lautaro Budini](https://github.com/lautibudini)
+- [Maria Luisa Britez](https://github.com/britezlmaria)
+- [Vicente Garcia Marti](https://github.com/vicen621)
 - [Matias Guaymas](https://github.com/MatiasGuaymas)
-- [Francisco Lima](https://github.com/franciscolima05)
-- [Leo Luna](https://github.com/Leonardo-Luna)
-- [Santiago Marcos](https://github.com/santi440)
+- [Matheo Lamiral](https://github.com/MatheoLamiral)
 
 ## 💻 Lenguajes de Programación
 
