@@ -72,7 +72,7 @@ Sistema web integral para la gestión de mascotas perdidas y encontradas. Permit
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/Vicen621-Facultad/volve-a-casa.git
+git clone https://github.com/MatiasGuaymas/TTPS
 cd volve-a-casa
 ```
 
@@ -272,11 +272,6 @@ Este usuario se crea a través del componente `DataInitializer` y tiene todos lo
 - ✅ Ranking de usuarios por colaboración
 - ✅ Panel de administración
 - ✅ Guards y protección de rutas
-
-### Inteligencia Artificial
-- ✅ Análisis con GROQ API
-- ✅ Comparación de características de mascotas
-- ✅ Sugerencias automáticas de coincidencias
 
 ## 🔐 Seguridad
 
