@@ -91,8 +91,8 @@ PGADMIN_EMAIL=test@gmail.com
 PGADMIN_PASSWORD=admin
 
 # Configuración de Email (Gmail SMTP)
-MAIL_USERNAME=volveacasattps@gmail.com
-MAIL_PASSWORD=wcvt vuvk gaok dudp
+MAIL_USERNAME=tu_email@gmail.com
+MAIL_PASSWORD=tu_contraseña_de_aplicacion
 
 # Bot de Telegram
 TELEGRAM_BOT_TOKEN=tu-telegram-bot-token
